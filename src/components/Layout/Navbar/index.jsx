@@ -1,5 +1,7 @@
-import React from "react";
 import "./Navbar.css"
+
+import { Link } from 'react-router-dom';
+
 export default function Navbar() {
     return (
         <nav className="navbar">
@@ -16,8 +18,13 @@ export default function Navbar() {
                 </ul>
             </div>
             <div className="navbar-right">
-                <button className="btn-outline">Đăng nhập</button>
-                <button className="btn-primary">Đăng ký</button>
+                <Link to="/login">
+                    <button className="btn-outline">Đăng nhập</button>
+                </Link>
+                <Link to="/register">
+                    <button className="btn-primary">Đăng ký</button>
+                </Link>
+
             </div>
         </nav>
     );

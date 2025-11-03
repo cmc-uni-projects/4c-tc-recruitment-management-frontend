@@ -27,9 +27,9 @@ export default function LoginSection() {
           <div className="login-section">
                {/* Banner */}
                <div className="login-banner">
-                    <img src="/logo.png" alt="TopCV Logo" className="logo" />
-                    <h1>TopCV</h1>
-                    <p>TopCV - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam</p>
+                    <img src="/logo.png" alt="Logo" className="logo" />
+                    <h1>SmartHire</h1>
+                    <p>SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam</p>
                </div>
                {/* Form */}
                <div className="login-box">
