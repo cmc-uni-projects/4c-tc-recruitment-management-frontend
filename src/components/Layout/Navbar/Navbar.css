@@ -1,0 +1,71 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 60px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eaeaea;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Logo */
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.logo .top {
+    color: #333;
+}
+
+.logo .cv {
+    color: #0f9d58;
+    /* Xanh lá đặc trưng của TopCV */
+}
+
+/* Menu */
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin-left: 40px;
+    gap: 24px;
+}
+
+.nav-links li {
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+}
+
+.nav-links li:hover {
+    color: #0f9d58;
+}
+
+/* Nút bên phải */
+.navbar-right button {
+    margin-left: 12px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-outline {
+    border: 1px solid #0f9d58;
+    color: #0f9d58;
+    background: none;
+}
+
+.btn-outline:hover {
+    background: #e6f5ec;
+}
+
+.btn-primary {
+    background-color: #0f9d58;
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0c864a;
+}
