@@ -12,6 +12,8 @@
 .logo {
     font-size: 28px;
     font-weight: 700;
+    margin-bottom: -38px;
+    margin-top: 10px;
 }
 
 .logo .top {
@@ -27,7 +29,7 @@
 .nav-links {
     display: flex;
     list-style: none;
-    margin-left: 40px;
+    margin-left: 120px;
     gap: 24px;
 }
 
