@@ -45,7 +45,7 @@ export default function LoginSection() {
                               <input type="password"  name="password" onChange={loginForm.handleChange} placeholder="Mật khẩu" required />
                          </div>
                          <div className="form-options">
-                              <a href="#">Quên mật khẩu?</a>
+                              <a href="/request-reset">Quên mật khẩu?</a>
                          </div>
                          <button type="submit" className="btn-login">
                               Đăng nhập
