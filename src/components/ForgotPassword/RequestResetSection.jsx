@@ -4,6 +4,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import { requestPasswordReset } from "../../services/auth.services";
+import { ToastContainer, toast } from "react-toastify";
+import Swal from "sweetalert2";
+import "react-toastify/dist/ReactToastify.css";
 import "./ForgotPassword.css";
 
 const validationSchema = Yup.object({
@@ -11,8 +14,6 @@ const validationSchema = Yup.object({
 });
 
 export default function RequestResetSection() {
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -21,14 +22,22 @@ export default function RequestResetSection() {
     validationSchema,
     onSubmit: async (values) => {
       setLoading(true);
-      setMessage("");
-      setError("");
       try {
         await requestPasswordReset(values.email);
-        setMessage("Đã gửi liên kết đặt lại mật khẩu đến email của bạn!");
+        Swal.fire({
+          icon: "success",
+          title: "Thành công",
+          text: "Đã gửi liên kết đặt lại mật khẩu đến email của bạn!",
+          timer: 3000,
+          showConfirmButton: false,
+        });
         setTimeout(() => navigate("/login"), 4000);
       } catch (err) {
-        setError(err.response?.data || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: err.response?.data || "Đã có lỗi xảy ra. Vui lòng thử lại.",
+        });
       } finally {
         setLoading(false);
       }
@@ -38,7 +47,7 @@ export default function RequestResetSection() {
   return (
     <div className="login-section">
       <div className="login-banner">
-        <img src="/logo.png" alt="Logo" className="logo" />
+        /logo.png
         <h1>SmartHire</h1>
         <p>SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam</p>
       </div>
@@ -55,14 +64,12 @@ export default function RequestResetSection() {
               name="email"
               placeholder="Nhập email của bạn"
               {...formik.getFieldProps("email")}
+              className="email-input"
             />
             {formik.touched.email && formik.errors.email ? (
               <div className="error-text">{formik.errors.email}</div>
             ) : null}
           </div>
-
-          {message && <div className="success-text">{message}</div>}
-          {error && <div className="error-text">{error}</div>}
 
           <button type="submit" className="btn-login" disabled={loading}>
             {loading ? "Đang gửi..." : "Gửi liên kết"}
@@ -80,6 +87,8 @@ export default function RequestResetSection() {
         </p>
         <p>© 2016. All Rights Reserved. TopCV Vietnam JSC.</p>
       </footer>
+
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
