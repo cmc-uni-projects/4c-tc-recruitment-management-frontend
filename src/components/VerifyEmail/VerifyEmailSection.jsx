@@ -63,6 +63,7 @@ export default function VerifyEmailSection() {
           </>
         )}
       </div>
+      
 
       <footer className="login-footer">
         <p>© 2016. All Rights Reserved. TopCV Vietnam JSC.</p>
