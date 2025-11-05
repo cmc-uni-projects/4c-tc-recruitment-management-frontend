@@ -1,3 +1,5 @@
+
+
 import { useFormik } from "formik";
 import "./RegisterSection.css";
 import LoginSocial from "../../components/Login/LoginSocial";
@@ -5,7 +7,7 @@ import * as Yup from "yup";
 import { useState } from "react";
 import { register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
 
 const formRegisterSchema = Yup.object({
   fullname: Yup.string().required("Vui lòng nhập họ tên"),
@@ -21,36 +23,47 @@ const formRegisterSchema = Yup.object({
 });
 
 export default function RegisterSection() {
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const RegisterForm = useFormik({
     initialValues: {
       fullname: "",
       email: "",
+      phone: "",
       password: "",
       verifypassword: "",
     },
     validationSchema: formRegisterSchema,
     onSubmit: async (values) => {
+      setLoading(true);
       try {
-        setError("");
-        setMessage("");
         const payload = {
-          fullName: values.fullname, // ⚡ tên field đúng theo DTO
+          fullName: values.fullname,
           email: values.email,
           phone: values.phone,
-          password: values.password, // ⚡ phải là 'password' chứ không phải 'matKhau'
+          password: values.password,
         };
         const response = await register(payload);
         console.log("✅ Server response:", response.data);
-        setMessage(
-          "Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản."
-        );
+
+        Swal.fire({
+          icon: "success",
+          title: "Đăng ký thành công!",
+          text: "Vui lòng kiểm tra email để xác minh tài khoản.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+
         setTimeout(() => navigate("/login"), 3000);
       } catch (err) {
-        setError(err.response?.data || "Đăng ký thất bại. Vui lòng thử lại.");
+        Swal.fire({
+          icon: "error",
+          title: "Đăng ký thất bại",
+          text: err.response?.data || "Vui lòng thử lại sau.",
+        });
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -59,13 +72,13 @@ export default function RegisterSection() {
     <div className="login-section">
       {/* Banner */}
       <div className="login-banner">
-
         <h1>SmartHire</h1>
         <p>
           SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại
           Việt Nam
         </p>
       </div>
+
       {/* Form */}
       <div className="login-box">
         <h2>Chào mừng bạn đến với SmartHire</h2>
@@ -73,6 +86,7 @@ export default function RegisterSection() {
           Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý
           tưởng
         </p>
+
         <form onSubmit={RegisterForm.handleSubmit} className="register-form">
           <div className="form-group">
             <label>Họ và Tên</label>
@@ -101,6 +115,7 @@ export default function RegisterSection() {
               <div className="error-text">{RegisterForm.errors.email}</div>
             )}
           </div>
+
           <div className="form-group">
             <label>Số điện thoại</label>
             <input
@@ -146,13 +161,11 @@ export default function RegisterSection() {
               )}
           </div>
 
-          {message && <div className="success-text">{message}</div>}
-          {error && <div className="error-text">{error}</div>}
-
-          <button type="submit" className="btn-login">
-            Đăng kí
+          <button type="submit" className="btn-login" disabled={loading}>
+            {loading ? "Đang đăng ký..." : "Đăng ký"}
           </button>
         </form>
+
         <LoginSocial />
         <p className="register-text">
           Bạn đã có tài khoản? <a href="/login">Đăng Nhập ngay</a>
