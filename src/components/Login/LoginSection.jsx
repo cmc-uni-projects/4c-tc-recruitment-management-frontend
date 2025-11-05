@@ -4,6 +4,10 @@ import LoginSocial from "./LoginSocial";
 import * as Yup from "yup";
 import { login } from "../../services/auth.services";   // ✅ Import login API
 import { useNavigate } from "react-router-dom";         // ✅ Điều hướng
+ import * as Yup from 'yup';
+ import bannerImg from '../../assets/logo.jpg';
+ 
+
 
 const formLoginSchema = Yup.object({
   password: Yup.string().required("Required"),
