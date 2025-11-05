@@ -1,6 +1,18 @@
 
 import "./HomeSection.css";
-import iconSales from "../../assets/icons/bat-dong-san.png";
+import iconSales from "../../assets/icons/kinh-doanh-ban-hang.png";
+import iconIT from "../../assets/icons/cong-nghe-thong-tin.png";
+import iconcustomer from "../../assets/icons/dich-vu-khach-hang.png";
+import iconhr from "../../assets/icons/hanh-chinh-van-phong.png";
+import iconrealestate from "../../assets/icons/bat-dong-san.png";
+import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
+import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
+import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
+
+
+
+
+
 const brands = [
   { name: "Bee Logistics Corporation", jobs: 28, category: "Logistics", logo: "/bee.png" },
   { name: "Công ty TNHH Thương mại - Dịch vụ Điện Mạnh", jobs: 4, category: "Điện lạnh", logo: "/mpe.png" },
@@ -13,13 +25,13 @@ const brands = [
 
 const industries = [
   { name: "Kinh doanh - Bán hàng", jobs: "11.254 việc làm", icon: iconSales },
-  { name: "Marketing - PR - Quảng cáo", jobs: "7.808 việc làm", icon: "/icons/marketing.png" },
-  { name: "Chăm sóc khách hàng", jobs: "2.678 việc làm", icon: "/icons/customer.png" },
-  { name: "Nhân sự - Hành chính", jobs: "3.099 việc làm", icon: "/icons/hr.png" },
-  { name: "Công nghệ Thông tin", jobs: "2.519 việc làm", icon: "/icons/it.png" },
-  { name: "Tài chính - Ngân hàng", jobs: "1.388 việc làm", icon: "/icons/finance.png" },
-  { name: "Bất động sản", jobs: "435 việc làm", icon: "/icons/realestate.png" },
-  { name: "Kế toán - Kiểm toán - Thuế", jobs: "5.841 việc làm", icon: "/icons/accounting.png" },
+  { name: "Marketing - PR - Quảng cáo", jobs: "7.808 việc làm", icon: iconmarketing },
+  { name: "Chăm sóc khách hàng", jobs: "2.678 việc làm", icon: iconcustomer },
+  { name: "Nhân sự - Hành chính", jobs: "3.099 việc làm", icon: iconhr },
+  { name: "Công nghệ Thông tin", jobs: "2.519 việc làm", icon: iconIT },
+  { name: "Tài chính - Ngân hàng", jobs: "1.388 việc làm", icon: iconfinance },
+  { name: "Bất động sản", jobs: "435 việc làm", icon: iconrealestate },
+  { name: "Kế toán - Kiểm toán - Thuế", jobs: "5.841 việc làm", icon: iconaccounting },
 ];
 
 
