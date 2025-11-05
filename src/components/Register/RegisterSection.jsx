@@ -6,6 +6,7 @@ import { useState } from "react";
 import { register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 
+
 const formRegisterSchema = Yup.object({
   fullname: Yup.string().required("Vui lòng nhập họ tên"),
   email: Yup.string()
@@ -58,7 +59,7 @@ export default function RegisterSection() {
     <div className="login-section">
       {/* Banner */}
       <div className="login-banner">
-        <img src="/logo.png" alt="Logo" className="logo" />
+
         <h1>SmartHire</h1>
         <p>
           SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại

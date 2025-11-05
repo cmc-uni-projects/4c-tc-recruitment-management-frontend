@@ -2,6 +2,9 @@ import { useFormik } from "formik";
 import "./LoginSection.css";
 import LoginSocial from "./LoginSocial";
  import * as Yup from 'yup';
+ import bannerImg from '../../assets/logo.jpg';
+ 
+
 
 const formLoginSchema =  Yup.object({
        password: Yup.string()
@@ -27,7 +30,7 @@ export default function LoginSection() {
           <div className="login-section">
                {/* Banner */}
                <div className="login-banner">
-                    <img src="/logo.png" alt="Logo" className="logo" />
+                   
                     <h1>SmartHire</h1>
                     <p>SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam</p>
                </div>
