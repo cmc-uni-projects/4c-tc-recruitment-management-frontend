@@ -1,53 +1,31 @@
-// src/services/api.js
-import axios from "axios";
+// src/services/auth.services.js
+import api from "../configs/axios.config.js";
 
-const API_BASE = "http://localhost:8080"; // ĐÚNG với backend
+// 🔹 Đăng ký tài khoản
+export const register = (data) => api.post("/users/register", data);
 
-const api = axios.create({
-  baseURL: API_BASE,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// 🔹 Đăng nhập (trả về token)
+export const login = (email, password) =>
+  api.post("/users/login", { email, password });
 
-// === INTERCEPTOR: TỰ ĐỘNG THÊM TOKEN ===
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// === INTERCEPTOR: XỬ LÝ LỖI CHUNG ===
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (!error.response) {
-      alert("Không kết nối được server!");
-    } else if (error.response.status === 401) {
-      alert("Phiên đăng nhập hết hạn!");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
-
-// === CÁC HÀM AUTH & QUÊN MẬT KHẨU ===
+// 🔹 Yêu cầu đặt lại mật khẩu (gửi email reset)
 export const requestPasswordReset = (email) =>
   api.post("/users/request-reset", { email });
 
+// 🔹 Xác thực token đặt lại mật khẩu
 export const validateResetToken = (token) =>
   api.get("/users/validate-reset-token", { params: { token } });
 
+// 🔹 Đặt lại mật khẩu
 export const resetPassword = (token, newPassword) =>
   api.post("/users/reset-password", { token, newPassword });
 
-// Thêm các hàm khác: login, register, logout,...
-// export const login = (email, password) => api.post("/auth/login", { email, password });
+// 🔹 Xác minh tài khoản qua email
+export const verifyEmail = (token) =>
+  api.get("/users/verify", { params: { token } });
 
-export default api;
+// 🔹 Đăng xuất
+export const logout = () => {
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+};
