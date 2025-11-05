@@ -31,7 +31,7 @@ export default function LoginSection() {
         alert("Đăng nhập thành công!");
 
         // ✅ Chuyển hướng
-        navigate("/home");
+        navigate("/");
       } catch (error) {
         alert("Sai email hoặc mật khẩu!");
       }
