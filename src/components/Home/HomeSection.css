@@ -16,9 +16,10 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border-radius: 50px; /* Bo tròn lớn */
+  border-radius: 50px;
+  /* Bo tròn lớn */
   padding: 8px 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 800px;
   margin: 20px auto;
@@ -26,7 +27,7 @@
 
 
 
-  
+
 .search-bar input {
   flex: 1;
   border: none;
@@ -57,7 +58,8 @@
   background: #00b14f;
   color: #fff;
   border: none;
-  border-radius: 50px; /* Bo tròn hoàn toàn */
+  border-radius: 50px;
+  /* Bo tròn hoàn toàn */
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -82,12 +84,45 @@
   text-align: left;
 }
 
-/* Brand Section */
+
+/* ===== Brand Section ===== */
 .brand-section {
   padding: 30px 40px;
   background: #f9f9f9;
 }
 
+/* Header */
+.brand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #f8e1b4, #d4a373);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.brand-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.brand-header p {
+  font-size: 14px;
+  color: #555;
+}
+
+.btn-pro {
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Tabs */
 .tabs {
   display: flex;
   gap: 10px;
@@ -96,29 +131,36 @@
 
 .tabs button {
   padding: 8px 16px;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: none;
+  background: #f3f4f6;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 20px;
+  font-weight: 600;
 }
 
 .tabs .active {
-  background: #00b14f;
+  background: #f59e0b;
   color: #fff;
 }
 
+/* Grid giống TopCV */
 .brand-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
 .brand-card {
   background: #fff;
-  border: 1px solid #eaeaea;
+  border: 1px solid #f0e68c;
+  /* viền vàng nhạt */
+  border-radius: 12px;
   padding: 16px;
-  border-radius: 8px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.3s ease;
 }
 
@@ -126,7 +168,114 @@
   transform: translateY(-5px);
 }
 
+.brand-card.highlight {
+  grid-row: span 2;
+  background: linear-gradient(180deg, #f8e1b4, #d4a373);
+  color: #fff;
+}
+
 .brand-card img {
-  height: 50px;
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
   margin-bottom: 10px;
+}
+
+.brand-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.brand-card p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.brand-card span {
+  font-size: 13px;
+  color: #374151;
+}
+
+.btn-pro-small {
+  margin-top: 8px;
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+/* ✅ INDUSTRY SECTION - Top ngành nghề nổi bật */
+.industry-section {
+  background-color: #f9f9f9;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.industry-header h2 {
+  color: #006a5b; /* xanh đậm giống TopCV */
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.industry-header p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.industry-header a {
+  color: #00b14f; /* màu xanh lá link */
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.industry-header a:hover {
+  text-decoration: underline;
+}
+
+/* ✅ Lưới hiển thị ngành nghề */
+.industry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ✅ Card mỗi ngành */
+.industry-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 25px 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.industry-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.industry-card img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+.industry-card h3 {
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.industry-card span {
+  color: #00b14f;
+  font-weight: 500;
+  font-size: 14px;
 }
