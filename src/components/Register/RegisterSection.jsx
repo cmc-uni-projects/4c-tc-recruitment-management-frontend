@@ -154,9 +154,13 @@ export default function RegisterSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
               >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
+                {showPassword ? (
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                ) : (
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                )}
               </button>
             </div>
             {RegisterForm.touched.password && RegisterForm.errors.password && (
@@ -177,9 +181,13 @@ export default function RegisterSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowVerifyPassword(!showVerifyPassword)}
+                onClick={() => setShowVerifyPassword(!showVerifyPassword)} // Toggle showVerifyPassword state
               >
-                {showVerifyPassword ? "👁️" : "👁️‍🗨️"}
+                {showVerifyPassword ? (
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                ) : (
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                )}
               </button>
             </div>
             {RegisterForm.touched.verifypassword && RegisterForm.errors.verifypassword && (
