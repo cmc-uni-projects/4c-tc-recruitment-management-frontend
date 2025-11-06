@@ -1,4 +1,3 @@
-
 import { useFormik } from "formik";
 import "./LoginSection.css";
 import LoginSocial from "./LoginSocial";
@@ -17,6 +16,9 @@ export default function LoginSection() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
+  // ✅ State hiển thị lỗi đỏ
+  const [errorMessage, setErrorMessage] = useState("");
+
   const loginForm = useFormik({
     initialValues: {
       email: "",
@@ -26,12 +28,18 @@ export default function LoginSection() {
     onSubmit: async (values) => {
       try {
         const res = await login(values.email, values.password);
+
         localStorage.setItem("token", res.data.accessToken);
         localStorage.setItem("refreshToken", res.data.refreshToken);
+
+        // ✅ Xóa lỗi nếu có
+        setErrorMessage("");
+
         alert("Đăng nhập thành công!");
         navigate("/");
       } catch {
-        alert("Sai email hoặc mật khẩu!");
+        // ❌ Không alert nữa — hiển thị dưới form
+        setErrorMessage("Sai email hoặc mật khẩu!");
       }
     },
   });
@@ -47,10 +55,8 @@ export default function LoginSection() {
         </p>
       </div>
 
-
       {/* Form */}
-      
-<div className="login-box">
+      <div className="login-box">
         <h2>Chào mừng bạn đã quay trở lại</h2>
         <p>
           Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
@@ -98,6 +104,11 @@ export default function LoginSection() {
             Đăng nhập
           </button>
         </form>
+
+        {/* ✅ Hiển thị lỗi màu đỏ dưới nút Đăng nhập */}
+        {errorMessage && (
+          <p style={{ color: "red", marginTop: "10px" }}>{errorMessage}</p>
+        )}
 
         <LoginSocial />
 
