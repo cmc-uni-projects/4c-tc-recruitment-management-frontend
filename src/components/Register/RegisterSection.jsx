@@ -34,6 +34,7 @@ export default function RegisterSection() {
       phone: "",
       password: "",
       verifypassword: "",
+      role: "CANDIDATE", // ✅ bỏ mặc định role
     },
     validationSchema: formRegisterSchema,
     onSubmit: async (values) => {
