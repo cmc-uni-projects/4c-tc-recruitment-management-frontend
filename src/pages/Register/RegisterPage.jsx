@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import RegisterPopup from "../../components/Register/RegisterPopup";
 import RegisterSection from "../../components/Register/RegisterSection";
+import RegisterHRSection from "../../components/Register/RegisterHRSection";
 
 export default function RegisterPage() {
   const [role, setRole] = useState(null);
@@ -18,7 +19,7 @@ export default function RegisterPage() {
   return (
     <>
       {role === "CANDIDATE" && <RegisterSection onBack={handleBack} />}
-      {role === "HR" && <RegisterSectionAdmin onBack={handleBack} />}
+      {role === "HR" && <RegisterHRSection onBack={handleBack} />}
     </>
   );
 }

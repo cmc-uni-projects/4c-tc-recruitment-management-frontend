@@ -1,0 +1,170 @@
+/* ===== Tổng thể ===== */
+.register-hr-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+/* ===== Banner ===== */
+.register-hr-banner {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-hr-banner .logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.register-hr-banner h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.register-hr-banner p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* ===== Form ===== */
+.register-hr-box {
+    background: #fff;
+    color: #333;
+    width: 400px;
+    border-radius: 8px;
+    padding: 40px 35px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.register-hr-box h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.register-hr-box p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* ===== Form fields ===== */
+.register-hr-form .form-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.register-hr-form label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.register-hr-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border 0.2s ease;
+    max-width: 380px;
+    margin: 0 auto;
+    display: block;
+}
+
+.register-hr-form input:focus {
+    border-color: #009f60;
+    outline: none;
+}
+
+/* ===== Options ===== */
+.form-options {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.form-options a {
+    font-size: 13px;
+    color: #007a4d;
+    text-decoration: none;
+}
+
+.form-options a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Nút đăng ký HR ===== */
+.btn-register-hr {
+    background-color: #009f60;
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-register-hr:hover {
+    background-color: #007a4d;
+}
+
+/* ===== Footer ===== */
+.register-hr-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.register-hr-footer strong {
+    color: #fff;
+}
+
+@media (max-width: 480px) {
+    .register-hr-box {
+        width: 90%;
+        padding: 30px 20px;
+    }
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+}
+.warning-text {
+    font-size: 12px;
+    color: #da4538;
+    margin-top: 5px;
+    text-align: left;
+}
