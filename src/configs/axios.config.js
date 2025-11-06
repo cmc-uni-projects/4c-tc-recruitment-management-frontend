@@ -14,9 +14,19 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    if (token) {
+
+    // ⚠️ Không thêm token cho các API public
+    const isPublicEndpoint =
+      config.url.includes("/users/login") ||
+      config.url.includes("/users/register") ||
+      config.url.includes("/users/request-reset") ||
+      config.url.includes("/users/verify") ||
+      config.url.includes("/users/validate");
+
+    if (!isPublicEndpoint && token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)

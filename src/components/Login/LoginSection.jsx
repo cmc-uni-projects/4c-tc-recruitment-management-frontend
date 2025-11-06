@@ -2,11 +2,9 @@ import { useFormik } from "formik";
 import "./LoginSection.css";
 import LoginSocial from "./LoginSocial";
 import * as Yup from "yup";
-import { login } from "../../services/auth.services";   // ✅ Import login API
-import { useNavigate } from "react-router-dom";         // ✅ Điều hướng
- import bannerImg from '../../assets/logo.jpg';
- 
-
+import { login } from "../../services/auth.services"; // ✅ Import login API
+import { useNavigate } from "react-router-dom"; // ✅ Điều hướng
+import bannerImg from "../../assets/logo.jpg";
 
 const formLoginSchema = Yup.object({
   password: Yup.string().required("Required"),
@@ -35,7 +33,7 @@ export default function LoginSection() {
 
         // ✅ Chuyển hướng
         navigate("/");
-      } catch (error) {
+      } catch {
         alert("Sai email hoặc mật khẩu!");
       }
     },
@@ -45,7 +43,7 @@ export default function LoginSection() {
     <div className="login-section">
       {/* Banner */}
       <div className="login-banner">
-        <img src="/logo.png" alt="Logo" className="logo" />
+        <img src={bannerImg} alt="Logo" className="logo" />
         <h1>SmartHire</h1>
         <p>
           SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại

@@ -18,8 +18,11 @@ const validationSchema = Yup.object({
 export default function ResetPasswordSection() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
+  
+  
   const [validating, setValidating] = useState(true);
   const [isValidToken, setIsValidToken] = useState(false);
+  
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -33,11 +36,12 @@ export default function ResetPasswordSection() {
 
     validateResetToken(token)
       .then((res) => {
-        if (res.data === "Token hợp lệ") {
-          setIsValidToken(true);
-        } else {
-          setError("Liên kết không hợp lệ hoặc đã hết hạn.");
-        }
+        if (res.data === "Token hợp lệ" || res.data?.message === "Token hợp lệ" || res.data?.valid === true) {
+  setIsValidToken(true);
+} else {
+  setError("Liên kết không hợp lệ hoặc đã hết hạn.");
+}
+
       })
       .catch(() => {
         setError("Liên kết không hợp lệ hoặc đã hết hạn.");
