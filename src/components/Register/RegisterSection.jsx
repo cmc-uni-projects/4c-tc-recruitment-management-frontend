@@ -39,11 +39,22 @@ export default function RegisterSection() {
     onSubmit: async (values) => {
       setLoading(true);
       try {
+        const role = localStorage.getItem("selectedRole"); // ✅ lấy role từ popup
+        if (!role) {
+          Swal.fire({
+            icon: "warning",
+            title: "Thiếu thông tin",
+            text: "Vui lòng chọn vai trò trước khi đăng ký.",
+          });
+          setLoading(false);
+          return;
+        }
         const payload = {
           fullName: values.fullname,
           email: values.email,
           phone: values.phone,
           password: values.password,
+          role, // ✅ gửi role lên backend
         };
         const response = await register(payload);
         console.log("✅ Server response:", response.data);
