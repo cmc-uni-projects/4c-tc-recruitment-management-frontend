@@ -1,5 +1,4 @@
 
-
 import { useFormik } from "formik";
 import "./RegisterSection.css";
 import LoginSocial from "../../components/Login/LoginSocial";
@@ -24,6 +23,8 @@ const formRegisterSchema = Yup.object({
 
 export default function RegisterSection() {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyPassword, setShowVerifyPassword] = useState(false);
   const navigate = useNavigate();
 
   const RegisterForm = useFormik({
@@ -74,17 +75,16 @@ export default function RegisterSection() {
       <div className="login-banner">
         <h1>SmartHire</h1>
         <p>
-          SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại
-          Việt Nam
+          SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam
         </p>
       </div>
 
       {/* Form */}
-      <div className="login-box">
+      
+<div className="login-box">
         <h2>Chào mừng bạn đến với SmartHire</h2>
         <p>
-          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý
-          tưởng
+          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
         </p>
 
         <form onSubmit={RegisterForm.handleSubmit} className="register-form">
@@ -132,13 +132,22 @@ export default function RegisterSection() {
 
           <div className="form-group">
             <label>Mật khẩu</label>
-            <input
-              type="password"
-              name="password"
-              onChange={RegisterForm.handleChange}
-              placeholder="Nhập mật khẩu"
-              value={RegisterForm.values.password}
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                onChange={RegisterForm.handleChange}
+                placeholder="Nhập mật khẩu"
+                value={RegisterForm.values.password}
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
             {RegisterForm.touched.password && RegisterForm.errors.password && (
               <div className="error-text">{RegisterForm.errors.password}</div>
             )}
@@ -146,19 +155,25 @@ export default function RegisterSection() {
 
           <div className="form-group">
             <label>Xác nhận Mật khẩu</label>
-            <input
-              type="password"
-              name="verifypassword"
-              onChange={RegisterForm.handleChange}
-              placeholder="Nhập lại mật khẩu"
-              value={RegisterForm.values.verifypassword}
-            />
-            {RegisterForm.touched.verifypassword &&
-              RegisterForm.errors.verifypassword && (
-                <div className="error-text">
-                  {RegisterForm.errors.verifypassword}
-                </div>
-              )}
+            <div className="password-wrapper">
+              <input
+                type={showVerifyPassword ? "text" : "password"}
+                name="verifypassword"
+                onChange={RegisterForm.handleChange}
+                placeholder="Nhập lại mật khẩu"
+                value={RegisterForm.values.verifypassword}
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowVerifyPassword(!showVerifyPassword)}
+              >
+                {showVerifyPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
+            {RegisterForm.touched.verifypassword && RegisterForm.errors.verifypassword && (
+              <div className="error-text">{RegisterForm.errors.verifypassword}</div>
+            )}
           </div>
 
           <button type="submit" className="btn-login" disabled={loading}>
