@@ -1,4 +1,4 @@
-// components/ForgotPassword/ResetPasswordSection.jsx
+
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -18,13 +18,13 @@ const validationSchema = Yup.object({
 export default function ResetPasswordSection() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-  
-  
+
   const [validating, setValidating] = useState(true);
   const [isValidToken, setIsValidToken] = useState(false);
-  
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,12 +36,15 @@ export default function ResetPasswordSection() {
 
     validateResetToken(token)
       .then((res) => {
-        if (res.data === "Token hợp lệ" || res.data?.message === "Token hợp lệ" || res.data?.valid === true) {
-  setIsValidToken(true);
-} else {
-  setError("Liên kết không hợp lệ hoặc đã hết hạn.");
-}
-
+        if (
+          res.data === "Token hợp lệ" ||
+          res.data?.message === "Token hợp lệ" ||
+          res.data?.valid === true
+        ) {
+          setIsValidToken(true);
+        } else {
+          setError("Liên kết không hợp lệ hoặc đã hết hạn.");
+        }
       })
       .catch(() => {
         setError("Liên kết không hợp lệ hoặc đã hết hạn.");
@@ -76,6 +79,7 @@ export default function ResetPasswordSection() {
     );
   }
 
+
   if (!isValidToken) {
     return (
       <div className="login-section">
@@ -90,10 +94,11 @@ export default function ResetPasswordSection() {
     );
   }
 
-  return (
+  
+return (
     <div className="login-section">
       <div className="login-banner">
-        <img src="/logo.png" alt="Logo" className="logo" />
+        /logo.png
         <h1>SmartHire</h1>
       </div>
 
@@ -104,28 +109,46 @@ export default function ResetPasswordSection() {
         <form onSubmit={formik.handleSubmit} className="login-form">
           <div className="form-group">
             <label>Mật khẩu mới</label>
-            <input
-              type="password"
-              name="newPassword"
-              placeholder="Ít nhất 6 ký tự"
-              {...formik.getFieldProps("newPassword")}
-            />
-            {formik.touched.newPassword && formik.errors.newPassword ? (
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="newPassword"
+                placeholder="Ít nhất 6 ký tự"
+                {...formik.getFieldProps("newPassword")}
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
+            {formik.touched.newPassword && formik.errors.newPassword && (
               <div className="error-text">{formik.errors.newPassword}</div>
-            ) : null}
+            )}
           </div>
 
           <div className="form-group">
             <label>Xác nhận mật khẩu</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Nhập lại mật khẩu"
-              {...formik.getFieldProps("confirmPassword")}
-            />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+            <div className="password-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Nhập lại mật khẩu"
+                {...formik.getFieldProps("confirmPassword")}
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+              </button>
+            </div>
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
               <div className="error-text">{formik.errors.confirmPassword}</div>
-            ) : null}
+            )}
           </div>
 
           {message && <div className="success-text">{message}</div>}
