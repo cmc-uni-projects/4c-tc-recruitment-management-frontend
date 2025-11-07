@@ -110,7 +110,7 @@ export default function RegisterHRSection() {
               value={RegisterForm.values.email}
             />
             <div className="warning-text">
-                    Khuyến cáo sử dụng mail cá nhân
+                    Khuyến cáo sử dụng email công ty!
             </div>
             {RegisterForm.touched.email && RegisterForm.errors.email && (
               <div className="error-text">{RegisterForm.errors.email}</div>
