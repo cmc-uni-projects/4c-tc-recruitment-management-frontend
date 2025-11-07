@@ -16,6 +16,9 @@ const formLoginSchema = Yup.object({
 export default function LoginSection() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginStatus, setLoginStatus] = useState("");
+  const [statusType, setStatusType] = useState("");
+
 
   const loginForm = useFormik({
     initialValues: {
@@ -28,13 +31,39 @@ export default function LoginSection() {
         const res = await login(values.email, values.password);
         localStorage.setItem("token", res.data.accessToken);
         localStorage.setItem("refreshToken", res.data.refreshToken);
-        alert("Đăng nhập thành công!");
-        navigate("/");
-      } catch {
-        alert("Sai email hoặc mật khẩu!");
-      }
-    },
-  });
+
+        
+// Hiển thị thông báo
+      setLoginStatus("Đăng nhập thành công!");
+      setStatusType("success");
+
+      // Lấy role từ user object
+      const rawRole = res.data.user?.role;
+      console.log("User role:", rawRole); // Debug
+      const userRole = rawRole?.toUpperCase();
+
+      
+setTimeout(() => {
+        if (userRole === "HR") {
+          navigate("/hr-page");
+        } else if (userRole === "CANDIDATE") {
+          navigate("/");
+        } else if (userRole === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/"); // fallback
+        }
+      }, 1500);
+    } catch {
+      setLoginStatus("Sai email hoặc mật khẩu!");
+      setStatusType("error");
+
+    }
+  },
+});
+
+
+
 
   return (
     <div className="login-section">
@@ -49,8 +78,8 @@ export default function LoginSection() {
 
 
       {/* Form */}
-      
-<div className="login-box">
+
+      <div className="login-box">
         <h2>Chào mừng bạn đã quay trở lại</h2>
         <p>
           Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng

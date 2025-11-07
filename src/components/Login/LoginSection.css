@@ -235,3 +235,16 @@
   font-size: 18px;
   color: #555;
 }
+.login-status {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.login-status.success {
+  color: #00b14f; /* Xanh lá cho thành công */
+}
+
+.login-status.error {
+  color: #ff4d4f; /* Đỏ cho thất bại */
+}

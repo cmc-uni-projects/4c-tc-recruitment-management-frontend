@@ -43,6 +43,7 @@ export default function HomeSection() {
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         <div className="search-bar">
           <input type="text" placeholder="Vị trí tuyển dụng, tên công ty" />
+
           <select>
             <option>Địa điểm</option>
           </select>
