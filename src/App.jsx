@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
@@ -8,10 +9,13 @@ import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 import ResetSuccessPage from "./pages/ForgotPassword/ResetSuccessPage";
 import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
+import AboutPage from "./pages/About/AboutPage"; // 👈 thêm dòng này
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/about" element={<AboutPage />} /> {/* 👈 thêm route này */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/request-reset" element={<RequestResetPage />} />
@@ -23,4 +27,5 @@ function App() {
     </Routes>
   );
 }
+
 export default App;
