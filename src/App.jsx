@@ -6,6 +6,7 @@ import RequestResetPage from "./pages/ForgotPassword/RequestResetPage";
 import ResetPasswordPage from "./pages/ForgotPassword/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmail/VerifyEmailPage";
 import ResetSuccessPage from "./pages/ForgotPassword/ResetSuccessPage";
+import HRPage from "./pages/HR/HRPage";
 function App() {
   return (
     <Routes>
@@ -16,8 +17,8 @@ function App() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify" element={<VerifyEmailPage />} />
       <Route path="/reset-success" element={<ResetSuccessPage />} />
+      <Route path="/hr-page" element={<HRPage />} />;
     </Routes>
   );
 }
-
 export default App;
