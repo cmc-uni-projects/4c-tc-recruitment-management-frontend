@@ -29,4 +29,11 @@ export const logout = () => {
   localStorage.removeItem("token");
   window.location.href = "/login";
 };
-
+// THÊM MỚI: API Job Category (dùng trong JobCategoryManager)
+export const jobCategoryAPI = {
+  getAll: () => api.get("/job-categories"),
+  getPopular: () => api.get("/job-categories/popular"),
+  create: (data) => api.post("/job-categories", data),
+  update: (id, data) => api.put(`/job-categories/${id}`, data),
+  delete: (id) => api.delete(`/job-categories/${id}`),
+};

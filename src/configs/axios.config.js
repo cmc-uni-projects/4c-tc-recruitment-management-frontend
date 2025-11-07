@@ -46,5 +46,11 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+// THÊM MỚI: Hỗ trợ UUID trong params (Spring dùng UUID)
+api.defaults.paramsSerializer = (params) => {
+  return Object.keys(params)
+    .map((key) => `${key}=${params[key]}`)
+    .join("&");
+};
 
 export default api;
