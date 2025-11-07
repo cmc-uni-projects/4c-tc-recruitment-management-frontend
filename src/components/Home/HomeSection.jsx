@@ -1,5 +1,7 @@
 
 import "./HomeSection.css";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import iconSales from "../../assets/icons/kinh-doanh-ban-hang.png";
 import iconIT from "../../assets/icons/cong-nghe-thong-tin.png";
 import iconcustomer from "../../assets/icons/dich-vu-khach-hang.png";
@@ -8,9 +10,6 @@ import iconrealestate from "../../assets/icons/bat-dong-san.png";
 import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
-
-
-
 
 
 const brands = [
@@ -36,18 +35,47 @@ const industries = [
 
 
 export default function HomeSection() {
+  
+const [keyword, setKeyword] = useState('');
+  const [location, setLocation] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    const query = `?keyword=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}`;
+    navigate(`/search-results${query}`);
+  };
+const locationsVN = [
+  "An Giang", "Bắc Ninh", "Cà Mau", "Cao Bằng", "TP. Cần Thơ", "TP. Đà Nẵng",
+  "Đắk Lắk", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai", "TP. Hà Nội",
+  "Hà Tĩnh", "TP. Hải Phòng", "TP. Hồ Chí Minh", "TP. Huế", "Hưng Yên",
+  "Khánh Hoà", "Lai Châu", "Lạng Sơn", "Lào Cai", "Lâm Đồng", "Nghệ An",
+  "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La",
+  "Tây Ninh", "Thái Nguyên", "Thanh Hóa", "Tuyên Quang", "Vĩnh Long"
+];
+
   return (
     <div className="home-section">
       {/* Banner */}
       <section className="banner">
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         <div className="search-bar">
-          <input type="text" placeholder="Vị trí tuyển dụng, tên công ty" />
+          <input
+            type="text"
+            placeholder="Vị trí tuyển dụng, tên công ty"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
 
-          <select>
-            <option>Địa điểm</option>
-          </select>
-          <button className="btn-search">Tìm kiếm</button>
+          <div className="location-select-wrapper">
+            <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
+            <select value={location} onChange={(e) => setLocation(e.target.value)}>
+              <option value="">Địa điểm</option>
+                {locationsVN.map((loc, index) => (
+              <option key={index} value={loc}>{loc}</option>
+                ))}
+            </select>
+          </div>
+          <button className="btn-search" onClick={handleSearch}>Tìm kiếm</button>
         </div>
         <div className="banner-content">
           <img src="/banner.jpg" alt="Banner" />

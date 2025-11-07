@@ -110,8 +110,7 @@ export default function RegisterHRSection() {
               value={RegisterForm.values.email}
             />
             <div className="warning-text">
-                    Trường hợp bạn đăng ký tài khoản bằng email không phải email tên miền công ty, một số dịch vụ trên
-                    tài khoản có thể sẽ bị giới hạn quyền mua hoặc sử dụng.
+                    Khuyến cáo sử dụng email công ty!
             </div>
             {RegisterForm.touched.email && RegisterForm.errors.email && (
               <div className="error-text">{RegisterForm.errors.email}</div>
