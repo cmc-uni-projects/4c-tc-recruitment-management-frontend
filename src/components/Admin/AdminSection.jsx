@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./AdminSection.css";
+import JobCategoryManager from "./JobCategoryManager";
 export default function AdminSection({ children }) {
  const [showLogout, setShowLogout] = useState(false);
  return (
@@ -58,6 +59,9 @@ export default function AdminSection({ children }) {
 </li>
 <li>
 <Link to="/admin/candidates">👤 Quản lý ứng viên</Link>
+</li>
+<li>
+  <Link to="/admin/job-categories">📂 Quản lý ngành nghề</Link>
 </li>
 <li>
 <Link to="/admin/ai">🤖 Toppy AI</Link>
