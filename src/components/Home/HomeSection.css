@@ -65,6 +65,24 @@
   cursor: pointer;
   margin-left: 8px;
 }
+.location-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-multi-location__icon {
+  position: absolute;
+  left: 10px;
+  color: #666;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.location-select-wrapper select {
+  padding-left: 30px; /* để tránh icon đè lên text */
+  height: 36px;
+}
 
 .banner-content {
   display: flex;
