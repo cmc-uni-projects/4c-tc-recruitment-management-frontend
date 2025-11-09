@@ -104,7 +104,7 @@ export default function JobCategoryManager() {
             <tr>
               <th>Tên ngành nghề</th>
               <th>Mô tả</th>
-              <th>Phổ biến</th>
+              <th>Nổi bật</th>
               <th>Hành động</th>
             </tr>
           </thead>
@@ -120,7 +120,7 @@ export default function JobCategoryManager() {
                 <tr key={cat.categoryId}>
                   <td>{cat.name}</td>
                   <td>{cat.description || "-"}</td>
-                  <td>{cat.isPopular ? "Có" : "Không"}</td>
+                  <td>{cat.popular ? "Có" : "Không"}</td>
                   <td className="actions">
                     <button className="edit-btn" onClick={() => openModal(cat)}>
                       Sửa
@@ -174,12 +174,12 @@ export default function JobCategoryManager() {
                 <label>
                   <input
                     type="checkbox"
-                    checked={form.isPopular}
+                    checked={form.popular}
                     onChange={(e) =>
-                      setForm({ ...form, isPopular: e.target.checked })
+                      setForm({ ...form, popular: e.target.checked })
                     }
                   />
-                  Ngành nghề phổ biến
+                  Ngành nghề nổi bật
                 </label>
               </div>
 
