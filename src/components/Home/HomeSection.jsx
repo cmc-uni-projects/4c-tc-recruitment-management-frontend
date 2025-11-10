@@ -1,5 +1,5 @@
 import "./HomeSection.css";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import iconSales from "../../assets/icons/kinh-doanh-ban-hang.png";
 import iconIT from "../../assets/icons/cong-nghe-thong-tin.png";
@@ -9,54 +9,10 @@ import iconrealestate from "../../assets/icons/bat-dong-san.png";
 import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
+import { jobCategoryAPI, companyAPI } from "../../services/auth.services.js";
+import featuredBanner from "../../assets/featured-banner.jpg";
 
-// === THÊM MỚI: Import API ===
-import { jobCategoryAPI } from "../../services/auth.services.js";
 
-const brands = [
-  {
-    name: "Bee Logistics Corporation",
-    jobs: 28,
-    category: "Logistics",
-    logo: "/bee.png",
-  },
-  {
-    name: "Công ty TNHH Thương mại - Dịch vụ Điện Mạnh",
-    jobs: 4,
-    category: "Điện lạnh",
-    logo: "/mpe.png",
-  },
-  {
-    name: "Công ty CP Đầu tư Thương mại và Dịch vụ",
-    jobs: 1,
-    category: "Xuất nhập khẩu",
-    logo: "/viettel.png",
-  },
-  {
-    name: "Công ty CP Xây dựng BCONS",
-    jobs: 19,
-    category: "Xây dựng",
-    logo: "/bcons.png",
-  },
-  {
-    name: "Công ty TNHH SX HTD Bình Tiên (BITI'S)",
-    jobs: 5,
-    category: "Bán lẻ - FMCG",
-    logo: "/bitis.png",
-  },
-  {
-    name: "Công ty TNHH CJ VINA AGRI",
-    jobs: 12,
-    category: "Sản xuất",
-    logo: "/cj.png",
-  },
-  {
-    name: "Trường Cao đẳng FPT Polytechnic",
-    jobs: 1,
-    category: "Giáo dục / Đào tạo",
-    logo: "/fpt.png",
-  },
-];
 
 // DỮ LIỆU MẪU DỰ PHÒNG (nếu API lỗi)
 const industries = [
@@ -81,10 +37,9 @@ const industries = [
 export default function HomeSection() {
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
-  const navigate = useNavigate();
-
-  // === THÊM MỚI: State cho ngành nghề phổ biến ===
   const [popularCategories, setPopularCategories] = useState([]);
+  const [featuredCompanies, setFeaturedCompanies] = useState([]);
+  const navigate = useNavigate();
 
   // === THÊM MỚI: Gọi API khi component mount ===
   useEffect(() => {
@@ -107,6 +62,20 @@ export default function HomeSection() {
     };
 
     fetchPopularCategories();
+  }, []);
+  
+
+useEffect(() => {
+    const fetchFeaturedCompanies = async () => {
+      try {
+        const response = await companyAPI.getFeatured();
+        setFeaturedCompanies(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải công ty nổi bật:", error);
+      }
+    };
+
+    fetchFeaturedCompanies();
   }, []);
 
   const handleSearch = () => {
@@ -243,36 +212,62 @@ export default function HomeSection() {
               Hàng trăm thương hiệu lớn tiêu biểu đang tuyển dụng trên TopCV Pro
             </p>
           </div>
-          <button className="btn-pro">Pro Company</button>
+          <button
+  className="btn-pro"
+  onClick={() => navigate("/companies")}
+>
+  Xem tất cả công ty
+</button>
         </div>
 
-        <div className="tabs">
-          <button className="active">Tất cả</button>
-          <button>Ngân hàng</button>
-          <button>Xây dựng</button>
-          <button>IT - Phần mềm</button>
-          <button>Tài chính</button>
-        </div>
+        <div className="brand-subtitle">
+  <h3>Danh sách công ty nổi bật</h3>
+</div>
 
-        <div className="brand-grid">
-          {brands.map((brand, index) => (
-            <div
-              key={index}
-              className={`brand-card ${index === 0 ? "highlight" : ""}`}
-            >
-              <img src={brand.logo} alt={brand.name} />
-              <h3>{brand.name}</h3>
-              <p>{brand.category}</p>
-              <span>{brand.jobs} việc làm</span>
-              {brand.pro && (
-                <button className="btn-pro-small">Pro Company</button>
-              )}
-              {index === 0 && (
-                <button className="btn-follow">+ Theo dõi</button>
-              )}
-            </div>
-          ))}
-        </div>
+        <div className="brand-grid-wrapper">
+<div className="banner-wrapper">
+  <img src={featuredBanner} className="featured-banner-img"/>
+</div>
+
+  
+{/* Danh sách công ty nổi bật */}
+  <div
+    className={`company-grid ${
+      featuredCompanies.length > 3 ? "two-rows" : "one-row"
+    }`}
+  >
+    {featuredCompanies.slice(0, 6).map((company) => (
+      <div key={company.companyId} className="brand-card">
+  {/* Ảnh bìa */}
+  <div
+    className="company-cover"
+    style={{
+      backgroundImage: `url(${company.coverUrl})`,
+    }}
+  ></div>
+
+  {/* Nội dung công ty */}
+  <div className="company-info">
+    <img
+      src={company.logoUrl || "/default-logo.png"}
+      alt={company.name}
+      className="company-logo"
+    />
+    <h3 className="company-name">{company.name}</h3>
+    <p className="company-industry">{company.industry}</p>
+    <p className="company-description">{company.description}</p>
+    <div className="company-meta">
+      <span><strong>Website:</strong> <a href={company.website} target="_blank" rel="noopener noreferrer">{company.website}</a></span>
+      <span><strong>Địa chỉ:</strong> {company.address}</span>
+      <span><strong>Thành phố:</strong> {company.city}</span>
+      <span><strong>Quy mô:</strong> {company.size}</span>
+      <span><strong>Năm thành lập:</strong> {company.foundedYear}</span>
+    </div>
+  </div>
+</div>
+    ))}
+  </div>
+</div>
       </section>
     </div>
   );

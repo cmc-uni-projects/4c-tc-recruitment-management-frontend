@@ -37,3 +37,7 @@ export const jobCategoryAPI = {
   update: (id, data) => api.put(`/job-categories/${id}`, data),
   delete: (id) => api.delete(`/job-categories/${id}`),
 };
+export const companyAPI = {
+  getFeatured: () => api.get("/companies/featured"),
+  getAllActive: () => api.get("/companies/public"),
+};

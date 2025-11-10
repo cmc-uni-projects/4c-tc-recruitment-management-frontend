@@ -21,7 +21,10 @@ api.interceptors.request.use(
       config.url.includes("/users/register") ||
       config.url.includes("/users/request-reset") ||
       config.url.includes("/users/verify") ||
-      config.url.includes("/users/validate");
+      config.url.includes("/users/validate")||
+      config.url.includes("/job-categories/popular")||
+      config.url.includes("/companies/public")||
+      config.url.includes("/companies/featured");
 
     if (!isPublicEndpoint && token) {
       config.headers.Authorization = `Bearer ${token}`;
