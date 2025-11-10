@@ -10,8 +10,10 @@ import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 
+
 // === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
+import LatestJobsSection from "./Job/LatestJobsSection.jsx";
 
 const brands = [
   {
@@ -196,6 +198,10 @@ export default function HomeSection() {
         </div>
       </section>
 
+      {/* Tin tuyển dụng mới nhất */}
+      <LatestJobsSection />
+
+      
       {/* Top ngành nghề nổi bật - DỮ LIỆU ĐỘNG TỪ API */}
       <section className="industry-section">
         <div className="industry-header">
