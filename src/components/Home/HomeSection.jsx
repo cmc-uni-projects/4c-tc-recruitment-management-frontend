@@ -10,7 +10,6 @@ import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 
-
 // === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "./Job/LatestJobsSection.jsx";
@@ -88,7 +87,11 @@ export default function HomeSection() {
   // === THÊM MỚI: State cho ngành nghề phổ biến ===
   const [popularCategories, setPopularCategories] = useState([]);
 
-  // === THÊM MỚI: Gọi API khi component mount ===
+  // === THÊM MỚI: State cho video modal ===
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+  // === GỌI API KHI COMPONENT MOUNT ===
   useEffect(() => {
     const fetchPopularCategories = async () => {
       try {
@@ -96,7 +99,6 @@ export default function HomeSection() {
         setPopularCategories(response.data);
       } catch (error) {
         console.error("Lỗi khi tải ngành nghề phổ biến:", error);
-        // Fallback về dữ liệu tĩnh nếu API lỗi
         setPopularCategories(
           industries.map((ind) => ({
             categoryId: null,
@@ -116,6 +118,18 @@ export default function HomeSection() {
       keyword
     )}&location=${encodeURIComponent(location)}`;
     navigate(`/search-results${query}`);
+  };
+
+  // === XỬ LÝ VIDEO MODAL ===
+  const openVideoModal = () => {
+    setIsVideoLoading(true);
+    setIsVideoOpen(true);
+    setTimeout(() => setIsVideoLoading(false), 800); // Giả lập loading
+  };
+
+  const closeVideoModal = () => {
+    setIsVideoOpen(false);
+    setIsVideoLoading(false);
   };
 
   const locationsVN = [
@@ -186,6 +200,7 @@ export default function HomeSection() {
             Tìm kiếm
           </button>
         </div>
+
         <div className="banner-content">
           <img src="/banner.jpg" alt="Banner" />
           <div className="job-stats">
@@ -196,13 +211,38 @@ export default function HomeSection() {
             </p>
           </div>
         </div>
+
+        {/* === HERO VIDEO SECTION - GIỐNG TOPCV, CHỈ LOAD KHI NHẤN PLAY === */}
+        <section className="hero-video-section">
+          <div className="hero-video-container">
+            <div className="hero-video-thumbnail" onClick={openVideoModal}>
+              <img
+                src="/video-thumbnail.jpg"
+                alt="Giới thiệu Smart Hire"
+                className="video-thumb"
+              />
+              <div className="video-play-overlay">
+                <button className="video-play-btn">
+                  <i className="fa-solid fa-play"></i>
+                </button>
+                <p>Xem video giới thiệu</p>
+              </div>
+            </div>
+            <div className="hero-video-text">
+              <h3>Tiếp lợi thế, nối thành công</h3>
+              <p>
+                Smart Hire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ
+                tại Việt Nam
+              </p>
+            </div>
+          </div>
+        </section>
       </section>
 
       {/* Tin tuyển dụng mới nhất */}
       <LatestJobsSection />
 
-      
-      {/* Top ngành nghề nổi bật - DỮ LIỆU ĐỘNG TỪ API */}
+      {/* Top ngành nghề nổi bật */}
       <section className="industry-section">
         <div className="industry-header">
           <h2>Top ngành nghề nổi bật</h2>
@@ -215,7 +255,6 @@ export default function HomeSection() {
           {popularCategories.length > 0
             ? popularCategories.map((item, index) => (
                 <div key={item.categoryId || index} className="industry-card">
-                  {/* Placeholder icon - có thể mở rộng sau */}
                   <div className="industry-icon-placeholder">
                     <i className="fa-solid fa-briefcase"></i>
                   </div>
@@ -229,8 +268,7 @@ export default function HomeSection() {
                   </span>
                 </div>
               ))
-            : // Skeleton loading
-              [...Array(8)].map((_, i) => (
+            : [...Array(8)].map((_, i) => (
                 <div key={i} className="industry-card skeleton">
                   <div className="skeleton-icon"></div>
                   <div className="skeleton-text"></div>
@@ -240,7 +278,7 @@ export default function HomeSection() {
         </div>
       </section>
 
-      {/* Brand Section giống TopCV */}
+      {/* Brand Section */}
       <section className="brand-section">
         <div className="brand-header">
           <div>
@@ -270,9 +308,6 @@ export default function HomeSection() {
               <h3>{brand.name}</h3>
               <p>{brand.category}</p>
               <span>{brand.jobs} việc làm</span>
-              {brand.pro && (
-                <button className="btn-pro-small">Pro Company</button>
-              )}
               {index === 0 && (
                 <button className="btn-follow">+ Theo dõi</button>
               )}
@@ -280,6 +315,37 @@ export default function HomeSection() {
           ))}
         </div>
       </section>
+
+      {/* === MODAL VIDEO - CHỈ LOAD KHI MỞ === */}
+      {isVideoOpen && (
+        <div className="video-modal-backdrop" onClick={closeVideoModal}>
+          <div
+            className="video-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="video-close-btn" onClick={closeVideoModal}>
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+
+            <div className="video-wrapper">
+              {isVideoLoading && (
+                <div className="video-loading">
+                  <div className="spinner"></div>
+                </div>
+              )}
+              <iframe
+                src="https://www.youtube.com/watch?v=5y9EYHhAwPs"
+                title="Smart Hire - Video giới thiệu"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={() => setIsVideoLoading(false)}
+                style={{ display: isVideoLoading ? "none" : "block" }}
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
