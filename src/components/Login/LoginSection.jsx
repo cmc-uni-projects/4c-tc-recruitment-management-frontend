@@ -45,7 +45,7 @@ export default function LoginSection() {
       
 setTimeout(() => {
         if (userRole === "HR") {
-          navigate("/hr-page");
+          navigate("/hr");
         } else if (userRole === "CANDIDATE") {
           navigate("/");
         } else if (userRole === "ADMIN") {
