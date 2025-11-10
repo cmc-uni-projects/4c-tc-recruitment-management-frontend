@@ -1,0 +1,53 @@
+.job-category-manager {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.header h2 {
+  margin: 0;
+  color: #1a1a1a;
+}
+.add-btn {
+  background: #00b14f;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.add-btn:hover {
+  background: #00943d;
+}
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.category-table th,
+.category-table td {
+  border: 1px solid #e5e7eb;
+  padding: 12px 10px;
+}
+.actions button {
+  margin-right: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.edit-btn {
+  background: #2563eb;
+  color: white;
+}
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
