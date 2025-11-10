@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import "./AdminSection.css";
 export default function AdminSection({ children }) {
   const [showLogout, setShowLogout] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () =>{
+    localStorage.clear();
+    navigate("/login");
+  }
   return (
     <div className="hr-page">
       {/* === HEADER === */}
@@ -29,7 +35,7 @@ export default function AdminSection({ children }) {
             <img src="https://via.placeholder.com/40" alt="Avatar" />
             {showLogout && (
               <div className="logout-dropdown">
-                <button>Đăng xuất</button>
+                <button onClick={handleLogout}>Đăng xuất</button>
               </div>
             )}
           </div>
