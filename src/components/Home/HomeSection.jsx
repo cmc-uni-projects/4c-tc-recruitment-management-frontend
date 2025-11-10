@@ -9,6 +9,8 @@ import iconrealestate from "../../assets/icons/bat-dong-san.png";
 import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
+import ThumnailImg from "../../assets/banner-topcv.png";
+import { FaPlay } from "react-icons/fa";
 
 // === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
@@ -85,6 +87,47 @@ export default function HomeSection() {
 
   // === THÊM MỚI: State cho ngành nghề phổ biến ===
   const [popularCategories, setPopularCategories] = useState([]);
+ // === THÊM MỚI: State cho số liệu đếm động ===
+  const [jobCount, setJobCount] = useState(0);
+  const [newJobCount, setNewJobCount] = useState(0);
+
+  // === THÊM MỚI: Hiệu ứng đếm động ===
+  useEffect(() => {
+    let start = 0;
+    const totalJobs = 51925;
+    const newJobs = 722;
+    const duration = 2000;
+    const stepTime = 20;
+
+    const step = totalJobs / (duration / stepTime);
+    const interval = setInterval(() => {
+      start += step;
+      if (start >= totalJobs) {
+        clearInterval(interval);
+        setJobCount(totalJobs);
+      } else {
+        setJobCount(Math.floor(start));
+      }
+    }, stepTime);
+
+    let startNew = 0;
+    const stepNew = newJobs / (duration / stepTime);
+    const intervalNew = setInterval(() => {
+      startNew += stepNew;
+      if (startNew >= newJobs) {
+        clearInterval(intervalNew);
+        setNewJobCount(newJobs);
+      } else {
+        setNewJobCount(Math.floor(startNew));
+      }
+    }, stepTime);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(intervalNew);
+    };
+  }, []);
+
 
   // === THÊM MỚI: Gọi API khi component mount ===
   useEffect(() => {
@@ -184,16 +227,59 @@ export default function HomeSection() {
             Tìm kiếm
           </button>
         </div>
-        <div className="banner-content">
+        {/* Nội dung banner */}
+         <div className="banner-content">
           <img src="/banner.jpg" alt="Banner" />
           <div className="job-stats">
             <span>Thị trường việc làm hôm nay</span>
             <p>
-              Việc làm đang tuyển: <strong>51,925</strong> | Việc làm mới hôm
-              nay: <strong>722</strong>
+              Việc làm đang tuyển:{" "}
+              <strong>{jobCount.toLocaleString()}</strong> | Việc làm mới hôm
+              nay: <strong>{newJobCount.toLocaleString()}</strong>
             </p>
           </div>
         </div>
+
+        {/* === THÊM MỚI: VIDEO GIỐNG TOPCV === */}
+        <section className="hero-video-section">
+          <div className="hero-video-thumbnail">
+            <img
+              src="/video-thumbnail.jpg"
+              alt="Giới thiệu Smart Hire"
+              className="video-thumb"
+            />
+            <button
+              className="video-play-btn"
+              onClick={() => document.getElementById("videoModal").showModal()}
+            >
+              <i className="fa-solid fa-play"></i>
+            </button>
+          </div>
+        </section>
+
+        {/* === Modal video === */}
+        <dialog id="videoModal" className="video-modal">
+          <div className="video-modal-content">
+            <button
+              className="video-close-btn"
+              onClick={() => document.getElementById("videoModal").close()}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+            <iframe
+              width="800"
+              height="450"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Smart Hire - Video giới thiệu"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </dialog>
+
+
+
       </section>
 
       {/* Top ngành nghề nổi bật - DỮ LIỆU ĐỘNG TỪ API */}
