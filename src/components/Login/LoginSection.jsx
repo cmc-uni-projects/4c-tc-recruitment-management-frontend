@@ -16,8 +16,8 @@ const formLoginSchema = Yup.object({
 export default function LoginSection() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginStatus, setLoginStatus] = useState("");
-  const [statusType, setStatusType] = useState("");
+  const [_loginStatus, setLoginStatus] = useState("");
+  const [_statusType, setStatusType] = useState("");
 
 
   const loginForm = useFormik({
