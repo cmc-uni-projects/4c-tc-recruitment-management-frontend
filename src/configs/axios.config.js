@@ -22,6 +22,11 @@ api.interceptors.request.use(
       config.url.includes("/users/request-reset") ||
       config.url.includes("/users/verify") ||
       config.url.includes("/users/validate")||
+      config.url.includes("/job-categories/popular")||
+      config.url.includes("/companies/public")||
+      config.url.includes("/companies/featured")||
+      
+
       config.url.includes("/jobs/latest")||
       config.url.includes("/jobs/**");
       
