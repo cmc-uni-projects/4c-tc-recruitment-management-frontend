@@ -10,55 +10,11 @@ import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 import { jobCategoryAPI } from "../../services/auth.services.js";
-import LatestJobsSection from "./Job/LatestJobsSection.jsx";
+import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 import {companyAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
 import { Link } from "react-router-dom";
-import LatestJobsSection from "../Job/LatestJobsSection.jsx";
-const brands = [
-  {
-    name: "Bee Logistics Corporation",
-    jobs: 28,
-    category: "Logistics",
-    logo: "/bee.png",
-  },
-  {
-    name: "Công ty TNHH Thương mại - Dịch vụ Điện Mạnh",
-    jobs: 4,
-    category: "Điện lạnh",
-    logo: "/mpe.png",
-  },
-  {
-    name: "Công ty CP Đầu tư Thương mại và Dịch vụ",
-    jobs: 1,
-    category: "Xuất nhập khẩu",
-    logo: "/viettel.png",
-  },
-  {
-    name: "Công ty CP Xây dựng BCONS",
-    jobs: 19,
-    category: "Xây dựng",
-    logo: "/bcons.png",
-  },
-  {
-    name: "Công ty TNHH SX HTD Bình Tiên (BITI'S)",
-    jobs: 5,
-    category: "Bán lẻ - FMCG",
-    logo: "/bitis.png",
-  },
-  {
-    name: "Công ty TNHH CJ VINA AGRI",
-    jobs: 12,
-    category: "Sản xuất",
-    logo: "/cj.png",
-  },
-  {
-    name: "Trường Cao đẳng FPT Polytechnic",
-    jobs: 1,
-    category: "Giáo dục / Đào tạo",
-    logo: "/fpt.png",
-  },
-];
+
 const industries = [
   { name: "Kinh doanh - Bán hàng", jobs: "11.254 việc làm", icon: iconSales },
   {
