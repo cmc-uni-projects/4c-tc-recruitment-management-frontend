@@ -1,8 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./AdminSection.css";
+import logoutIcon from "../../assets/hr/logout.png";
+import { FiLogOut } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
+import avatar from "../../assets/hr/avatar.png";
+import Bell from "../../assets/hr/bell.png";
+import Setting from "../../assets/hr/setting.png";
+import { useNavigate } from "react-router-dom";
+
 export default function AdminSection({ children }) {
   const [showLogout, setShowLogout] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = () =>{
+    localStorage.clear();
+    navigate("/login"); 
+  }
   return (
     <div className="hr-page">
       {/* === HEADER === */}
@@ -11,7 +24,7 @@ export default function AdminSection({ children }) {
           <img
             src="https://www.topcv.vn/images/logo-topcv.svg"
             alt="TopCV Logo"
-          />
+          />   
           <nav className="header-nav">
             <button className="header-btn">HR Insider</button>
             <button className="header-btn primary">Đăng tin</button>
@@ -20,19 +33,22 @@ export default function AdminSection({ children }) {
             <button className="header-btn">Insights</button>
           </nav>
         </div>
-        <div className="header-right">
-          <div className="header-icons">
-            <span className="icon">🔔</span>
-            <span className="icon">⚙️</span>
-          </div>
+       <div className="header-right">
+  <div className="header-icons">
+    <img src={Bell} alt="Thông báo" className="icon-img" />
+    <img src={Setting} alt="Cài đặt" className="icon-img" />
+  </div>
           <div className="avatar" onClick={() => setShowLogout(!showLogout)}>
-            <img src="https://via.placeholder.com/40" alt="Avatar" />
+            <img src={avatar} alt="Avatar"onClick={() => setShowLogout(!showLogout)}></img>
             {showLogout && (
               <div className="logout-dropdown">
-                <button>Đăng xuất</button>
+                <button className="logout-btn" onClick={handleLogout}>
+                  <img src={logoutIcon} alt="Logout" className="logout-icon" />
+                  Đăng xuất
+                  </button>
               </div>
             )}
-          </div>
+          </div>    
         </div>
       </header>
       {/* === BODY === */}
@@ -47,28 +63,64 @@ export default function AdminSection({ children }) {
             </div>
           </div>
           <ul className="sidebar-menu">
-            <li className="active">
-              <Link to="/admin">Báo cáo thống kê</Link>
-            </li>
-            <li>
-              <Link to="/admin/employers">Quản lý nhà tuyển dụng</Link>
-            </li>
-            <li>
-              <Link to="/admin/candidates">Quản lý ứng viên</Link>
-            </li>
-            <li>
-              <Link to="/admin/job-categories">Quản lý ngành nghề</Link>
-            </li>
-            <li>
-              <Link to="/admin/job-categories">Quản lý các vị trí công việc</Link>
-            </li>
-            <li>
-              <Link to="/admin/ai">🤖 Toppy AI</Link>
-            </li>
-            <li>
-              <Link to="/admin/notifications">Thông báo</Link>
-            </li>
-          </ul>
+  <li>
+    <NavLink
+      to="/admin"
+      end
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Báo cáo thống kê
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/employers"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Quản lý nhà tuyển dụng
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/candidates"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Quản lý ứng viên
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/job-categories"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Quản lý ngành nghề
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/job-positions"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Quản lý các vị trí công việc
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/ai"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      🤖 Toppy AI
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/admin/notifications"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Thông báo
+    </NavLink>
+  </li>
+</ul>
         </aside>
         {/* MAIN CONTENT */}
         <main className="hr-content">{children}</main>
