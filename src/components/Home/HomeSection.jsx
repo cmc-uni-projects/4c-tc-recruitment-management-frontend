@@ -11,7 +11,7 @@ import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 // === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
-import LatestJobsSection from "./Job/LatestJobsSection.jsx";
+import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 
 const brands = [
   {
