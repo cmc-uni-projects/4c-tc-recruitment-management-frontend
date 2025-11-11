@@ -27,6 +27,7 @@ function App() {
         element={<JobCategoryManagerPage />}
       />
     </Routes>
+    
   );
 }
 
