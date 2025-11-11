@@ -129,31 +129,42 @@ export default function HomeSection() {
       {/* === BANNER === */}
       <section className="banner">
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Vị trí tuyển dụng, tên công ty"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <div className="location-select-wrapper">
-            <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            >
-              <option value="">Địa điểm</option>
-              {locationsVN.map((loc, index) => (
-                <option key={index} value={loc}>
-                  {loc}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button className="btn-search" onClick={handleSearch}>
-            Tìm kiếm
-          </button>
+        {/* Thanh tìm kiếm chính */}
+      <div className="search-bar">
+        <select className="category-select">
+          <option>Danh mục Nghề</option>
+          <option>Kế toán - Kiểm toán</option>
+          <option>Kinh doanh - Bán hàng</option>
+          <option>IT - Phần mềm</option>
+        </select>
+
+        <input
+          type="text"
+          placeholder="Vị trí tuyển dụng, tên công ty"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+        />
+
+        <div className="location-select-wrapper">
+          <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
+          <select
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          >
+            <option value="">Địa điểm</option>
+            {locationsVN.map((loc, index) => (
+              <option key={index} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <button className="btn-search" onClick={handleSearch}>
+          Tìm kiếm
+        </button>
+      </div>
+      
         <div className="banner-content">
           <img src="/banner.jpg" alt="Banner" />
           <div className="job-stats">
