@@ -4,9 +4,10 @@ import "./LoginSection.css";
 import LoginSocial from "./LoginSocial";
 import * as Yup from "yup";
 import { login } from "../../services/auth.services";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import bannerImg from "../../assets/logo.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 
 const formLoginSchema = Yup.object({
   password: Yup.string().required("Required"),
@@ -18,6 +19,8 @@ export default function LoginSection() {
   const [showPassword, setShowPassword] = useState(false);
   const [_loginStatus, setLoginStatus] = useState("");
   const [_statusType, setStatusType] = useState("");
+ 
+
 
 
   const loginForm = useFormik({
@@ -29,8 +32,10 @@ export default function LoginSection() {
     onSubmit: async (values) => {
       try {
         const res = await login(values.email, values.password);
+        
         localStorage.setItem("token", res.data.accessToken);
         localStorage.setItem("refreshToken", res.data.refreshToken);
+        localStorage.setItem("userId", res.data.user.userId);
 
         
 // Hiển thị thông báo

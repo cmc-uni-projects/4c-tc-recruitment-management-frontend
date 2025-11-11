@@ -11,11 +11,44 @@ import exploreService from "../../assets/hr/explore_service.png";
 import cvIcon from "../../assets/hr/CV.png";
 import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import axios from "axios";
 
 
 const HRSection = ({ children }) => {
 const [showLogout, setShowLogout] = useState(false);
+
+  const userId = localStorage.getItem("userId");
+ const [loading,setLoading]= useState(true);
+ const [error,setError] = useState("");
+ const [user, setUser] = useState({});
+
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+ 
+    if (!userId) return;
+
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`http://localhost:8080/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // thêm token vào header
+        },
+      });
+
+        setUser(response.data);
+        
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
   const navigate = useNavigate();
   const handleLogout = () =>{
     localStorage.clear();
@@ -64,8 +97,8 @@ const [showLogout, setShowLogout] = useState(false);
           <div className="sidebar-user">
             <img src={avatar} alt="User Avatar" />
             <div>
-              <p className="sidebar-name">Phạm Khánh Linh</p>
-              <p className="sidebar-role">Employer</p>
+              <p className="sidebar-name">{user.fullName}</p>
+              <p className="sidebar-role">{user.role}</p>
             </div>
           </div>
           <ul className="sidebar-menu">
