@@ -9,7 +9,6 @@ import iconrealestate from "../../assets/icons/bat-dong-san.png";
 import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
-
 // === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "./Job/LatestJobsSection.jsx";
