@@ -63,3 +63,8 @@ export const jobAPI = {
   // 8. Tìm kiếm job theo từ khóa, vị trí, ngành nghề
   searchJobs: (params) => api.get("/jobs/search", { params }),
 };
+export const companyAPI = {
+  getFeatured: () => api.get("/companies/featured"),
+  getAllActive: () => api.get("/companies/public"),
+  getById: (id) => api.get(`/companies/public/${id}`),
+}

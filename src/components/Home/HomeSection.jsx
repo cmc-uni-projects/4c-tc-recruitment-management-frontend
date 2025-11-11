@@ -1,5 +1,5 @@
 import "./HomeSection.css";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import iconSales from "../../assets/icons/kinh-doanh-ban-hang.png";
 import iconIT from "../../assets/icons/cong-nghe-thong-tin.png";
@@ -11,6 +11,9 @@ import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "./Job/LatestJobsSection.jsx";
+import {companyAPI } from "../../services/auth.services.js";
+import featuredBanner from "../../assets/featured-banner.jpg";
+import { Link } from "react-router-dom";
 const brands = [
   {
     name: "Bee Logistics Corporation",
@@ -79,6 +82,7 @@ export default function HomeSection() {
   const navigate = useNavigate();
   const videoId = "E2AEQlU4QLI";
   const [popularCategories, setPopularCategories] = useState([]);
+  const [featuredCompanies, setFeaturedCompanies] = useState([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   useEffect(() => {
@@ -99,6 +103,18 @@ export default function HomeSection() {
       }
     };
     fetchPopularCategories();
+  }, []);
+  useEffect(() => {
+    const fetchFeaturedCompanies = async () => {
+      try {
+        const response = await companyAPI.getFeatured();
+        setFeaturedCompanies(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải công ty nổi bật:", error);
+      }
+    };
+
+    fetchFeaturedCompanies();
   }, []);
   const handleSearch = () => {
     const query = `?keyword=${encodeURIComponent(
@@ -262,33 +278,51 @@ export default function HomeSection() {
               Hàng trăm thương hiệu lớn tiêu biểu đang tuyển dụng trên TopCV Pro
             </p>
           </div>
-          <button className="btn-pro">Pro Company</button>
+           <button
+  className="btn-pro"
+  onClick={() => navigate("/companies")}
+>
+  Xem tất cả công ty
+</button>
         </div>
-        <div className="tabs">
-          <button className="active">Tất cả</button>
-          <button>Ngân hàng</button>
-          <button>Xây dựng</button>
-          <button>IT - Phần mềm</button>
-          <button>Tài chính</button>
-        </div>
-        <div className="brand-grid">
-          {brands.map((brand, index) => (
-            <div
-              key={index}
-              className={`brand-card ${index === 0 ? "highlight" : ""}`}
-            >
-              <img src={brand.logo} alt={brand.name} />
-              <h3>{brand.name}</h3>
-              <p>{brand.category}</p>
-              <span>{brand.jobs} việc làm</span>
-              {index === 0 && (
-                <button className="btn-follow">+ Theo dõi</button>
-              )}
-            </div>
-          ))}
-        </div>
+        <div className="brand-subtitle">
+  <h3>Danh sách công ty tiêu biểu của top ngành nghề</h3>
+</div>
+        <div className="brand-grid-wrapper">
+<div className="banner-wrapper">
+  <img src={featuredBanner} className="featured-banner-img"/>
+</div>
+
+
+{/* Danh sách công ty nổi bật */}
+
+<div className="company-grid">
+  {featuredCompanies.slice(0, 6).map((company) => (
+    <Link to={`/company/public/${company.companyId}`} className="brand-card" key={company.companyId}>
+      <div
+        className="company-cover"
+        style={{ backgroundImage: `url(${company.coverUrl})` }}
+      >
+        <img
+          src={company.logoUrl || "/default-logo.png"}
+          alt={company.name}
+          className="company-logo"
+        />
+      </div>
+
+      <div className="company-info">
+        <h3 className="company-name">{company.name}</h3>
+        <p className="company-address">
+          <strong>Địa chỉ:</strong> {company.address}
+        </p>
+        <p className="company-description">{company.description}</p>
+      </div>
+    </Link>
+  ))}
+</div>
+</div>
       </section>
-      
+
       {/* === MODAL VIDEO === */}
       {isVideoOpen && (
         <div className="video-modal-backdrop" onClick={closeVideoModal}>

@@ -12,6 +12,7 @@ import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import ManageJobPage from "./pages/HR/ManageJobPage";
 import AboutPage from "./pages/About/AboutPage";
 import BlogDetail from "./pages/Blog/BlogDetail";
+import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
       <Route path="/hr/jobs" element={<ManageJobPage />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
       <Route path="/about" element={<AboutPage />} />
-      
+      <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
     </Routes>
     
   );
