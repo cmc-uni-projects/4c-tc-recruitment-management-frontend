@@ -23,8 +23,8 @@ api.interceptors.request.use(
       config.url.includes("/users/verify") ||
       config.url.includes("/users/validate")||
       config.url.includes("/jobs/latest")||
-      config.url.includes("/jobs/{id}");
-
+      config.url.includes("/jobs/**");
+      
     if (!isPublicEndpoint && token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

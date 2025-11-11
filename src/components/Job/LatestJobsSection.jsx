@@ -21,7 +21,7 @@ export default function LatestJobsSection() {
   }, []);
 
   const handleDetail = (jobId) => {
-    navigate(`/job/${jobId}`);
+    navigate(`/jobs/${jobId}`);
   };
 
   const formatSalary = (min, max) => {
