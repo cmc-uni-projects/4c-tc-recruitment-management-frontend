@@ -45,9 +45,9 @@ const AboutPage = () => {
           <div className="about-text">
             <h2>Giá trị cốt lõi</h2>
             <ul>
-              <li>💡 Ứng dụng AI để tối ưu quy trình tuyển dụng.</li>
-              <li>🤝 Cầu nối giữa nhà tuyển dụng và ứng viên.</li>
-              <li>🚀 Hiệu quả, minh bạch và hiện đại.</li>
+              <li>Ứng dụng AI để tối ưu quy trình tuyển dụng.</li>
+              <li>Cầu nối giữa nhà tuyển dụng và ứng viên.</li>
+              <li>Hiệu quả, minh bạch và hiện đại.</li>
             </ul>
           </div>
         </div>
