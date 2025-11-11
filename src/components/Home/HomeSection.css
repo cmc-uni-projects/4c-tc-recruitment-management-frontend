@@ -5,11 +5,58 @@
 
 /* Banner */
 .banner {
-  background: linear-gradient(90deg, #004d40, #00796b);
+position: relative;
+  background: linear-gradient(135deg, #004d40, #00796b, #00b14f);
+  background-size: 400% 400%;
+  animation: gradientMove 8s ease infinite;
   color: #fff;
   padding: 30px 40px;
   text-align: center;
+  overflow: hidden;
 }
+
+/* Thêm overlay hình khối */
+.banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../../assets/hero-pattern.png') no-repeat center;
+  background-size: cover;
+  opacity: 0.35; /* Điều chỉnh độ mờ */
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.banner-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+position: relative;
+  z-index: 2; /* Đảm bảo nội dung nằm trên overlay */
+
+}
+
+.banner h1, .banner p {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4); /* tăng độ nổi chữ */
+}
+
+
+.banner-img { 
+  width: 400px;
+  border-radius: 8px;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 .search-bar {
   display: flex;
@@ -78,18 +125,7 @@
   height: 36px;
 }
 
-.banner-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-}
 
-.banner-img {
-  width: 400px;
-  border-radius: 8px;
-}
 
 .job-stats {
   font-size: 14px;

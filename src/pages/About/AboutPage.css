@@ -1,0 +1,213 @@
+.about-page {
+  font-family: "Montserrat", sans-serif;
+  color: #333;
+  background-color: #fff;
+  overflow-x: hidden;
+}
+
+/* === Header === */
+.about-header {
+  text-align: center;
+  padding: 100px 10%;
+  background: linear-gradient(135deg, #e0f8ec, #00b14f);
+  color: #fff;
+  border-radius: 0 0 60px 60px;
+  box-shadow: 0 8px 30px rgba(0, 177, 79, 0.2);
+}
+
+.about-header h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+.about-header p {
+  font-size: 1.2rem;
+  opacity: 0.95;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* === Section chung === */
+.about-section {
+  padding: 100px 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.about-section:nth-child(even) {
+  background: #e6fff2;
+}
+
+.about-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 80px;
+  max-width: 1200px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.about-section.reverse .about-content {
+  flex-direction: row-reverse;
+}
+
+/* === Text === */
+.about-text {
+  flex: 1;
+}
+
+.about-text h2 {
+  color: #00b14f;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.about-text p,
+.about-text ul {
+  color: #555;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.about-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.about-text li {
+  background: #e0f8ec;
+  padding: 12px 18px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-text li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 177, 79, 0.15);
+}
+
+/* === Hình ảnh === */
+.about-image {
+  flex: 1;
+  text-align: center;
+}
+
+.about-image img {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.4s ease;
+}
+
+.about-image img:hover {
+  transform: scale(1.05);
+}
+
+/* === CTA Section === */
+.about-cta {
+  text-align: center;
+  padding: 100px 10%;
+  background: linear-gradient(135deg, #f8f9fa, #fff);
+  border-top: 1px solid #eee;
+}
+
+.about-cta h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #222;
+  font-weight: 600;
+}
+
+/* === Nút chính === */
+.btn.primary {
+  display: inline-block;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #00b14f, #009e46);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 40px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 15px rgba(0, 177, 79, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn.primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 177, 79, 0.5);
+}
+
+.btn.primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.6s;
+}
+
+.btn.primary:hover::after {
+  left: 100%;
+}
+
+/* === Footer === */
+.about-footer {
+  text-align: center;
+  padding: 40px 10%;
+  background: linear-gradient(135deg, #00b14f, #009e46);
+  color: #fff;
+  border-top-left-radius: 60px;
+  border-top-right-radius: 60px;
+  margin-top: 80px;
+}
+
+/* === Hiệu ứng xuất hiện === */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Responsive === */
+@media (max-width: 900px) {
+  .about-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 40px;
+  }
+
+  .about-image img {
+    max-width: 340px;
+  }
+
+  .about-header {
+    padding: 80px 5%;
+  }
+
+  .about-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .about-header p {
+    font-size: 1rem;
+  }
+}

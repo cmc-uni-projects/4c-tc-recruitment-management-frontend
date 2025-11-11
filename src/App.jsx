@@ -10,6 +10,8 @@ import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import ManageJobPage from "./pages/HR/ManageJobPage";
+import AboutPage from "./pages/About/AboutPage";
+import BlogDetail from "./pages/Blog/BlogDetail";
 
 function App() {
   return (
@@ -25,8 +27,11 @@ function App() {
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
       <Route path="/hr/jobs" element={<ManageJobPage />} />
-
+      <Route path="/blog/:id" element={<BlogDetail />} />
+      <Route path="/about" element={<AboutPage />} />
+      
     </Routes>
+    
   );
 }
 
