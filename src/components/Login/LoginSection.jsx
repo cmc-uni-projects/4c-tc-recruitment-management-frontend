@@ -16,8 +16,8 @@ const formLoginSchema = Yup.object({
 export default function LoginSection() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [loginStatus, setLoginStatus] = useState("");
-  const [statusType, setStatusType] = useState("");
+  const [_loginStatus, setLoginStatus] = useState("");
+  const [_statusType, setStatusType] = useState("");
 
 
   const loginForm = useFormik({
@@ -45,7 +45,7 @@ export default function LoginSection() {
       
 setTimeout(() => {
         if (userRole === "HR") {
-          navigate("/hr-page");
+          navigate("/hr");
         } else if (userRole === "CANDIDATE") {
           navigate("/");
         } else if (userRole === "ADMIN") {

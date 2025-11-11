@@ -48,22 +48,25 @@ export default function AdminSection({ children }) {
           </div>
           <ul className="sidebar-menu">
             <li className="active">
-              <Link to="/admin">📊 Báo cáo thống kê</Link>
+              <Link to="/admin">Báo cáo thống kê</Link>
             </li>
             <li>
-              <Link to="/admin/employers">🏢 Quản lý nhà tuyển dụng</Link>
+              <Link to="/admin/employers">Quản lý nhà tuyển dụng</Link>
             </li>
             <li>
-              <Link to="/admin/candidates">👤 Quản lý ứng viên</Link>
+              <Link to="/admin/candidates">Quản lý ứng viên</Link>
             </li>
             <li>
-              <Link to="/admin/job-categories">📂 Quản lý ngành nghề</Link>
+              <Link to="/admin/job-categories">Quản lý ngành nghề</Link>
+            </li>
+            <li>
+              <Link to="/admin/job-categories">Quản lý các vị trí công việc</Link>
             </li>
             <li>
               <Link to="/admin/ai">🤖 Toppy AI</Link>
             </li>
             <li>
-              <Link to="/admin/notifications">🔔 Thông báo</Link>
+              <Link to="/admin/notifications">Thông báo</Link>
             </li>
           </ul>
         </aside>

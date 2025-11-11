@@ -10,6 +10,9 @@ import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
+import ManageJobPage from "./pages/HR/ManageJobPage";
+import AboutPage from "./pages/About/AboutPage";
+import BlogDetail from "./pages/Blog/BlogDetail";
 
 function App() {
   return (
@@ -21,11 +24,16 @@ function App() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify" element={<VerifyEmailPage />} />
       <Route path="/reset-success" element={<ResetSuccessPage />} />
-      <Route path="/hr-page" element={<HRPage />} />
+      <Route path="/hr" element={<HRPage />} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin/job-categories" element={<JobCategoryManagerPage />}/>
       <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
+      <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+      <Route path="/hr/jobs" element={<ManageJobPage />} />
+      <Route path="/blog/:id" element={<BlogDetail />} />
+      <Route path="/about" element={<AboutPage />} />
+      
     </Routes>
+    
   );
 }
 
