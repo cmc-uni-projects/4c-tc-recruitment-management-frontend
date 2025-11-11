@@ -1,4 +1,3 @@
-// src/components/RegisterHRSection.jsx
 import { useFormik } from "formik";
 import "./RegisterHRSection.css";
 import * as Yup from "yup";
@@ -7,16 +6,15 @@ import { register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-// Schema xác thực cho form đăng ký
 const formRegisterSchema = Yup.object({
   fullname: Yup.string().required("Vui lòng nhập họ tên"),
   email: Yup.string()
     .email("Email không hợp lệ")
-    .matches(
-      /^[a-zA-Z0-9._%+-]+@(?!.*(company|companydomain|org))[^@]+$/, // Regex kiểm tra email công ty
-      "Cảnh báo: Bạn đang sử dụng email cá nhân, khuyến khích dùng email công ty."
-    )
+    .matches(/^[a-zA-Z0-9._%+-]+@(?!.*(company|companydomain|org))[^@]+$/, "Cảnh báo: Bạn đang sử dụng email cá nhân, khuyến khích dùng email công ty.")
     .required("Vui lòng nhập email"),
+  phone: Yup.string()
+    .matches(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ (đầu số 03,05,07,08,09 và đủ 10 số)")
+    .required("Vui lòng nhập số điện thoại"),
   password: Yup.string()
     .min(6, "Mật khẩu tối thiểu 6 ký tự")
     .required("Vui lòng nhập mật khẩu"),
@@ -38,21 +36,20 @@ export default function RegisterHRSection() {
       phone: "",
       password: "",
       verifypassword: "",
-      role: "HR", // Đặt mặc định là HR
+      role: "HR",
     },
     validationSchema: formRegisterSchema,
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        // Thêm role vào payload
         const payload = {
           fullName: values.fullname,
           email: values.email,
           phone: values.phone,
           password: values.password,
-          role: values.role, // Gửi vai trò HR
+          role: values.role,
         };
-        const response = await register(payload); // Đăng ký với cùng một endpoint
+        const response = await register(payload);
         Swal.fire({
           icon: "success",
           title: "Đăng ký thành công!",
@@ -75,17 +72,14 @@ export default function RegisterHRSection() {
 
   return (
     <div className="login-section">
-      {/* Banner */}
       <div className="login-banner">
         <h1>SmartHire</h1>
         <p>SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam</p>
       </div>
 
-      {/* Form */}
       <div className="login-box">
         <h2>Đăng ký Nhà Tuyển Dụng</h2>
         <form onSubmit={RegisterForm.handleSubmit} className="register-form">
-          {/* Các trường thông tin đăng ký */}
           <div className="form-group">
             <label>Họ và Tên</label>
             <input
@@ -109,9 +103,7 @@ export default function RegisterHRSection() {
               placeholder="Nhập Email"
               value={RegisterForm.values.email}
             />
-            <div className="warning-text">
-                    Khuyến cáo sử dụng email công ty!
-            </div>
+            <div className="warning-text">Khuyến cáo sử dụng email công ty!</div>
             {RegisterForm.touched.email && RegisterForm.errors.email && (
               <div className="error-text">{RegisterForm.errors.email}</div>
             )}
@@ -144,12 +136,12 @@ export default function RegisterHRSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i>
                 ) : (
-                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i>
                 )}
               </button>
             </div>
@@ -171,12 +163,12 @@ export default function RegisterHRSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowVerifyPassword(!showVerifyPassword)} // Toggle showVerifyPassword state
+                onClick={() => setShowVerifyPassword(!showVerifyPassword)}
               >
                 {showVerifyPassword ? (
-                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i>
                 ) : (
-                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i>
                 )}
               </button>
             </div>

@@ -1,4 +1,3 @@
-
 import { useFormik } from "formik";
 import "./RegisterSection.css";
 import LoginSocial from "../../components/Login/LoginSocial";
@@ -13,6 +12,9 @@ const formRegisterSchema = Yup.object({
   email: Yup.string()
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
+  phone: Yup.string()
+    .matches(/^(03|05|07|08|09)\d{8}$/, "Số điện thoại không hợp lệ (đầu số 03,05,07,08,09 và đủ 10 số)")
+    .required("Vui lòng nhập số điện thoại"),
   password: Yup.string()
     .min(6, "Mật khẩu tối thiểu 6 ký tự")
     .required("Vui lòng nhập mật khẩu"),
@@ -92,8 +94,7 @@ export default function RegisterSection() {
       </div>
 
       {/* Form */}
-      
-<div className="login-box">
+      <div className="login-box">
         <h2>Chào mừng bạn đến với SmartHire</h2>
         <p>
           Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
@@ -202,9 +203,7 @@ export default function RegisterSection() {
         </form>
 
         <LoginSocial />
-        <p className="register-text">
-          Bạn đã có tài khoản? <a href="/login">Đăng Nhập ngay</a>
-        </p>
+        <p className="register-text" >Bạn đã có tài khoản? <a href="/login">Đăng Nhập ngay</a></p>    
       </div>
       {/* Footer */}
       <footer className="login-footer">
