@@ -11,6 +11,7 @@ import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 import { jobCategoryAPI, companyAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
+import { Link } from "react-router-dom";
 
 
 
@@ -221,7 +222,7 @@ useEffect(() => {
         </div>
 
         <div className="brand-subtitle">
-  <h3>Danh sách công ty nổi bật</h3>
+  <h3>Danh sách công ty tiêu biểu của top ngành nghề</h3>
 </div>
 
         <div className="brand-grid-wrapper">
@@ -231,42 +232,31 @@ useEffect(() => {
 
   
 {/* Danh sách công ty nổi bật */}
-  <div
-    className={`company-grid ${
-      featuredCompanies.length > 3 ? "two-rows" : "one-row"
-    }`}
-  >
-    {featuredCompanies.slice(0, 6).map((company) => (
-      <div key={company.companyId} className="brand-card">
-  {/* Ảnh bìa */}
-  <div
-    className="company-cover"
-    style={{
-      backgroundImage: `url(${company.coverUrl})`,
-    }}
-  ></div>
+  
+<div className="company-grid">
+  {featuredCompanies.slice(0, 6).map((company) => (
+    <Link to={`/company/public/${company.companyId}`} className="brand-card" key={company.companyId}>
+      <div
+        className="company-cover"
+        style={{ backgroundImage: `url(${company.coverUrl})` }}
+      >
+        <img
+          src={company.logoUrl || "/default-logo.png"}
+          alt={company.name}
+          className="company-logo"
+        />
+      </div>
 
-  {/* Nội dung công ty */}
-  <div className="company-info">
-    <img
-      src={company.logoUrl || "/default-logo.png"}
-      alt={company.name}
-      className="company-logo"
-    />
-    <h3 className="company-name">{company.name}</h3>
-    <p className="company-industry">{company.industry}</p>
-    <p className="company-description">{company.description}</p>
-    <div className="company-meta">
-      <span><strong>Website:</strong> <a href={company.website} target="_blank" rel="noopener noreferrer">{company.website}</a></span>
-      <span><strong>Địa chỉ:</strong> {company.address}</span>
-      <span><strong>Thành phố:</strong> {company.city}</span>
-      <span><strong>Quy mô:</strong> {company.size}</span>
-      <span><strong>Năm thành lập:</strong> {company.foundedYear}</span>
-    </div>
-  </div>
+      <div className="company-info">
+        <h3 className="company-name">{company.name}</h3>
+        <p className="company-address">
+          <strong>Địa chỉ:</strong> {company.address}
+        </p>
+        <p className="company-description">{company.description}</p>
+      </div>
+    </Link>
+  ))}
 </div>
-    ))}
-  </div>
 </div>
       </section>
     </div>

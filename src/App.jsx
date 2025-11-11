@@ -9,6 +9,7 @@ import ResetSuccessPage from "./pages/ForgotPassword/ResetSuccessPage";
 import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
+import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 
 function App() {
   return (
@@ -22,10 +23,8 @@ function App() {
       <Route path="/reset-success" element={<ResetSuccessPage />} />
       <Route path="/hr-page" element={<HRPage />} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route
-        path="/admin/job-categories"
-        element={<JobCategoryManagerPage />}
-      />
+      <Route path="/admin/job-categories" element={<JobCategoryManagerPage />}/>
+      <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
     </Routes>
   );
 }

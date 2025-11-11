@@ -40,4 +40,5 @@ export const jobCategoryAPI = {
 export const companyAPI = {
   getFeatured: () => api.get("/companies/featured"),
   getAllActive: () => api.get("/companies/public"),
+  getById: (id) => api.get(`/companies/public/${id}`),
 };
