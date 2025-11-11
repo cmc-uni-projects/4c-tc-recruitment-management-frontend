@@ -13,6 +13,7 @@ import ManageJobPage from "./pages/HR/ManageJobPage";
 import AboutPage from "./pages/About/AboutPage";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
+import JobDetail from "./components/Job/JobDetail";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
       <Route path="/blog/:id" element={<BlogDetail />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
+      <Route path="/jobs/:jobId" element={<JobDetail />} />
+      
     </Routes>
     
   );

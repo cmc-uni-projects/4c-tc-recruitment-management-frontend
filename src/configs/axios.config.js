@@ -25,8 +25,11 @@ api.interceptors.request.use(
       config.url.includes("/job-categories/popular")||
       config.url.includes("/companies/public")||
       config.url.includes("/companies/featured")||
-      config.url.includes("jobs/latest");
+      
 
+      config.url.includes("/jobs/latest")||
+      config.url.includes("/jobs/**");
+      
     if (!isPublicEndpoint && token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

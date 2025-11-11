@@ -9,10 +9,18 @@ import exploreJob from "../../assets/hr/explore_job.png";
 import exploreCV from "../../assets/hr/exploreCV.png";
 import exploreService from "../../assets/hr/explore_service.png";
 import cvIcon from "../../assets/hr/CV.png";
+import logoutIcon from "../../assets/hr/logout.png";
+import { FiLogOut } from "react-icons/fi"; // Icon logout
+import React, { useState } from "react"
+
 
 const HRSection = ({ children }) => {
+const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
-
+  const handleLogout = () =>{
+    localStorage.clear();
+    navigate("/login"); 
+  }
   return (
     <div className="hr-page">
       {/* Header */}
@@ -33,9 +41,19 @@ const HRSection = ({ children }) => {
             <img src={Bell} alt="Thông báo" className="icon-img" />
             <img src={Setting} alt="Cài đặt" className="icon-img" />
           </div>
-          <div className="avatar">
-            <img src={avatar} alt="Avatar" />
-          </div>
+          
+<div className="avatar" onClick={() => setShowLogout(!showLogout)}>
+  <img src={avatar} alt="Avatar" />
+  {showLogout && (
+    <div className="logout-dropdown">
+      <button className="logout-btn" onClick={handleLogout}>
+        <img src={logoutIcon} alt="Logout" className="logout-icon" />
+        Đăng xuất
+      </button>
+    </div>
+  )}
+</div>
+
         </div>
       </header>
 

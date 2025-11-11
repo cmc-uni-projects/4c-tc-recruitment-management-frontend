@@ -14,6 +14,7 @@ import LatestJobsSection from "./Job/LatestJobsSection.jsx";
 import {companyAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
 import { Link } from "react-router-dom";
+import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 const brands = [
   {
     name: "Bee Logistics Corporation",
@@ -207,9 +208,7 @@ export default function HomeSection() {
             </p>
           </div>
         </div>
-      </section>
-      {/* === HERO VIDEO SECTION === */}
-      <section className="hero-video-section">
+        <section className="hero-video-section">
         <div className="hero-video-container">
           <div className="hero-video-thumbnail" onClick={openVideoModal}>
             <img
@@ -233,6 +232,9 @@ export default function HomeSection() {
           </div>
         </div>
       </section>
+      </section>
+      {/* === HERO VIDEO SECTION === */}
+      
       {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
       <LatestJobsSection />
       {/* === NGÀNH NGHỀ NỔI BẬT === */}
