@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jobAPI } from "../../../services/auth.services";
+import { jobAPI } from "../../services/auth.services";
 import "./LatestJobsSection.css";
 
 export default function LatestJobsSection() {
@@ -44,14 +44,18 @@ export default function LatestJobsSection() {
     <div className="job-meta">
       <span className="salary">
         {job.salaryMin && job.salaryMax
-          ? `${job.salaryMin} - ${job.salaryMax} triệu`
+          ? `${job.salaryMin} - ${job.salaryMax} vnđ`
           : "Thỏa thuận"}
       </span>
       <span>{job.location || "Chưa cập nhật"}</span>
     </div>
   </div>
 
-  <button className="save-icon">❤️</button>
+
+<button className="save-icon">
+  <i className="fa-regular fa-heart"></i>
+</button>
+
 </div>
           ))
         ) : (
