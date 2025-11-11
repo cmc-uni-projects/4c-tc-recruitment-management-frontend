@@ -288,6 +288,7 @@ export default function HomeSection() {
           ))}
         </div>
       </section>
+      
       {/* === MODAL VIDEO === */}
       {isVideoOpen && (
         <div className="video-modal-backdrop" onClick={closeVideoModal}>
