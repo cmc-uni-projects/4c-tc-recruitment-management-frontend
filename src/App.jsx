@@ -27,6 +27,7 @@ function App() {
       <Route path="/hr/jobs" element={<ManageJobPage />} />
 
     </Routes>
+    
   );
 }
 
