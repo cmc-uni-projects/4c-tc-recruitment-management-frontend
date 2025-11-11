@@ -14,7 +14,7 @@ import AboutPage from "./pages/About/AboutPage";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 import JobDetail from "./components/Job/JobDetail";
-
+import SearchPage from "./pages/Search/SearchPage";
 function App() {
   return (
     <Routes>
@@ -33,6 +33,7 @@ function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
       <Route path="/jobs/:jobId" element={<JobDetail />} />
+      <Route path="/search" element={<SearchPage />} />
       
     </Routes>
     
