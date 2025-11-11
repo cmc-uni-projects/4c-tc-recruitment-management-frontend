@@ -684,12 +684,15 @@ transform: none;
   text-overflow: ellipsis;
 }
 .company-description {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+  display: -webkit-box !important;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; /* hỗ trợ chuẩn mới */
+  max-height: 3.2em; /* đảm bảo chiều cao tương ứng 2 dòng */
+  line-height: 1.6em;
+  white-space: normal;
 }
+
+
