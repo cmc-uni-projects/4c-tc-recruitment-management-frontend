@@ -9,10 +9,8 @@ import iconrealestate from "../../assets/icons/bat-dong-san.png";
 import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
-// === THÊM MỚI: Import API ===
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "./Job/LatestJobsSection.jsx";
-
 const brands = [
   {
     name: "Bee Logistics Corporation",
@@ -57,8 +55,6 @@ const brands = [
     logo: "/fpt.png",
   },
 ];
-
-// DỮ LIỆU MẪU DỰ PHÒNG (nếu API lỗi)
 const industries = [
   { name: "Kinh doanh - Bán hàng", jobs: "11.254 việc làm", icon: iconSales },
   {
@@ -77,20 +73,14 @@ const industries = [
     icon: iconaccounting,
   },
 ];
-
 export default function HomeSection() {
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
   const navigate = useNavigate();
-
-  // === THÊM MỚI: State cho ngành nghề phổ biến ===
+  const videoId = "E2AEQlU4QLI";
   const [popularCategories, setPopularCategories] = useState([]);
-
-  // === THÊM MỚI: State cho video modal ===
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
-
-  // === GỌI API KHI COMPONENT MOUNT ===
   useEffect(() => {
     const fetchPopularCategories = async () => {
       try {
@@ -108,29 +98,23 @@ export default function HomeSection() {
         );
       }
     };
-
     fetchPopularCategories();
   }, []);
-
   const handleSearch = () => {
     const query = `?keyword=${encodeURIComponent(
       keyword
     )}&location=${encodeURIComponent(location)}`;
     navigate(`/search-results${query}`);
   };
-
-  // === XỬ LÝ VIDEO MODAL ===
   const openVideoModal = () => {
     setIsVideoLoading(true);
     setIsVideoOpen(true);
-    setTimeout(() => setIsVideoLoading(false), 800); // Giả lập loading
+    setTimeout(() => setIsVideoLoading(false), 800);
   };
-
   const closeVideoModal = () => {
     setIsVideoOpen(false);
     setIsVideoLoading(false);
   };
-
   const locationsVN = [
     "An Giang",
     "Bắc Ninh",
@@ -167,10 +151,9 @@ export default function HomeSection() {
     "Tuyên Quang",
     "Vĩnh Long",
   ];
-
   return (
     <div className="home-section">
-      {/* Banner */}
+      {/* === BANNER === */}
       <section className="banner">
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         <div className="search-bar">
@@ -180,7 +163,6 @@ export default function HomeSection() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
-
           <div className="location-select-wrapper">
             <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
             <select
@@ -199,7 +181,6 @@ export default function HomeSection() {
             Tìm kiếm
           </button>
         </div>
-
         <div className="banner-content">
           <img src="/banner.jpg" alt="Banner" />
           <div className="job-stats">
@@ -210,74 +191,69 @@ export default function HomeSection() {
             </p>
           </div>
         </div>
-
-        {/* === HERO VIDEO SECTION - GIỐNG TOPCV, CHỈ LOAD KHI NHẤN PLAY === */}
-        <section className="hero-video-section">
-          <div className="hero-video-container">
-            <div className="hero-video-thumbnail" onClick={openVideoModal}>
-              <img
-                src="/video-thumbnail.jpg"
-                alt="Giới thiệu Smart Hire"
-                className="video-thumb"
-              />
-              <div className="video-play-overlay">
-                <button className="video-play-btn">
-                  <i className="fa-solid fa-play"></i>
-                </button>
-                <p>Xem video giới thiệu</p>
-              </div>
-            </div>
-            <div className="hero-video-text">
-              <h3>Tiếp lợi thế, nối thành công</h3>
-              <p>
-                Smart Hire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ
-                tại Việt Nam
-              </p>
+      </section>
+      {/* === HERO VIDEO SECTION === */}
+      <section className="hero-video-section">
+        <div className="hero-video-container">
+          <div className="hero-video-thumbnail" onClick={openVideoModal}>
+            <img
+              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+              alt="Giới thiệu Smart Hire"
+              className="video-thumb"
+            />
+            <div className="video-play-overlay">
+              <button className="video-play-btn">
+                <i className="fa-solid fa-play"></i>
+              </button>
+              <p>Xem video giới thiệu</p>
             </div>
           </div>
-        </section>
+          <div className="hero-video-text">
+            <h3>Tiếp lợi thế, nối thành công</h3>
+            <p>
+              Smart Hire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ
+              tại Việt Nam
+            </p>
+          </div>
+        </div>
       </section>
-
-      {/* Tin tuyển dụng mới nhất */}
+      {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
       <LatestJobsSection />
-
-      {/* Top ngành nghề nổi bật */}
+      {/* === NGÀNH NGHỀ NỔI BẬT === */}
       <section className="industry-section">
         <div className="industry-header">
           <h2>Top ngành nghề nổi bật</h2>
           <p>
-            Bạn muốn tìm việc mới? Xem danh sách việc làm{" "}
-            <a href="#">tại đây</a>
+            Bạn muốn tìm việc mới? Xem danh sách việc làm <a href="#">tại đây</a>
           </p>
         </div>
         <div className="industry-grid">
           {popularCategories.length > 0
             ? popularCategories.map((item, index) => (
-                <div key={item.categoryId || index} className="industry-card">
-                  <div className="industry-icon-placeholder">
-                    <i className="fa-solid fa-briefcase"></i>
-                  </div>
-                  <h3>{item.name}</h3>
-                  <span>
-                    {item.description
-                      ? item.description.length > 50
-                        ? item.description.substring(0, 50) + "..."
-                        : item.description
-                      : "Nhiều việc làm"}
-                  </span>
+              <div key={item.categoryId || index} className="industry-card">
+                <div className="industry-icon-placeholder">
+                  <i className="fa-solid fa-briefcase"></i>
                 </div>
-              ))
+                <h3>{item.name}</h3>
+                <span>
+                  {item.description
+                    ? item.description.length > 50
+                      ? item.description.substring(0, 50) + "..."
+                      : item.description
+                    : "Nhiều việc làm"}
+                </span>
+              </div>
+            ))
             : [...Array(8)].map((_, i) => (
-                <div key={i} className="industry-card skeleton">
-                  <div className="skeleton-icon"></div>
-                  <div className="skeleton-text"></div>
-                  <div className="skeleton-subtext"></div>
-                </div>
-              ))}
+              <div key={i} className="industry-card skeleton">
+                <div className="skeleton-icon"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-subtext"></div>
+              </div>
+            ))}
         </div>
       </section>
-
-      {/* Brand Section */}
+      {/* === THƯƠNG HIỆU LỚN === */}
       <section className="brand-section">
         <div className="brand-header">
           <div>
@@ -288,7 +264,6 @@ export default function HomeSection() {
           </div>
           <button className="btn-pro">Pro Company</button>
         </div>
-
         <div className="tabs">
           <button className="active">Tất cả</button>
           <button>Ngân hàng</button>
@@ -296,7 +271,6 @@ export default function HomeSection() {
           <button>IT - Phần mềm</button>
           <button>Tài chính</button>
         </div>
-
         <div className="brand-grid">
           {brands.map((brand, index) => (
             <div
@@ -314,8 +288,7 @@ export default function HomeSection() {
           ))}
         </div>
       </section>
-
-      {/* === MODAL VIDEO - CHỈ LOAD KHI MỞ === */}
+      {/* === MODAL VIDEO === */}
       {isVideoOpen && (
         <div className="video-modal-backdrop" onClick={closeVideoModal}>
           <div
@@ -325,7 +298,6 @@ export default function HomeSection() {
             <button className="video-close-btn" onClick={closeVideoModal}>
               <i className="fa-solid fa-xmark"></i>
             </button>
-
             <div className="video-wrapper">
               {isVideoLoading && (
                 <div className="video-loading">
@@ -333,7 +305,7 @@ export default function HomeSection() {
                 </div>
               )}
               <iframe
-                src="https://www.youtube.com/watch?v=5y9EYHhAwPs"
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
                 title="Smart Hire - Video giới thiệu"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
