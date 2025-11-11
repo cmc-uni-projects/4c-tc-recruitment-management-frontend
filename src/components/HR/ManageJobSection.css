@@ -1,3 +1,4 @@
+/* ========== JOB CATEGORY MANAGER ========== */
 .job-category-manager {
   background: #fff;
   padding: 24px;
@@ -6,16 +7,19 @@
   max-width: 1000px;
   margin: 0 auto;
 }
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
+
 .header h2 {
   margin: 0;
   color: #1a1a1a;
 }
+
 .add-btn {
   background: #00b14f;
   color: white;
@@ -24,30 +28,242 @@
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
 }
+
 .add-btn:hover {
   background: #00943d;
 }
+
 .category-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px;
 }
+
 .category-table th,
 .category-table td {
   border: 1px solid #e5e7eb;
   padding: 12px 10px;
+  text-align: left;
 }
+
+.category-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.category-table tbody tr:hover {
+  background: #f8fff9;
+}
+
 .actions button {
   margin-right: 8px;
   padding: 6px 10px;
+  font-size: 13px;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
 }
+
 .edit-btn {
   background: #2563eb;
   color: white;
 }
+
+.edit-btn:hover {
+  background: #1d4ed8;
+}
+
 .delete-btn {
   background: #ef4444;
   color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+}
+
+/* ========== FORM (thay mới hoàn toàn theo form của bạn) ========== */
+
+/* Overlay làm mờ nền */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 28px;
+  width: 85%;
+  max-width: 800px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.25s ease;
+  border-top: 4px solid #00b14f;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  text-align: center;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Grid form */
+.modal-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px 20px;
+}
+
+/* Một số ô full width nếu cần (ví dụ: tiêu đề, mô tả) */
+.modal-form .form-group.full-width {
+  grid-column: 1 / -1; /* Chiếm toàn bộ dòng */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #374151;
+  font-size: 14px;
+}
+
+/* Input và Textarea chung */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 10px 12px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #fafafa;
+}
+/* Select cao vừa phải */
+.form-group select {
+  height: 32px;
+}
+
+/* Hover & Focus */
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: #00b14f;
+  background-color: #f8fff9;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  background-color: #fff;
+}
+/* Select nhỏ hơn, gọn */
+.form-group select {
+  height: 36px;
+  background-color: #fafafa;
+}
+
+/* Textarea lớn hơn, giống input nhưng có chiều cao */
+.form-group textarea {
+  min-height: 100px; /* Cao hơn để dễ nhập */
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Actions */
+.modal-actions {
+  grid-column: span 4;
+  display: flex;
+  justify-content: flex-end; /* sát phải */
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.submit-btn {
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.25s ease;
+}
+
+.cancel-btn {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.cancel-btn:hover {
+  background: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.submit-btn {
+  background: #00b14f;
+  color: #fff;
+}
+
+.submit-btn:hover {
+  background: #1f8b50;
+  transform: translateY(-1px);
+}
+
+/* Cuộn mượt, gọn scrollbar */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
 }

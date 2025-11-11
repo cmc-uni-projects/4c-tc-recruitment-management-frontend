@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../../components/Admin/AdminSection.css"; // tái sử dụng style
+import "./ManageJobSection.css";
 import { jobAPI } from "../../services/auth.services";
 
 function ManageJobSection() {
@@ -199,8 +199,8 @@ function ManageJobSection() {
           >
             <h3>{editingId ? "Chỉnh sửa Job" : "Thêm Job mới"}</h3>
             <form className="modal-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>Tiêu đề *</label>
+              <div className="form-group full-width ">
+                <label>Tên Vị Trí Tuyển Dụng *</label>
                 <input
                   type="text"
                   value={form.title}
@@ -211,7 +211,7 @@ function ManageJobSection() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group full-width">
                 <label>Mô tả</label>
                 <textarea
                   rows="3"
@@ -225,7 +225,7 @@ function ManageJobSection() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group full-width">
                 <label>Yêu cầu</label>
                 <textarea
                   rows="2"
@@ -239,7 +239,7 @@ function ManageJobSection() {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group full-width">
                 <label>Địa điểm</label>
                 <input
                   type="text"
