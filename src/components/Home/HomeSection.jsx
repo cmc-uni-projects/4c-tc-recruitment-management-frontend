@@ -10,7 +10,7 @@ import iconfinance from "../../assets/icons/ngan-hang-tai-chinh.png";
 import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 import { jobCategoryAPI } from "../../services/auth.services.js";
-import LatestJobsSection from "./Job/LatestJobsSection.jsx";
+import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 const brands = [
   {
     name: "Bee Logistics Corporation",
@@ -191,9 +191,7 @@ export default function HomeSection() {
             </p>
           </div>
         </div>
-      </section>
-      {/* === HERO VIDEO SECTION === */}
-      <section className="hero-video-section">
+        <section className="hero-video-section">
         <div className="hero-video-container">
           <div className="hero-video-thumbnail" onClick={openVideoModal}>
             <img
@@ -217,6 +215,9 @@ export default function HomeSection() {
           </div>
         </div>
       </section>
+      </section>
+      {/* === HERO VIDEO SECTION === */}
+      
       {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
       <LatestJobsSection />
       {/* === NGÀNH NGHỀ NỔI BẬT === */}

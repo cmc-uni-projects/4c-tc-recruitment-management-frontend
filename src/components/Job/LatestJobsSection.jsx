@@ -24,6 +24,13 @@ export default function LatestJobsSection() {
     navigate(`/job/${jobId}`);
   };
 
+  const formatSalary = (min, max) => {
+    if (min && max) {
+      return `${(min / 1_000_000).toFixed(0)} - ${(max / 1_000_000).toFixed(0)} triệu`;
+    }
+    return "Thỏa thuận";
+  };
+
   return (
     <section className="latest-job-section">
       <h2>Tin tuyển dụng mới nhất</h2>
@@ -31,32 +38,45 @@ export default function LatestJobsSection() {
       <div className="job-card-grid">
         {latestJobs.length > 0 ? (
           latestJobs.map((job) => (
-            <div className="job-card">
-  <img
-    src={job.logoUrl || "/default-logo.png"}
-    alt={job.companyName}
-    className="company-logo"
-  />
+            <div
+              key={job.jobId}
+              className="job-card"
+              onClick={() => handleDetail(job.jobId)}
+            >
+              {/* Logo công ty */}
+              <img
+                src={job.logoUrl || "/default-logo.png"}
+                alt={job.companyName}
+                className="company-logo"
+              />
 
-  <div className="job-info">
-    <h3>{job.title}</h3>
-    <p>{job.companyName || "Công ty chưa cập nhật"}</p>
-    <div className="job-meta">
-      <span className="salary">
-        {job.salaryMin && job.salaryMax
-          ? `${job.salaryMin} - ${job.salaryMax} vnđ`
-          : "Thỏa thuận"}
-      </span>
-      <span>{job.location || "Chưa cập nhật"}</span>
-    </div>
-  </div>
+              {/* Nội dung chính */}
+              <div className="job-info">
+                <h3>{job.title}</h3>
+                <p>{job.companyName || "Công ty chưa cập nhật"}</p>
+                <div className="job-meta">
+                  <span className="salary">
+                    {formatSalary(job.salaryMin, job.salaryMax)}
+                  </span>
+                  <span>{job.location || "Chưa cập nhật"}</span>
+                </div>
+              </div>
 
+              {/* Badge nếu có */}
+              {job.isTop && <span className="badge top">TIN MỚI</span>}
+              {job.isPro && !job.isTop && <span className="badge">PRO</span>}
 
-<button className="save-icon">
-  <i className="fa-regular fa-heart"></i>
-</button>
-
-</div>
+              {/* Icon lưu việc làm */}
+              <button
+                className="save-icon"
+                onClick={(e) => {
+                  e.stopPropagation(); // Ngăn điều hướng khi click icon
+                  console.log("Đã lưu job:", job.jobId);
+                }}
+              >
+                <i className="fa-regular fa-heart"></i>
+              </button>
+            </div>
           ))
         ) : (
           <p>Đang tải tin tuyển dụng...</p>
