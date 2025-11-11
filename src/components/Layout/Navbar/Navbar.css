@@ -1,73 +1,145 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 60px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #eaeaea;
-    font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 60px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  font-family: "Inter", sans-serif;
 }
 
 /* Logo */
 .logo {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: -38px;
-    margin-top: 10px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: -38px;
+  margin-top: 10px;
 }
 
 .logo .top {
-    color: #333;
+  color: #333;
 }
 
 .logo .cv {
-    color: #0f9d58;
-    /* Xanh lá đặc trưng của TopCV */
+  color: #0f9d58;
+  /* Xanh lá đặc trưng của TopCV */
 }
 
 /* Menu */
 .nav-links {
-    display: flex;
-    list-style: none;
-    margin-left: 120px;
-    gap: 24px;
+  display: flex;
+  list-style: none;
+  margin-left: 120px;
+  gap: 24px;
 }
 
 .nav-links li {
-    cursor: pointer;
-    font-weight: 500;
-    color: #333;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
 }
 
 .nav-links li:hover {
-    color: #0f9d58;
+  color: #0f9d58;
 }
 
 /* Nút bên phải */
 .navbar-right button {
-    margin-left: 12px;
-    padding: 8px 18px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
+  margin-left: 12px;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .btn-outline {
-    border: 1px solid #0f9d58;
-    color: #0f9d58;
-    background: none;
+  border: 1px solid #0f9d58;
+  color: #0f9d58;
+  background: none;
 }
 
 .btn-outline:hover {
-    background: #e6f5ec;
+  background: #e6f5ec;
 }
 
 .btn-primary {
-    background-color: #0f9d58;
-    border: none;
-    color: white;
+  background-color: #0f9d58;
+  border: none;
+  color: white;
 }
 
 .btn-primary:hover {
-    background-color: #0c864a;
+  background-color: #0c864a;
+}
+/* ===== USER MENU KHI ĐÃ ĐĂNG NHẬP ===== */
+.navbar-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: all 0.2s;
+  background: #f8f9fa;
+}
+
+.user-menu:hover {
+  background: #e8f5e8;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #0f9d58;
+  box-shadow: 0 2px 10px rgba(15, 157, 88, 0.25);
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+/* Dropdown đẹp như TopCV */
+.user-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+  border: 1px solid #eee;
+  min-width: 190px;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #e74c3c;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #fff5f5;
+}
+
+/* Icon cửa mở ra đẹp lung linh */
+.logout-icon {
+  width: 36px !important; /* to hơn hẳn */
+  height: 36px !important; /* to hơn hẳn */
+  margin-right: 16px;
+  margin-left: -4px; /* căn lại cho cân đối */
 }
