@@ -10,7 +10,7 @@ export default function LatestJobsSection() {
   useEffect(() => {
     const fetchLatestJobs = async () => {
       try {
-        const response = await jobAPI.getLatestJobs(); // ✅ Sửa tên hàm
+        const response = await jobAPI.getLatestJobs();
         setLatestJobs(response.data);
       } catch (error) {
         console.error("Lỗi khi tải tin tuyển dụng mới nhất:", error);
@@ -27,23 +27,31 @@ export default function LatestJobsSection() {
   return (
     <section className="latest-job-section">
       <h2>Tin tuyển dụng mới nhất</h2>
+
       <div className="job-card-grid">
         {latestJobs.length > 0 ? (
           latestJobs.map((job) => (
-            <div key={job.jobId} className="job-card">
-  <h3>{job.title}</h3>
-  <p>{job.companyName || "Công ty chưa cập nhật"}</p>
-  <span>Lương: {job.salary || "Thỏa thuận"}</span>
-  <span>Địa điểm: {job.location || "Chưa cập nhật"}</span>
-  <span>
-    Ngày đăng: {new Date(job.createdAt).toLocaleDateString("vi-VN")}
-  </span>
-  <button
-    className="btn-detail"
-    onClick={() => handleDetail(job.jobId)}
-  >
-    Xem chi tiết
-  </button>
+            <div className="job-card">
+  <img
+    src={job.logoUrl || "/default-logo.png"}
+    alt={job.companyName}
+    className="company-logo"
+  />
+
+  <div className="job-info">
+    <h3>{job.title}</h3>
+    <p>{job.companyName || "Công ty chưa cập nhật"}</p>
+    <div className="job-meta">
+      <span className="salary">
+        {job.salaryMin && job.salaryMax
+          ? `${job.salaryMin} - ${job.salaryMax} triệu`
+          : "Thỏa thuận"}
+      </span>
+      <span>{job.location || "Chưa cập nhật"}</span>
+    </div>
+  </div>
+
+  <button className="save-icon">❤️</button>
 </div>
           ))
         ) : (
