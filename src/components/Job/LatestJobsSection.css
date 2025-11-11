@@ -24,7 +24,7 @@
 .job-card {
   display: flex;
   align-items: center;
-  background: #fff;
+  background: linear-gradient(135deg, #f9f9f9, #ffffff); /* Thêm gradient vào background */
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -37,17 +37,32 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* Container chứa logo */
+.logo-container {
+  width: 50px;               /* Đảm bảo container có chiều rộng cố định */
+  height: 50px;              /* Đảm bảo container có chiều cao cố định */
+  display: flex;
+  justify-content: center;   /* Căn giữa logo trong container */
+  align-items: center;       /* Căn giữa logo theo chiều dọc */
+  overflow: hidden;          /* Đảm bảo không có phần logo tràn ra ngoài */
+  border-radius: 50%;        /* Giúp container có dạng tròn */
+}
+
 /* Logo công ty */
 .company-logo {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  margin-right: 16px;
+  width: 100%;               /* Logo chiếm toàn bộ chiều rộng của container */
+  height: 100%;              /* Logo chiếm toàn bộ chiều cao của container */
+  object-fit: contain;       /* Đảm bảo logo giữ nguyên tỷ lệ mà không bị méo */
+}
+
+.company-logo:hover {
+  transform: scale(1.1); /* Phóng to logo khi hover */
 }
 
 /* Nội dung chính */
 .job-info {
   flex: 1;
+  padding-left: 35px;
 }
 
 .job-info h3 {
@@ -64,6 +79,7 @@
   font-size: 14px;
   color: #777;
   margin-bottom: 8px;
+  line-height: 1.5; /* Cải thiện sự dễ đọc */
 }
 
 /* Hàng thông tin phụ */
@@ -83,7 +99,7 @@
 .save-icon {
   position: absolute;
   right: 16px;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
   background: none;
   border: 1px solid #00b14f;
@@ -118,9 +134,28 @@
 }
 
 .badge.top {
-  background-color: #ff9800;
+  background-color: #ff9800; /* Màu sắc của badge 'top' */
 }
 
+.saved {
+  color: #00b14f; /* Màu hồng cho icon khi đã lưu */
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+.spinner {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 /* Responsive */
 @media (max-width: 992px) {
   .job-card-grid {

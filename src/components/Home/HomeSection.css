@@ -648,9 +648,8 @@ position: relative;
 
 .company-logo {
   position: absolute;
-  bottom: -28px;
   left: 16px;
-transform: none;
+  transform: none;
   width: 56px;
   height: 56px;
   object-fit: contain;

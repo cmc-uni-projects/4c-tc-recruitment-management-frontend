@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jobAPI } from "../../services/auth.services";
 import "./LatestJobsSection.css";
+import { FaHeart, FaSpinner } from "react-icons/fa";
 
 export default function LatestJobsSection() {
   const [latestJobs, setLatestJobs] = useState([]);
+  const [loading, setLoading] = useState(true);  // Thêm state loading
+  const [savedJobs, setSavedJobs] = useState([]);  // Thêm state để lưu jobs đã được lưu
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,8 +15,10 @@ export default function LatestJobsSection() {
       try {
         const response = await jobAPI.getLatestJobs();
         setLatestJobs(response.data);
+        setLoading(false);  // Đặt loading thành false khi đã tải xong
       } catch (error) {
         console.error("Lỗi khi tải tin tuyển dụng mới nhất:", error);
+        setLoading(false);  // Dù có lỗi hay không, cũng dừng loading
       }
     };
 
@@ -21,7 +26,15 @@ export default function LatestJobsSection() {
   }, []);
 
   const handleDetail = (jobId) => {
-    navigate(`/jobs/${jobId}`);
+    navigate(`/jobs/${jobId}`); // Điều hướng tới trang chi tiết công việc
+  };
+
+  const handleSaveJob = (jobId, e) => {
+    e.stopPropagation(); // Ngăn điều hướng khi click icon
+    if (savedJobs.includes(jobId)) {
+    } else {
+      setSavedJobs([...savedJobs, jobId]);
+    }
   };
 
   const formatSalary = (min, max) => {
@@ -36,19 +49,27 @@ export default function LatestJobsSection() {
       <h2>Tin tuyển dụng mới nhất</h2>
 
       <div className="job-card-grid">
-        {latestJobs.length > 0 ? (
+        
+        {loading ? (
+          <div className="loading-spinner">
+            <FaSpinner className="spinner" />
+            Đang tải tin tuyển dụng...
+          </div>
+        ) : latestJobs.length > 0 ? (
           latestJobs.map((job) => (
             <div
               key={job.jobId}
               className="job-card"
               onClick={() => handleDetail(job.jobId)}
             >
-              {/* Logo công ty */}
-              <img
-                src={job.logoUrl || "/default-logo.png"}
-                alt={job.companyName}
-                className="company-logo"
-              />
+            {/* Container logo công ty */}
+            <div className="logo-container">
+            <img
+              src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
+              alt={job.companyName}
+              className="company-logo"
+            />
+            </div>
 
               {/* Nội dung chính */}
               <div className="job-info">
@@ -69,17 +90,14 @@ export default function LatestJobsSection() {
               {/* Icon lưu việc làm */}
               <button
                 className="save-icon"
-                onClick={(e) => {
-                  e.stopPropagation(); // Ngăn điều hướng khi click icon
-                  console.log("Đã lưu job:", job.jobId);
-                }}
+                onClick={(e) => handleSaveJob(job.jobId, e)}
               >
-                <i className="fa-regular fa-heart"></i>
+                <FaHeart className={`fa-regular ${savedJobs.includes(job.jobId) ? 'saved' : ''}`} />
               </button>
             </div>
           ))
         ) : (
-          <p>Đang tải tin tuyển dụng...</p>
+          <p>Không có công việc nào để hiển thị</p>
         )}
       </div>
     </section>
