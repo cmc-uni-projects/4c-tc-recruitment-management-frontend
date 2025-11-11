@@ -75,19 +75,38 @@
  transform: scale(1.1);
  color: #00b14f;
 }
+/* ✅ Sửa kích cỡ icon */
+.icon-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  transition: 0.2s;
+}
+
+.icon-img:hover {
+  background: #e6f7ef;
+  transform: scale(1.05);
+  border-color: #00b14f;
+}
 .avatar {
  position: relative;
 }
+/* Avatar */
 .avatar img {
- width: 40px;
- height: 40px;
- border-radius: 50%;
- cursor: pointer;
- border: 2px solid #e5e7eb;
- transition: 0.2s;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #e5e7eb;
+  transition: 0.2s;
 }
+
 .avatar img:hover {
- border-color: #00b14f;
+  border-color: #00b14f;
 }
 .logout-dropdown {
  position: absolute;
@@ -186,3 +205,5 @@
  background: #f7f9fb;
  overflow-y: auto;
 }
+
+
