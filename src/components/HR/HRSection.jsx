@@ -1,6 +1,6 @@
 import "./HRSection.css";
 import { useNavigate } from "react-router-dom";
-
+import { NavLink } from "react-router-dom";
 import logo from "../../assets/hr/logo.png";
 import avatar from "../../assets/hr/avatar.png";
 import Bell from "../../assets/hr/bell.png";
@@ -11,34 +11,35 @@ import exploreService from "../../assets/hr/explore_service.png";
 import cvIcon from "../../assets/hr/CV.png";
 import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-
 const HRSection = ({ children }) => {
-const [showLogout, setShowLogout] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
 
   const userId = localStorage.getItem("userId");
- const [loading,setLoading]= useState(true);
- const [error,setError] = useState("");
- const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [user, setUser] = useState({});
 
- useEffect(() => {
-  const token = localStorage.getItem("token");
- 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
     if (!userId) return;
 
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // thêm token vào header
-        },
-      });
+        const response = await axios.get(
+          `http://localhost:8080/users/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // thêm token vào header
+            },
+          }
+        );
 
         setUser(response.data);
-        
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,10 +51,10 @@ const [showLogout, setShowLogout] = useState(false);
   }, [userId]);
 
   const navigate = useNavigate();
-  const handleLogout = () =>{
+  const handleLogout = () => {
     localStorage.clear();
-    navigate("/login"); 
-  }
+    navigate("/login");
+  };
   return (
     <div className="hr-page">
       {/* Header */}
@@ -74,19 +75,18 @@ const [showLogout, setShowLogout] = useState(false);
             <img src={Bell} alt="Thông báo" className="icon-img" />
             <img src={Setting} alt="Cài đặt" className="icon-img" />
           </div>
-          
-<div className="avatar" onClick={() => setShowLogout(!showLogout)}>
-  <img src={avatar} alt="Avatar" />
-  {showLogout && (
-    <div className="logout-dropdown">
-      <button className="logout-btn" onClick={handleLogout}>
-        <img src={logoutIcon} alt="Logout" className="logout-icon" />
-        Đăng xuất
-      </button>
-    </div>
-  )}
-</div>
 
+          <div className="avatar" onClick={() => setShowLogout(!showLogout)}>
+            <img src={avatar} alt="Avatar" />
+            {showLogout && (
+              <div className="logout-dropdown">
+                <button className="logout-btn" onClick={handleLogout}>
+                  <img src={logoutIcon} alt="Logout" className="logout-icon" />
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -102,13 +102,63 @@ const [showLogout, setShowLogout] = useState(false);
             </div>
           </div>
           <ul className="sidebar-menu">
-            <li className="active">Bảng Tin</li>
-            <li>Quản Lý Công Ty</li>
-            <li onClick={() => navigate("/hr/jobs")}>Quản Lý Tin Tuyển Dụng</li>
-            <li>Quản lý Ứng Viên</li>
-            <li>TopCV AI (Đánh giá CV)</li>
-            <li>Thống Kê Tuyển dụng</li>
-            <li>Hoạt Động</li>
+            <li>
+              <NavLink
+                to="/hr"
+                end
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Bảng Tin
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/companies"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản Lý Công Ty
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/jobs"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản Lý Tin Tuyển Dụng
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/candidates"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý Ứng Viên
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/ai"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                🤖 TopCV AI (Đánh giá CV)
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/statistics"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Thống Kê Tuyển dụng
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/hr/activities"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Hoạt Động
+              </NavLink>
+            </li>
           </ul>
         </aside>
 
