@@ -4,7 +4,7 @@ import ManageJobSection from "../../components/HR/ManageJobSection";
 
 function ManageJobPage() {
   return (
-    <HRSection title="Quản Lý Các Vị Trí">
+    <HRSection title="Quản Lý Tin Tuyển Dụng">
       <ManageJobSection />
     </HRSection>
   );

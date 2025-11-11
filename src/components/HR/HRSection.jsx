@@ -53,8 +53,7 @@ const HRSection = ({ children }) => {
           <ul className="sidebar-menu">
             <li className="active">Bảng Tin</li>
             <li>Quản Lý Công Ty</li>
-            <li>Quản Lý Tin Tuyển Dụng</li>
-            <li onClick={() => navigate("/hr/jobs")}>Quản Lý Các Vị Trí</li>
+            <li onClick={() => navigate("/hr/jobs")}>Quản Lý Tin Tuyển Dụng</li>
             <li>Quản lý Ứng Viên</li>
             <li>TopCV AI (Đánh giá CV)</li>
             <li>Thống Kê Tuyển dụng</li>
