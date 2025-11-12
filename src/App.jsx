@@ -15,6 +15,7 @@ import BlogDetail from "./pages/Blog/BlogDetail";
 import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
+import NotificationsPage from "./pages/Notification/NotificationsPage";
 function App() {
   return (
     <Routes>
@@ -27,16 +28,18 @@ function App() {
       <Route path="/reset-success" element={<ResetSuccessPage />} />
       <Route path="/hr" element={<HRPage />} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+      <Route
+        path="/admin/job-categories"
+        element={<JobCategoryManagerPage />}
+      />
       <Route path="/hr/jobs" element={<ManageJobPage />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/company/public/:id" element={<CompanyDetailPage/>} />
+      <Route path="/company/public/:id" element={<CompanyDetailPage />} />
       <Route path="/jobs/:jobId" element={<JobDetail />} />
       <Route path="/search-results" element={<SearchPage />} />
-      
+      <Route path="/admin/notifications" element={<NotificationsPage />} />
     </Routes>
-    
   );
 }
 
