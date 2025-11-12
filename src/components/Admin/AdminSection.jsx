@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";import { Link } from "react-router-dom";
 import "./AdminSection.css";
 import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi";
@@ -8,14 +7,31 @@ import avatar from "../../assets/hr/avatar.png";
 import Bell from "../../assets/hr/bell.png";
 import Setting from "../../assets/hr/setting.png";
 import { useNavigate } from "react-router-dom";
-
+import { jobAPI } from "../../services/auth.services";
 export default function AdminSection({ children }) {
   const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
   const handleLogout = () =>{
     localStorage.clear();
     navigate("/login"); 
   }
+  // Lấy số job đang chờ duyệt
+  const fetchPendingCount = async () => {
+    try {
+      const res = await jobAPI.getAllJobs();
+      const pending = res.data.filter(j => j.status === "PENDING").length;
+      setPendingCount(pending);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingCount();
+    const interval = setInterval(fetchPendingCount, 10000); // Cập nhật mỗi 10s
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="hr-page">
       {/* === HEADER === */}
@@ -35,8 +51,12 @@ export default function AdminSection({ children }) {
         </div>
        <div className="header-right">
   <div className="header-icons">
-    <img src={Bell} alt="Thông báo" className="icon-img" />
-    <img src={Setting} alt="Cài đặt" className="icon-img" />
+<div className="notification-wrapper" onClick={() => navigate("/admin/notifications")}>
+              <img src={Bell} alt="Thông báo" className="icon-img" />
+              {pendingCount > 0 && (
+                <span className="notification-badge">{pendingCount}</span>
+              )}
+            </div>    <img src={Setting} alt="Cài đặt" className="icon-img" />
   </div>
           <div className="avatar" onClick={() => setShowLogout(!showLogout)}>
             <img src={avatar} alt="Avatar"onClick={() => setShowLogout(!showLogout)}></img>

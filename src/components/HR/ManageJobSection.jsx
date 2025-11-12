@@ -42,7 +42,6 @@ function ManageJobSection() {
     }
   };
 
-
   // ✅ Load danh mục và công ty cho dropdown
   const fetchDropdownData = async () => {
     try {
@@ -74,10 +73,10 @@ function ManageJobSection() {
 
   // ✅ Mở modal
   const openModal = async (job = null) => {
-  // Tải lại dropdown mỗi khi mở modal (để cập nhật công ty/danh mục mới)
-  await fetchDropdownData();
-  console.log("openModal - job:", job); // THÊM DÒNG NÀY
-  console.log("editingId sẽ là:", job?.id);
+    // Tải lại dropdown mỗi khi mở modal (để cập nhật công ty/danh mục mới)
+    await fetchDropdownData();
+    console.log("openModal - job:", job); // THÊM DÒNG NÀY
+    console.log("editingId sẽ là:", job?.id);
     if (job) {
       setForm({
         title: job.title,
@@ -119,36 +118,36 @@ function ManageJobSection() {
   };
 
   // ✅ Gửi form (thêm/sửa)
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    if (editingId) {
-      // GIỮ companyId KHI SỬA → backend chấp nhận
-      await jobAPI.updateJob(editingId, form);
-      alert("Cập nhật thành công!");
-    } else {
-      await jobAPI.createJob(form);
-      alert("Thêm mới thành công!");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        // GIỮ companyId KHI SỬA → backend chấp nhận
+        await jobAPI.updateJob(editingId, form);
+        alert("Cập nhật thành công!");
+      } else {
+        await jobAPI.createJob(form);
+        alert("Thêm mới thành công!");
+      }
+      closeModal();
+      fetchJobs();
+    } catch (err) {
+      console.error("Lỗi:", err.response?.data || err);
+      alert("Thao tác thất bại!");
     }
-    closeModal();
-    fetchJobs();
-  } catch (err) {
-    console.error("Lỗi:", err.response?.data || err);
-    alert("Thao tác thất bại!");
-  }
-};
+  };
 
   // ✅ Xóa Job
   const handleDelete = async (id) => {
-  if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
-  try {
-    await jobAPI.deleteJob(id); // ← Xóa bất kỳ job nào
-    fetchJobs();
-  } catch (err) {
-    console.error("Lỗi khi xóa job:", err);
-    alert("Xóa thất bại!");
-  }
-};
+    if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
+    try {
+      await jobAPI.deleteJob(id); // ← Xóa bất kỳ job nào
+      fetchJobs();
+    } catch (err) {
+      console.error("Lỗi khi xóa job:", err);
+      alert("Xóa thất bại!");
+    }
+  };
   return (
     <div className="admin-content">
       <div className="job-category-manager">
@@ -198,7 +197,11 @@ function ManageJobSection() {
                           job.status?.toLowerCase() || "pending"
                         }`}
                       >
-                        {job.status || "PENDING"}
+                        {job.status === "APPROVED"
+                          ? "APPROVED"
+                          : job.status === "PENDING"
+                          ? "PENDING"
+                          : job.status || "PENDING"}
                       </small>
                     </td>
                     <td className="actions">
