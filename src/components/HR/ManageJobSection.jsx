@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "./ManageJobSection.css";
-import { jobAPI } from "../../services/auth.services";
+import {
+  jobAPI,
+  jobCategoryAPI,
+  companyAPI,
+} from "../../services/auth.services";
 
 function ManageJobSection() {
+  const [dropdownLoading, setDropdownLoading] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,12 +42,42 @@ function ManageJobSection() {
     }
   };
 
+
+  // ✅ Load danh mục và công ty cho dropdown
+  const fetchDropdownData = async () => {
+    try {
+      setDropdownLoading(true);
+      const [catRes, comRes] = await Promise.all([
+        jobCategoryAPI.getAll(),
+        companyAPI.getAllActive(),
+      ]);
+
+      console.log("Danh mục nghề:", catRes.data);
+      console.log("Công ty:", comRes.data);
+
+      setCategories(Array.isArray(catRes.data) ? catRes.data : []);
+      setCompanies(Array.isArray(comRes.data) ? comRes.data : []);
+    } catch (err) {
+      console.error("Lỗi khi tải dropdown:", err);
+      alert("Không thể tải danh sách công ty/danh mục!");
+      setCategories([]);
+      setCompanies([]);
+    } finally {
+      setDropdownLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchJobs();
+    fetchDropdownData(); // ← Thêm dòng này
   }, []);
 
   // ✅ Mở modal
-  const openModal = (job = null) => {
+  const openModal = async (job = null) => {
+  // Tải lại dropdown mỗi khi mở modal (để cập nhật công ty/danh mục mới)
+  await fetchDropdownData();
+  console.log("openModal - job:", job); // THÊM DÒNG NÀY
+  console.log("editingId sẽ là:", job?.id);
     if (job) {
       setForm({
         title: job.title,
@@ -51,13 +88,11 @@ function ManageJobSection() {
         salaryMin: job.salaryMin || "",
         salaryMax: job.salaryMax || "",
         experienceRequired: job.experienceRequired || "",
-        expiredAt: job.expiredAt
-          ? job.expiredAt.slice(0, 16)
-          : "",
+        expiredAt: job.expiredAt ? job.expiredAt.slice(0, 16) : "",
         companyId: job.companyId || "",
         categoryId: job.categoryId || "",
       });
-      setEditingId(job.id || job.jobId);
+      setEditingId(job.jobId);
     } else {
       setForm({
         title: "",
@@ -84,36 +119,36 @@ function ManageJobSection() {
   };
 
   // ✅ Gửi form (thêm/sửa)
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingId) {
-        await jobAPI.updateJob(editingId, form);
-        alert("Cập nhật công việc thành công!");
-      } else {
-        await jobAPI.createJob(form);
-        alert("Thêm công việc mới thành công!");
-      }
-      closeModal();
-      fetchJobs();
-    } catch (err) {
-      console.error("Lỗi khi lưu công việc:", err);
-      alert("Thao tác thất bại!");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    if (editingId) {
+      // GIỮ companyId KHI SỬA → backend chấp nhận
+      await jobAPI.updateJob(editingId, form);
+      alert("Cập nhật thành công!");
+    } else {
+      await jobAPI.createJob(form);
+      alert("Thêm mới thành công!");
     }
-  };
+    closeModal();
+    fetchJobs();
+  } catch (err) {
+    console.error("Lỗi:", err.response?.data || err);
+    alert("Thao tác thất bại!");
+  }
+};
 
   // ✅ Xóa Job
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
-    try {
-      await jobAPI.deleteJob(id);
-      fetchJobs();
-    } catch (err) {
-      console.error("Lỗi khi xóa job:", err);
-      alert("Xóa thất bại!");
-    }
-  };
-
+  if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
+  try {
+    await jobAPI.deleteJob(id); // ← Xóa bất kỳ job nào
+    fetchJobs();
+  } catch (err) {
+    console.error("Lỗi khi xóa job:", err);
+    alert("Xóa thất bại!");
+  }
+};
   return (
     <div className="admin-content">
       <div className="job-category-manager">
@@ -175,9 +210,7 @@ function ManageJobSection() {
                       </button>
                       <button
                         className="delete-btn"
-                        onClick={() =>
-                          handleDelete(job.id || job.jobId)
-                        }
+                        onClick={() => handleDelete(job.jobId)}
                       >
                         Xóa
                       </button>
@@ -193,10 +226,7 @@ function ManageJobSection() {
       {/* 🧩 Modal thêm/sửa Job */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>{editingId ? "Chỉnh sửa Job" : "Thêm Job mới"}</h3>
             <form className="modal-form" onSubmit={handleSubmit}>
               <div className="form-group full-width ">
@@ -204,9 +234,7 @@ function ManageJobSection() {
                 <input
                   type="text"
                   value={form.title}
-                  onChange={(e) =>
-                    setForm({ ...form, title: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
                   required
                 />
               </div>
@@ -318,28 +346,71 @@ function ManageJobSection() {
                 />
               </div>
 
+              {/* Dropdown Công ty - ĐÃ SỬA */}
               <div className="form-group">
-                <label>ID Công ty</label>
-                <input
-                  type="text"
-                  value={form.companyId}
-                  onChange={(e) =>
-                    setForm({ ...form, companyId: e.target.value })
-                  }
-                />
+                <label>Công ty *</label>
+                {dropdownLoading ? (
+                  <select disabled>
+                    <option>Đang tải...</option>
+                  </select>
+                ) : (
+                  <select
+                    value={form.companyId}
+                    onChange={(e) =>
+                      setForm({ ...form, companyId: e.target.value })
+                    }
+                    required
+                  >
+                    <option value="">-- Chọn công ty --</option>
+                    {companies
+                      .filter((comp) => comp && comp.companyId) // Chỉ lấy có id
+                      .map((comp) => {
+                        const shortId =
+                          comp.companyId && String(comp.companyId).length > 8
+                            ? String(comp.companyId).substring(0, 8)
+                            : comp.companyId || "";
+                        return (
+                          <option key={comp.companyId} value={comp.companyId}>
+                            {comp.name || "Không tên"} (ID: {shortId}...)
+                          </option>
+                        );
+                      })}
+                  </select>
+                )}
               </div>
 
+              {/* Dropdown Danh mục - ĐÃ SỬA */}
               <div className="form-group">
-                <label>ID Danh mục</label>
-                <input
-                  type="text"
-                  value={form.categoryId}
-                  onChange={(e) =>
-                    setForm({ ...form, categoryId: e.target.value })
-                  }
-                />
+                <label>Danh mục nghề *</label>
+                {dropdownLoading ? (
+                  <select disabled>
+                    <option>Đang tải...</option>
+                  </select>
+                ) : (
+                  <select
+                    value={form.categoryId}
+                    onChange={(e) =>
+                      setForm({ ...form, categoryId: e.target.value })
+                    }
+                    required
+                  >
+                    <option value="">-- Chọn danh mục --</option>
+                    {categories
+                      .filter((cat) => cat && cat.categoryId)
+                      .map((cat) => {
+                        const shortId =
+                          cat.categoryId && String(cat.categoryId).length > 8
+                            ? String(cat.categoryId).substring(0, 8)
+                            : cat.categoryId || "";
+                        return (
+                          <option key={cat.categoryId} value={cat.categoryId}>
+                            {cat.name || "Không tên"} (ID: {shortId}...)
+                          </option>
+                        );
+                      })}
+                  </select>
+                )}
               </div>
-
               <div className="modal-actions">
                 <button
                   type="button"
