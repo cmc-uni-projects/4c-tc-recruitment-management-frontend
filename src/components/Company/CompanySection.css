@@ -1,44 +1,294 @@
-.company-detail-container {
-  max-width: 960px;
+/* ====================== PAGE ====================== */
+.company-detail-page {
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.cover-section {
+/* ====================== HERO ====================== */
+/* ====================== HERO ====================== */
+.detail-hero {
   position: relative;
+  margin-bottom: 32px;
+  border-radius: 16px;
+  overflow: visible;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: #fff;
 }
 
-.cover-img {
+.detail-cover {
+  height: 260px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.detail-cover-img {
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
+  transition: transform 0.4s ease;
 }
 
-.logo-img {
-  position: absolute;
-  bottom: -28px;
-  left: 20px;
-  width: 64px;
-  height: 64px;
+.detail-hero:hover .detail-cover-img {
+  transform: scale(1.03);
+}
+
+/* Phần DƯỚI ảnh cover: logo + tiêu đề */
+.detail-hero-below {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 0 32px;
+  margin-top: -60px; /* Đẩy lên để logo "nổi" vào ảnh */
+  pointer-events: none;
+}
+
+.detail-logo-wrapper {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.detail-logo {
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  border-radius: 12px;
-  background: white;
-  padding: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  border-radius: 18px;
+  padding: 8px;
+  border: 6px solid #fff;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  transition: all 0.3s ease;
 }
 
-.info-section {
-  margin-top: 48px;
+/* Hover */
+.detail-hero:hover .detail-logo-wrapper {
+  transform: translateY(-6px);
 }
 
-.info-section h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 16px;
+.detail-hero:hover .detail-logo {
+  transform: scale(1.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
-.info-section p {
+/* Tiêu đề - DƯỚI ảnh */
+.detail-title {
+  flex: 1;
+  padding-top: 12px;
+  padding-bottom: 10px;
+  pointer-events: auto;
+  color: #1a1a1a;
+}
+
+.detail-title h1 {
+  padding-top: 50px;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #1a1a1a;
+}
+
+.detail-subtitle {
   font-size: 16px;
-  margin-bottom: 8px;
+  font-weight: 500;
+  color: #00b14f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.detail-city {
+  font-size: 15px;
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+.detail-city i {
+  color: #00b14f;
+}
+/* ====================== INFO GRID ====================== */
+.detail-info-section {
+  margin-bottom: 60px;
+}
+
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Card chung */
+.info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.info-icon {
+  font-size: 20px;
+  color: #00b14f;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0f7e9;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.info-card strong {
+  display: block;
+  font-size: 14px;
+  color: #004d40;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 15px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.info-card a {
+  color: #00b14f;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.info-card a:hover {
+  text-decoration: underline;
+}
+
+/* Mô tả */
+.description-card {
+  grid-column: span 1;
+}
+
+.company-desc {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: #333;
+  margin-top: 6px;
+}
+
+/* ====================== ACTIONS ====================== */
+.detail-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #00b14f;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #009d45;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 177, 79, 0.3);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #00b14f;
+  border: 2px solid #00b14f;
+}
+
+.btn-secondary:hover {
+  background: #f0fdf4;
+  border-color: #009d45;
+  color: #009d45;
+}
+
+/* ====================== SKELETON & ERROR ====================== */
+.detail-skeleton,
+.detail-error {
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 768px) {
+  .detail-hero {
+    margin-bottom: 80px;
+  }
+
+  .detail-cover {
+    height: 200px;
+  }
+
+  .detail-hero-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 20px 80px 20px;
+  }
+
+  .detail-logo-wrapper {
+    bottom: -50px;
+    left: 20px;
+  }
+
+  .detail-logo {
+    width: 84px;
+    height: 84px;
+  }
+
+  .detail-title {
+    margin-left: 0;
+    margin-top: 70px;
+  }
+
+  .detail-title h1 {
+    font-size: 24px;
+  }
+
+  .detail-subtitle,
+  .detail-city {
+    font-size: 14px;
+  }
+
+  .detail-info-grid {
+    grid-template-columns: 1fr;
+  }
 }

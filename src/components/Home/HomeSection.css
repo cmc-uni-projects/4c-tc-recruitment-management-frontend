@@ -648,8 +648,9 @@ position: relative;
 
 .company-logo {
   position: absolute;
+  bottom: -28px;
   left: 16px;
-  transform: none;
+transform: none;
   width: 56px;
   height: 56px;
   object-fit: contain;
@@ -674,24 +675,29 @@ position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .company-address {
   font-size: 13px;
   color: #666;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.company-description {
-  display: -webkit-box !important;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  line-clamp: 2; /* hỗ trợ chuẩn mới */
-  max-height: 3.2em; /* đảm bảo chiều cao tương ứng 2 dòng */
-  line-height: 1.6em;
+  margin: 0;
+  display: block;
   white-space: normal;
 }
 
-
+/* MÔ TẢ: 2 dòng, cắt + ... */
+.company-description {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.3;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;        /* hoặc overflow-wrap */
+  overflow-wrap: break-word;    /* Đảm bảo từ dài cũng xuống dòng */
+  white-space: normal;
+  padding: 0px 10px 0px 10px ;
+}
