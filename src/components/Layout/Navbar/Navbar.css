@@ -150,3 +150,128 @@
   align-items: center;
   gap: 60px;
 }
+/* Dropdown Việc làm */
+.nav-links .dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  display: none;
+  flex-wrap: wrap;
+  gap: 40px;
+  width: 620px;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.dropdown-section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #0f9d58;
+}
+
+.dropdown-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-section ul li {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-section ul li:hover {
+  background: #e6f5ec;
+  color: #0f9d58;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+  display: none;
+  flex-wrap: nowrap;
+  gap: 40px;
+  width: 900px;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-section {
+  flex: 1;
+}
+
+.dropdown-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.dropdown-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-section ul li {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-section ul li img {
+  width: 18px;
+  height: 18px;
+}
+
+.dropdown-section ul li:hover {
+  background: #e6f5ec;
+  color: #0f9d58;
+}

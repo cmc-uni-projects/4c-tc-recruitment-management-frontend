@@ -1,7 +1,10 @@
-// src/components/Layout/Navbar.jsx
+import { FaSearch, FaRegBookmark, FaClipboardList, FaRegCheckCircle } from "react-icons/fa";
+import { MdBusiness, MdStars } from "react-icons/md";
+
 import avatar from "../../../assets/hr/avatar.png";
 import logoutIcon from "../../../assets/hr/logout.png";
 import "./Navbar.css";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -13,7 +16,7 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId"); // giả sử bạn lưu userId khi login
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     if (!token || !userId) {
@@ -23,14 +26,9 @@ export default function Navbar() {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`http://localhost:8080/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         setUser({
           name: response.data.fullName || response.data.name || "Người dùng",
@@ -38,7 +36,6 @@ export default function Navbar() {
         });
       } catch (err) {
         console.error("Lỗi lấy thông tin user:", err);
-        // Nếu lỗi token → tự động logout
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
       } finally {
@@ -65,33 +62,78 @@ export default function Navbar() {
           <span className="top">Smart</span>
           <span className="cv">Hire</span>
         </Link>
+
+        {/* Menu với dropdown cho Việc làm */}
         <ul className="nav-links">
-          <li>Việc làm</li>
-          <li>Công ty</li>
+          <li className="dropdown">
+            Việc làm
+            <div className="dropdown-menu">
+              {/* Cột 1 */}
+              <div className="dropdown-section">
+                <h4>VIỆC LÀM</h4>
+                <ul>
+                  <li><FaSearch /> Tìm việc làm</li>
+                  <li><FaRegBookmark /> Việc làm đã lưu</li>
+                  <li><FaClipboardList /> Việc làm đã ứng tuyển</li>
+                  <li><FaRegCheckCircle /> Việc làm phù hợp</li>
+                </ul>
+
+                <h4>CÔNG TY</h4>
+                <ul>
+                  <li><MdBusiness /> Danh sách công ty</li>
+                  <li><MdStars /> Top công ty</li>
+                </ul>
+              </div>
+
+              {/* Cột 2 */}
+              <div className="dropdown-section">
+                <h4>VIỆC LÀM THEO VỊ TRÍ</h4>
+                <ul>
+                  <li>Việc làm Nhân viên kinh doanh</li>
+                  <li>Việc làm Kế toán</li>
+                  <li>Việc làm Marketing</li>
+                  <li>Việc làm Hành chính nhân sự</li>
+                  <li>Việc làm Chăm sóc khách hàng</li>
+                  <li>Việc làm Ngân hàng</li>
+                  <li>Việc làm IT</li>
+                </ul>
+              </div>
+
+              {/* Cột 3 */}
+              <div className="dropdown-section">
+                <h4>VIỆC LÀM THEO VỊ TRÍ</h4>
+                <ul>
+                  <li>Việc làm Lao động phổ thông</li>
+                  <li>Việc làm Senior</li>
+                  <li>Việc làm Kỹ sư xây dựng</li>
+                  <li>Việc làm Thiết kế đồ họa</li>
+                  <li>Việc làm Bất động sản</li>
+                  <li>Việc làm Giáo dục</li>
+                  <li>Việc làm telesales</li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li>Tạo CV</li>
+          <li>Công cụ</li>
           <li>Cẩm nang nghề nghiệp</li>
           <li>TopCV Pro</li>
         </ul>
       </div>
 
+      {/* User menu bên phải */}
       <div className="navbar-right">
         {loading ? (
           <div className="user-name">Đang tải...</div>
         ) : user ? (
-          <div
-            className="user-menu"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
+          <div className="user-menu" onClick={() => setShowDropdown(!showDropdown)}>
             <img src={avatar} alt="Avatar" className="user-avatar" />
             <span className="user-name">{user.name}</span>
 
             {showDropdown && (
               <div className="user-dropdown">
                 <div className="dropdown-item" onClick={handleLogout}>
-                  <img
-                    src={logoutIcon}
-                    alt="Đăng xuất"
-                    className="logout-icon"
-                  />
+                  <img src={logoutIcon} alt="Đăng xuất" className="logout-icon" />
                   Đăng xuất
                 </div>
               </div>
