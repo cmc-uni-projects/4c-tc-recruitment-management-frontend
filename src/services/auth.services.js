@@ -1,4 +1,4 @@
-// src/services/auth.services.js
+// src/services/auth.services.js 
 import api from "../configs/axios.config.js";
 
 // 🔹 Đăng ký tài khoản
@@ -71,6 +71,8 @@ export const companyAPI = {
   getFeatured: () => api.get("/companies/featured"),
   getAllActive: () => api.get("/companies/public"),
   getById: (id) => api.get(`/companies/public/${id}`),
-}
-
-  
+  getAll: () => api.get("/companies"),
+  create: (data) => api.post("/companies", data),
+  update: (id, data) => api.put(`/companies/${id}`, data),
+  delete: (id) => api.delete(`/companies/${id}`),
+};
