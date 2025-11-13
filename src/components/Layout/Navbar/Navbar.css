@@ -275,3 +275,13 @@
   background: #e6f5ec;
   color: #0f9d58;
 }
+.arrow-icon {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #333;
+  transition: transform 0.2s ease;
+}
+
+.dropdown:hover .arrow-icon {
+  color: #0f9d58;
+}

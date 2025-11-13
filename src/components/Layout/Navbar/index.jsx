@@ -9,6 +9,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -65,9 +67,13 @@ export default function Navbar() {
 
         {/* Menu với dropdown cho Việc làm */}
         <ul className="nav-links">
-          <li className="dropdown">
-            Việc làm
-            <div className="dropdown-menu">
+
+<li
+  className="dropdown"
+  onMouseEnter={() => setShowDropdown(true)}
+  onMouseLeave={() => setShowDropdown(false)}
+>
+ Việc làm {showDropdown ? <FaChevronUp className="arrow-icon" /> : <FaChevronDown className="arrow-icon" />}            <div className="dropdown-menu">
               {/* Cột 1 */}
               <div className="dropdown-section">
                 <h4>VIỆC LÀM</h4>
