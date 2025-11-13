@@ -16,6 +16,8 @@ import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
+import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
+
 function App() {
   return (
     <Routes>
@@ -39,6 +41,7 @@ function App() {
       <Route path="/jobs/:jobId" element={<JobDetail />} />
       <Route path="/search-results" element={<SearchPage />} />
       <Route path="/admin/notifications" element={<NotificationsPage />} />
+       <Route path="/saved-jobs" element={<SavedJobsPage />} />
     </Routes>
   );
 }
