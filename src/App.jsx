@@ -17,6 +17,7 @@ import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
+import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
       <Route path="/search-results" element={<SearchPage />} />
       <Route path="/admin/notifications" element={<NotificationsPage />} />
        <Route path="/saved-jobs" element={<SavedJobsPage />} />
+       <Route path="/applied-jobs" element={<AppliedJobsPage />} />
     </Routes>
   );
 }

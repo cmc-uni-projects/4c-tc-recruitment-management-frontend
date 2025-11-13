@@ -1,0 +1,123 @@
+.applied-jobs-layout {
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.applied-jobs-left {
+  flex: 2;
+}
+
+.applied-jobs-right {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.filter-container {
+  margin-bottom: 20px;
+}
+
+.filter-select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.empty-applied-jobs {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.empty-image {
+  width: 120px;
+  margin-bottom: 16px;
+}
+
+.btn-find-jobs {
+  background-color: #27ae60;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.applied-jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.applied-job-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.job-info h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.company-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.job-location {
+  color: #666;
+  margin: 4px 0;
+}
+
+.job-status {
+  display: inline-block;
+  background-color: #eafaf1;
+  color: #27ae60;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.job-salary {
+  color: #e67e22;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.profile-management {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.btn-update-cv {
+  background-color: #3498db;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.banner-image {
+  width: 100%;
+  border-radius: 8px;
+}
