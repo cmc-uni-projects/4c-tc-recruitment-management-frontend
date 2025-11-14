@@ -19,6 +19,7 @@ import NotificationsPage from "./pages/Notification/NotificationsPage";
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
 import MyCVPage from "./pages/MyCV/MyCVPage";
+import PersonalSettingsPage from "./pages/PersonalSettings/PersonalSettingsPage";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
        <Route path="/saved-jobs" element={<SavedJobsPage />} />
        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
         <Route path="/my-cv" element={<MyCVPage />} />
+        <Route path="/personal-settings" element={<PersonalSettingsPage />} />
     </Routes>
   );
 }
