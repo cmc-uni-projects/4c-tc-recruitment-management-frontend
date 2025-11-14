@@ -48,14 +48,21 @@
   border-radius: 50%;        /* Giúp container có dạng tròn */
 }
 
-/* Logo công ty */
-.company-logo {
-  width: 100%;               /* Logo chiếm toàn bộ chiều rộng của container */
-  height: 100%;              /* Logo chiếm toàn bộ chiều cao của container */
-  object-fit: contain;       /* Đảm bảo logo giữ nguyên tỷ lệ mà không bị méo */
+.company-logo1 {
+  position: absolute;
+  left: 16px;
+transform: none;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 2;
 }
 
-.company-logo:hover {
+.company-logo1:hover {
   transform: scale(1.1); /* Phóng to logo khi hover */
 }
 

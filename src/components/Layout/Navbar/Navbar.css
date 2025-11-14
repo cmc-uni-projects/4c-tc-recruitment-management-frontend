@@ -35,6 +35,17 @@
   align-items: center;
 }
 
+.nav-link {
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none; /* bỏ gạch chân */
+}
+
+.nav-link:hover {
+  color: #0f9d58; /* màu xanh lá đồng bộ */
+}
+
 .nav-links li {
   cursor: pointer;
   font-weight: 500;

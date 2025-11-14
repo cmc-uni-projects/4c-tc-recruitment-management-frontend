@@ -17,6 +17,7 @@ import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
+import CompanyListPage from "./pages/Company/CompanyListPage";
 function App() {
   return (
     <Routes>
@@ -41,6 +42,7 @@ function App() {
       <Route path="/search-results" element={<SearchPage />} />
       <Route path="/admin/notifications" element={<NotificationsPage />} />
       <Route path="/admin/companies" element={<CompanyManagerPage />} />
+      <Route path="/companies/public" element={<CompanyListPage />} />
     </Routes>
   );
 }

@@ -67,7 +67,7 @@ export default function LatestJobsSection() {
             <img
               src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
               alt={job.companyName}
-              className="company-logo"
+              className="company-logo1"
             />
             </div>
 

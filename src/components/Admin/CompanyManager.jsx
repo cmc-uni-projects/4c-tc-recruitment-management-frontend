@@ -23,13 +23,22 @@ export default function AdminCompanyManager() {
   });
   const [editingId, setEditingId] = useState(null);
 
+  // 🔍 State cho tìm kiếm và bộ lọc
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [featuredFilter, setFeaturedFilter] = useState("ALL");
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
+
   // Fetch all companies
   const fetchCompanies = async () => {
     try {
-        setLoading(true);
-        const res = await companyAPI.getAll();
-        const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setCompanies(sorted);
+      setLoading(true);
+      const res = await companyAPI.getAll();
+      const sorted = res.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setCompanies(sorted);
+      setFilteredCompanies(sorted); // mặc định hiển thị tất cả
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -44,6 +53,20 @@ export default function AdminCompanyManager() {
   useEffect(() => {
     fetchCompanies();
   }, []);
+
+  // Hàm áp dụng tìm kiếm và lọc
+  const applyFilters = () => {
+    const result = companies.filter((c) => {
+      const matchName = c.name.toLowerCase().includes(search.toLowerCase());
+      const matchStatus = statusFilter === "ALL" || c.status === statusFilter;
+      const matchFeatured =
+        featuredFilter === "ALL" ||
+        (featuredFilter === "YES" && c.featured) ||
+        (featuredFilter === "NO" && !c.featured);
+      return matchName && matchStatus && matchFeatured;
+    });
+    setFilteredCompanies(result);
+  };
 
   // Open modal
   const openModal = (company = null) => {
@@ -140,7 +163,6 @@ export default function AdminCompanyManager() {
       confirmButtonText: "Xóa",
       cancelButtonText: "Hủy",
     });
-
     if (result.isConfirmed) {
       try {
         await companyAPI.delete(id);
@@ -170,6 +192,36 @@ export default function AdminCompanyManager() {
         </button>
       </div>
 
+      {/* Thanh tìm kiếm và bộ lọc */}
+      <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Tìm kiếm công ty..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="search-input"
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="ALL">Tất cả trạng thái</option>
+          <option value="ACTIVE">Hoạt động</option>
+          <option value="INACTIVE">Ngừng hoạt động</option>
+        </select>
+        <select
+          value={featuredFilter}
+          onChange={(e) => setFeaturedFilter(e.target.value)}
+        >
+          <option value="ALL">Tất cả</option>
+          <option value="YES">Nổi bật</option>
+          <option value="NO">Không nổi bật</option>
+        </select>
+        <button className="btn-search" onClick={applyFilters}>
+          Tìm kiếm
+        </button>
+      </div>
+
       {loading ? (
         <p className="loading">Đang tải dữ liệu...</p>
       ) : (
@@ -184,14 +236,14 @@ export default function AdminCompanyManager() {
             </tr>
           </thead>
           <tbody>
-            {companies.length === 0 ? (
+            {filteredCompanies.length === 0 ? (
               <tr>
                 <td colSpan="5" className="no-data">
-                  Chưa có công ty nào
+                  Không tìm thấy công ty nào
                 </td>
               </tr>
             ) : (
-              companies.map((c) => (
+              filteredCompanies.map((c) => (
                 <tr key={c.companyId}>
                   <td>{c.name}</td>
                   <td>{c.industry || "-"}</td>
