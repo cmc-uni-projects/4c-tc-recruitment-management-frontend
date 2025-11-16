@@ -77,7 +77,7 @@ const calculateDaysLeft = (expiredAt) => {
         <div className="job-detail-container">
         {/* Left Column */}
         <div className="job-left">
-          <div className="breadcrumb">Trang chủ &gt; Việc làm IT &gt; {job.title}</div>
+          <div className="breadcrumb">Trang chủ &gt; Việc làm &gt; {job.title}</div>
 
           {/* Header */}
           <div className="job-header">

@@ -108,21 +108,22 @@ position: relative;
 }
 .location-select-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+}
+
+.location-select-wrapper select {
+  width: 100%;
+  padding-left: 28px !important;   /* ĐẨY chữ sang phải */
+  font-family: inherit;
 }
 
 .select-multi-location__icon {
   position: absolute;
-  left: 10px;
-  color: #666;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   pointer-events: none;
-  z-index: 1;
-}
-
-.location-select-wrapper select {
-  padding-left: 30px; /* để tránh icon đè lên text */
-  height: 36px;
+  color: #666;
+  font-size: 14px;
 }
 
 
