@@ -352,3 +352,54 @@
 .logout-btn:hover {
   background-color: #e0e0e0;
 }
+/* === TRẠNG THÁI XÁC THỰC TRONG SIDEBAR === */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.verified-status {
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin: 4px 0;
+  width: fit-content;
+  transition: all 0.2s;
+}
+
+.verified-status svg {
+  flex-shrink: 0;
+}
+
+.verified {
+  background: #e6f7ef;
+  color: #00b14f;
+  border: 1px solid #00b14f33;
+}
+
+.not-verified {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #dc262633;
+  cursor: pointer;
+}
+
+.not-verified:hover {
+  background: #fee2e2;
+  transform: translateX(2px);
+}
+
+.verify-now {
+  color: #dc2626;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.verify-now:hover {
+  color: #b91c1c;
+}
