@@ -168,3 +168,6 @@
     grid-template-columns: 1fr;
   }
 }
+.save-icon .saved {
+  color: red; /* hoặc màu bạn muốn */
+}
