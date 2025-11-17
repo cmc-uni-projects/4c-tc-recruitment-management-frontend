@@ -119,14 +119,14 @@ export default function LatestJobsSection() {
               className="job-card"
               onClick={() => handleDetail(job.jobId)}
             >
-              {/* Logo công ty */}
-              <div className="logo-container">
-                <img
-                  src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
-                  alt={job.companyName}
-                  className="company-logo"
-                />
-              </div>
+            {/* Container logo công ty */}
+            <div className="logo-container">
+            <img
+              src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
+              alt={job.companyName}
+              className="company-logo1"
+            />
+            </div>
 
               {/* Nội dung chính */}
               <div className="job-info">

@@ -67,7 +67,7 @@ export default function Navbar() {
         </Link>
         <ul className="nav-links">
           <li>Việc làm</li>
-          <li>Công ty</li>
+          <Link to="/companies/public" className="nav-link">Công ty</Link>
           <li>Cẩm nang nghề nghiệp</li>
           <li>TopCV Pro</li>
         </ul>

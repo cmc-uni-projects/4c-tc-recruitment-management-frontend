@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { companyAPI } from "../../services/auth.services";
 import "./CompanySection.css";
@@ -7,6 +7,7 @@ const CompanyDetail = () => {
   const { id } = useParams();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     companyAPI.getById(id)
@@ -125,9 +126,9 @@ const CompanyDetail = () => {
           <Link to={`/jobs?company=${company.companyId}`} className="btn-primary">
             Xem việc làm tại {company.name}
           </Link>
-          <Link to="/" className="btn-secondary">
+          <button className="btn-secondary" onClick={() => navigate(-1)}>
             Quay lại
-          </Link>
+          </button>
         </div>
       </section>
     </div>
