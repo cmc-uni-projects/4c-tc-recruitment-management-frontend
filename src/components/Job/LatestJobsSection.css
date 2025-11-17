@@ -49,10 +49,10 @@
 }
 
 /* Logo công ty */
-.company-logo {
-  width: 100%;               /* Logo chiếm toàn bộ chiều rộng của container */
-  height: 100%;              /* Logo chiếm toàn bộ chiều cao của container */
+.company-logo {      
+  bottom: 28px;     
   object-fit: contain;       /* Đảm bảo logo giữ nguyên tỷ lệ mà không bị méo */
+
 }
 
 .company-logo:hover {

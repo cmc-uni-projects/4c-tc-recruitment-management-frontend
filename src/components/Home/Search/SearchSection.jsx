@@ -1,129 +1,151 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { jobAPI, jobCategoryAPI } from "../../../services/auth.services.js";
+import { Link } from "react-router-dom";
 import "./SearchSection.css";
 
 export default function SearchSection() {
-  const [keyword, setKeyword] = useState("");
-  const [location, setLocation] = useState("");
-  const [filter, setFilter] = useState("Tên việc làm");
-  const [sortBy, setSortBy] = useState("AI");
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
 
-  const locationsVN = [
-    "TP. Hồ Chí Minh",
-    "TP. Hà Nội",
-    "Đà Nẵng",
-    "Cần Thơ",
-    "Hải Phòng",
-    "Nghệ An",
-    "Khánh Hòa",
-  ];
+  // Lấy params từ URL
+  const initialKeyword = query.get("keyword") || "";
+  const initialLocation = query.get("location") || "";
+  const initialCategory = query.get("category") || "";
 
-  const jobs = [
-    {
-      id: 1,
-      title: "Kế Toán Trưởng 1991, 1992 (Thu Nhập Upto 26 Triệu) Đi Làm Ngay",
-      company: "CÔNG TY TNHH ALI LOGISTICS VIỆT NAM",
-      salary: "25 - 30 triệu",
-      location: "Hà Nội",
-      tags: ["Kế toán", "Tài chính", "Thuế"],
-    },
-    {
-      id: 2,
-      title: "Kế Toán Trưởng - Đi Làm Ngay - Thu Nhập Từ 30 - 40 Triệu / Tháng",
-      company: "CÔNG TY CP XNK TIẾN PHONG VN",
-      salary: "30 - 40 triệu",
-      location: "Hà Nội",
-      tags: ["Kế toán trưởng", "Cao đẳng", "3 năm kinh nghiệm"],
-    },
-  ];
+  const [keyword, setKeyword] = useState(initialKeyword);
+  const [location, setLocation] = useState(initialLocation);
+  const [category, setCategory] = useState(initialCategory);
 
+  const [categories, setCategories] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [locationsList, setLocationsList] = useState([]);
+
+  // ===== Load danh mục và location từ API =====
+  useEffect(() => {
+    jobCategoryAPI.getAll().then((res) => setCategories(res.data));
+
+    // Load location từ tất cả job
+    jobAPI.getApprovedJobs().then((res) => {
+      const allLocations = res.data
+        .map((job) => job.location)
+        .filter((loc) => loc && loc.trim() !== "");
+
+      const uniqueLocations = [...new Set(allLocations)].sort();
+
+      setLocationsList(uniqueLocations);
+    });
+  }, []);
+
+  // ===== Gọi API search ngay khi trang load =====
+  useEffect(() => {
+    fetchSearchResult(initialKeyword, initialLocation, initialCategory);
+  }, [initialKeyword, initialLocation, initialCategory]);
+
+  // ===== Hàm gọi API Search =====
+  const fetchSearchResult = async (keyword, location, category) => {
+    setLoading(true);
+    try {
+      const res = await jobAPI.searchJobs({
+        keyword,
+        location,
+        category,
+        page: 0,
+        size: 20,
+      });
+
+      setJobs(res.data);
+    } catch (e) {
+      console.error("Lỗi tìm kiếm:", e);
+    }
+    setLoading(false);
+  };
+
+  // ===== Khi user nhấn nút tìm kiếm lại =====
   const handleSearch = () => {
-    alert(`Tìm kiếm: ${keyword} tại ${location}`);
+    const params = new URLSearchParams({
+      keyword,
+      location,
+      category,
+    }).toString();
+
+    window.history.replaceState({}, "", `/search-results?${params}`);
+
+    fetchSearchResult(keyword, location, category);
   };
 
   return (
     <div className="search-section">
-      {/* Thanh tìm kiếm chính */}
+
+      {/* ========== SEARCH BAR ========== */}
       <div className="search-bar">
-        <select className="category-select">
-          <option>Danh mục Nghề</option>
-          <option>Kế toán - Kiểm toán</option>
-          <option>Kinh doanh - Bán hàng</option>
-          <option>IT - Phần mềm</option>
+
+        {/* Category */}
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">Danh mục Nghề</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
         </select>
 
+        {/* Keyword */}
         <input
           type="text"
-          placeholder="Vị trí tuyển dụng, tên công ty"
+          placeholder="Vị trí tuyển dụng, tên công ty..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
 
-        <div className="location-select-wrapper">
-          <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          >
-            <option value="">Địa điểm</option>
-            {locationsVN.map((loc, index) => (
-              <option key={index} value={loc}>
-                {loc}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Location */}
+      <div className="location-select-wrapper">
+        <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
+        <select value={location} onChange={(e) => setLocation(e.target.value)}>
+          <option value="">Địa điểm</option>
+          {locationsList.map((loc) => (
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
+          ))}
+        </select>
+      </div>
 
         <button className="btn-search" onClick={handleSearch}>
           Tìm kiếm
         </button>
       </div>
 
-      {/* Thanh lọc tìm kiếm */}
-      <div className="filter-bar">
-        <div className="filter-left">
-          <span>Tìm kiếm theo:</span>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option>Tên việc làm</option>
-            <option>Tên công ty</option>
-          </select>
-          <button className="btn-both">Cả hai</button>
-        </div>
-
-        <div className="filter-right">
-          <span>Sắp xếp theo:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="sort-select"
-          >
-            <option>Search by AI</option>
-            <option>Mới nhất</option>
-            <option>Mức lương cao nhất</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Danh sách việc làm */}
+      {/* ========== SEARCH RESULTS ========== */}
       <div className="job-list">
-        {jobs.map((job) => (
-          <div key={job.id} className="job-card">
-            <div className="job-info">
-              <h3 className="job-title">{job.title}</h3>
-              <p className="job-company">{job.company}</p>
-              <p className="job-location">{job.location}</p>
-              <div className="job-tags">
-                {job.tags.map((tag, i) => (
-                  <span key={i}>{tag}</span>
-                ))}
+        {loading && <p>Đang tải...</p>}
+        {!loading && jobs.length === 0 && <p>Không tìm thấy việc làm.</p>}
+
+        {!loading &&
+          jobs.map((job) => (
+            <Link 
+              to={`/jobs/${job.jobId}`} 
+              className="job-card"
+              key={job.jobId}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+
+
+              <div className="job-info">
+                <h3 className="job-title">{job.title}</h3>
+                <p className="job-company">{job.companyName}</p>
+                <p className="job-location">{job.location}</p>
               </div>
-            </div>
-            <div className="job-salary">{job.salary}</div>
-          </div>
-        ))}
+
+              <div className="job-salary">
+                {job.salaryMin && job.salaryMax
+                  ? `${(job.salaryMin / 1_000_000).toFixed(1)} - ${(job.salaryMax / 1_000_000).toFixed(1)} triệu`
+                  : "Thoả thuận"}
+              </div>
+
+            </Link>
+          ))}
       </div>
     </div>
   );

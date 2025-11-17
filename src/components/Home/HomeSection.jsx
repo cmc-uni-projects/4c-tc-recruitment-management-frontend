@@ -12,7 +12,9 @@ import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.p
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 import {companyAPI } from "../../services/auth.services.js";
+import {jobAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
+import toppyBanner from "../../assets/toppy_unemployed.png";
 import { Link } from "react-router-dom";
 
 const industries = [
@@ -36,12 +38,52 @@ const industries = [
 export default function HomeSection() {
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
+  const [category, setCategory] = useState("");
+  const [locations, setLocations] = useState([]);
   const navigate = useNavigate();
   const videoId = "E2AEQlU4QLI";
   const [popularCategories, setPopularCategories] = useState([]);
   const [featuredCompanies, setFeaturedCompanies] = useState([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+  useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const res = await jobAPI.getApprovedJobs();
+      const jobs = res.data;
+
+      // Tạo map: { Hà Nội: 12, HCM: 8, ... }
+      const locationCount = {};
+
+      jobs.forEach(job => {
+        const loc = job.location?.trim();
+        if (!loc) return; // bỏ job không có location
+
+        if (!locationCount[loc]) {
+          locationCount[loc] = 1;
+        } else {
+          locationCount[loc]++;
+        }
+      });
+
+      // Convert từ object sang array để sort
+      const sortedLocations = Object.entries(locationCount)
+        .map(([loc, count]) => ({ loc, count }))
+        .sort((a, b) => b.count - a.count); // sort giảm dần
+
+      setLocations(sortedLocations);
+
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách địa điểm:", error);
+    }
+  };
+
+  fetchLocations();
+}, []);
+
+
+
   useEffect(() => {
     const fetchPopularCategories = async () => {
       try {
@@ -73,12 +115,17 @@ export default function HomeSection() {
 
     fetchFeaturedCompanies();
   }, []);
-  const handleSearch = () => {
-    const query = `?keyword=${encodeURIComponent(
-      keyword
-    )}&location=${encodeURIComponent(location)}`;
-    navigate(`/search-results${query}`);
-  };
+const handleSearch = () => {
+  const query = new URLSearchParams({
+    keyword: keyword || "",
+    location: location || "",
+    category: category || "",
+  }).toString();
+
+  navigate(`/search-results?${query}`);
+};
+
+
   const openVideoModal = () => {
     setIsVideoLoading(true);
     setIsVideoOpen(true);
@@ -88,93 +135,85 @@ export default function HomeSection() {
     setIsVideoOpen(false);
     setIsVideoLoading(false);
   };
-  const locationsVN = [
-    "An Giang",
-    "Bắc Ninh",
-    "Cà Mau",
-    "Cao Bằng",
-    "TP. Cần Thơ",
-    "TP. Đà Nẵng",
-    "Đắk Lắk",
-    "Điện Biên",
-    "Đồng Nai",
-    "Đồng Tháp",
-    "Gia Lai",
-    "TP. Hà Nội",
-    "Hà Tĩnh",
-    "TP. Hải Phòng",
-    "TP. Hồ Chí Minh",
-    "TP. Huế",
-    "Hưng Yên",
-    "Khánh Hoà",
-    "Lai Châu",
-    "Lạng Sơn",
-    "Lào Cai",
-    "Lâm Đồng",
-    "Nghệ An",
-    "Ninh Bình",
-    "Phú Thọ",
-    "Quảng Ngãi",
-    "Quảng Ninh",
-    "Quảng Trị",
-    "Sơn La",
-    "Tây Ninh",
-    "Thái Nguyên",
-    "Thanh Hóa",
-    "Tuyên Quang",
-    "Vĩnh Long",
-  ];
+
   return (
     <div className="home-section">
       {/* === BANNER === */}
       <section className="banner">
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         {/* Thanh tìm kiếm chính */}
-      <div className="search-bar">
-        <select className="category-select">
-          <option>Danh mục Nghề</option>
-          <option>Kế toán - Kiểm toán</option>
-          <option>Kinh doanh - Bán hàng</option>
-          <option>IT - Phần mềm</option>
-        </select>
+      {/* === SEARCH BAR (REWRITTEN) === */}
+<div className="search-bar">
 
-        <input
-          type="text"
-          placeholder="Vị trí tuyển dụng, tên công ty"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-        />
+  {/* Category Dropdown - Đồng bộ với API */}
+  <select
+    className="category-select"
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+  >
+    <option value="">Danh mục nghề</option>
 
-        <div className="location-select-wrapper">
-          <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          >
-            <option value="">Địa điểm</option>
-            {locationsVN.map((loc, index) => (
-              <option key={index} value={loc}>
-                {loc}
-              </option>
-            ))}
-          </select>
-        </div>
+    {popularCategories.map((cat) => (
+      <option key={cat.categoryId || cat.name} value={cat.categoryId}>
+        {cat.name}
+      </option>
+    ))}
+  </select>
 
-        <button className="btn-search" onClick={handleSearch}>
-          Tìm kiếm
-        </button>
-      </div>
+  {/* Keyword input */}
+  <input
+    type="text"
+    placeholder="Vị trí tuyển dụng, tên công ty..."
+    value={keyword}
+    onChange={(e) => setKeyword(e.target.value)}
+    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+  />
+
+  {/* Location */}
+  <div className="location-select-wrapper">
+    <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
+    <select value={location} onChange={(e) => setLocation(e.target.value)}>
+  <option value="">Địa điểm</option>
+
+  {locations.map((item) => (
+    <option key={item.loc} value={item.loc}>
+      {item.loc} ({item.count} việc làm)
+    </option>
+  ))}
+</select>
+
+
+  </div>
+
+  <button className="btn-search" onClick={handleSearch}>
+    Tìm kiếm
+  </button>
+</div>
+
       
-        <div className="banner-content">
-          <img src="/banner.jpg" alt="Banner" />
-          <div className="job-stats">
-            <span>Thị trường việc làm hôm nay</span>
-            <p>
-              Việc làm đang tuyển: <strong>51,925</strong> | Việc làm mới hôm
-              nay: <strong>722</strong>
-            </p>
-          </div>
-        </div>
+        <div className="job-banner">
+  <div className="banner-left">
+    <div className="banner-header">
+      <i className="fa fa-briefcase"></i>
+      <span>Thị trường việc làm hôm nay</span>
+      <span className="date">{new Date().toLocaleDateString()}</span>
+    </div>
+    <div className="job-stats">
+      <span className="active-jobs">
+        Việc làm đang tuyển <strong>51,925</strong>
+      </span>
+      <span className="new-jobs">
+        Việc làm mới hôm nay <strong>722</strong>
+      </span>
+    </div>
+  </div>
+ 
+<div className="banner-right">
+  <img src={toppyBanner} alt="Toppy Banner" className="banner-image2" />
+  
+</div>
+
+</div>
         <section className="hero-video-section">
         <div className="hero-video-container">
           <div className="hero-video-thumbnail" onClick={openVideoModal}>

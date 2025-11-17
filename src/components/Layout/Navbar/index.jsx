@@ -1,5 +1,4 @@
-// src/components/Layout/Navbar.jsx
-import avatar from "../../../assets/hr/avatar.png";
+import avatarDefault from "../../../assets/hr/avatar.png";
 import logoutIcon from "../../../assets/hr/logout.png";
 import "./Navbar.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +7,8 @@ import axios from "axios";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [verified, setVerified] = useState(false);
+  const [userIdDisplay, setUserIdDisplay] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -23,22 +24,21 @@ export default function Navbar() {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`http://localhost:8080/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setUser({
           name: response.data.fullName || response.data.name || "Người dùng",
           email: response.data.email,
+          avatar: response.data.avatar || avatarDefault,
         });
+        setVerified(response.data.verified || false);
+        setUserIdDisplay(response.data.id || "");
       } catch (err) {
         console.error("Lỗi lấy thông tin user:", err);
-        // Nếu lỗi token → tự động logout
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
       } finally {
@@ -77,23 +77,59 @@ export default function Navbar() {
         {loading ? (
           <div className="user-name">Đang tải...</div>
         ) : user ? (
-          <div
-            className="user-menu"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
-            <img src={avatar} alt="Avatar" className="user-avatar" />
+          <div className="user-menu" onClick={() => setShowDropdown(!showDropdown)}>
+            <img src={user.avatar} alt="Avatar" className="user-avatar" />
             <span className="user-name">{user.name}</span>
 
             {showDropdown && (
               <div className="user-dropdown">
-                <div className="dropdown-item" onClick={handleLogout}>
-                  <img
-                    src={logoutIcon}
-                    alt="Đăng xuất"
-                    className="logout-icon"
-                  />
-                  Đăng xuất
+                {/* Header thông tin user */}
+                <div className="dropdown-header">
+                  <img src={user.avatar} alt="Avatar" className="dropdown-avatar" />
+                  <div className="dropdown-info">
+                    <p className="dropdown-name">{user.name}</p>
+                   
+<p className="verified-text">
+  {verified ? "Tài khoản đã xác thực" : "Tài khoản chưa xác thực"} </p>
+
+                    <p className="dropdown-email">ID {userIdDisplay} | {user.email}</p>
+                  </div>
                 </div>
+                <hr />
+
+                {/* Các mục menu */}
+                <div className="dropdown-section">
+                  <p className="section-title">Quản lý tìm việc</p>
+                  <ul>
+                    <li><Link to="/saved-jobs">Việc làm đã lưu</Link></li>
+                    <li><Link to="/applied-jobs">Việc làm đã ứng tuyển</Link></li>
+                    <li><Link to="/recommended-jobs">Gợi ý việc làm phù hợp với bạn</Link></li>
+                  </ul>
+                </div>
+
+                <div className="dropdown-section">
+                  <p className="section-title">Quản lý CV</p>
+                  <ul>
+                    <li><Link to="/my-cv">CV của tôi</Link></li>
+                
+                  </ul>
+                </div>
+
+                <div className="dropdown-section">
+                  <p className="section-title">Cài đặt tài khoản</p>
+                   <ul>
+                    <li><Link to="/personal-settings">Cài đặt thông tin cá nhân</Link></li>
+                
+                  </ul>
+                </div>
+
+               
+
+                {/* Nút đăng xuất */}
+                <button className="logout-btn" onClick={handleLogout}>
+                  <img src={logoutIcon} alt="Đăng xuất" className="logout-icon" />
+                 <span>Đăng xuất</span>
+                </button>
               </div>
             )}
           </div>
