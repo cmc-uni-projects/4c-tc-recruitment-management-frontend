@@ -110,6 +110,14 @@ export default function AdminSection({ children }) {
   </li>
   <li>
     <NavLink
+      to="/admin/companies"
+      className={({ isActive }) => isActive ? "active" : ""}
+    >
+      Quản lý công ty
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
       to="/admin/job-categories"
       className={({ isActive }) => isActive ? "active" : ""}
     >

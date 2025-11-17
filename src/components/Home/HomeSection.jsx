@@ -288,7 +288,7 @@ const handleSearch = () => {
           </div>
            <button
   className="btn-pro"
-  onClick={() => navigate("/companies")}
+  onClick={() => navigate("/companies/public")}
 >
   Xem tất cả công ty
 </button>
