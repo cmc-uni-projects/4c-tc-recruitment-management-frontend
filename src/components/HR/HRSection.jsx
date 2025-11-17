@@ -16,45 +16,55 @@ import axios from "axios";
 
 const HRSection = ({ children }) => {
   const [showLogout, setShowLogout] = useState(false);
-
-  const userId = localStorage.getItem("userId");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({ fullName: "Đang tải...", role: "HR" });
+  const [employer, setEmployer] = useState(null); // ← Quan trọng: trạng thái xác thực
+
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    if (!token || !userId) {
+      setLoading(false);
+      return;
+    }
 
-    if (!userId) return;
-
-    const fetchUser = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:8080/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // thêm token vào header
-            },
-          }
-        );
 
-        setUser(response.data);
+        // 1. Lấy thông tin User
+        const userRes = await axios.get(`http://localhost:8080/users/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(userRes.data);
+
+        // 2. Lấy thông tin Employer để kiểm tra verified
+        try {
+          const employerRes = await axios.get("http://localhost:8080/employers/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setEmployer(employerRes.data);
+        } catch (err) {
+          if (err.response?.status === 404) {
+            setEmployer(null); // Chưa tạo hồ sơ Employer
+          }
+        }
       } catch (err) {
-        setError(err.message);
+        console.error("Lỗi tải dữ liệu HR:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
-  }, [userId]);
-
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
+    fetchData();
+  }, [token, userId]);
   return (
     <div className="hr-page">
       {/* Header */}
@@ -97,8 +107,31 @@ const HRSection = ({ children }) => {
           <div className="sidebar-user">
             <img src={avatar} alt="User Avatar" />
             <div>
-              <p className="sidebar-name">{user.fullName}</p>
-              <p className="sidebar-role">{user.role}</p>
+              <p className="sidebar-name">
+                {loading ? "Đang tải..." : user.fullName || "HR User"}
+              </p>
+
+              {/* TRẠNG THÁI XÁC THỰC – ĐẸP NHƯ TOPCV */}
+              {loading ? (
+                <div className="verified-status loading">Đang kiểm tra...</div>
+              ) : employer?.verified ? (
+                <div className="verified-status verified">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                  Đã Xác Thực
+                </div>
+              ) : (
+                <div
+                  className="verified-status not-verified"
+                  onClick={() => navigate("/hr/profile")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Xác Thực Ngay
+                </div>
+              )}
+
+              <p className="sidebar-role">{user.role || "HR"}</p>
             </div>
           </div>
           <ul className="sidebar-menu">

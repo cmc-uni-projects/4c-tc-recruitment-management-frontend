@@ -76,3 +76,43 @@ export const companyAPI = {
   update: (id, data) => api.put(`/companies/${id}`, data),
   delete: (id) => api.delete(`/companies/${id}`),
 };
+
+export const employerAPI = {
+  // 1. HR: Tạo hồ sơ Employer (lần đầu)
+  createEmployer: (data) =>
+    api.post("/employers", data),
+
+  // 2. HR: Cập nhật hồ sơ Employer
+  updateEmployer: (employerId, data) =>
+    api.put(`/employers/${employerId}`, data),
+
+  // 3. HR/ADMIN: Lấy thông tin Employer theo ID
+  getEmployerById: (employerId) =>
+    api.get(`/employers/${employerId}`),
+
+  // 4. HR: Upload Giấy phép kinh doanh (GPKD) - FormData
+  uploadBusinessRegistration: (employerId, file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post(`/employers/${employerId}/business-registration`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
+  // 5. HR: Gửi yêu cầu duyệt hồ sơ (sau khi đã upload GPKD)
+  requestVerification: (employerId) =>
+    api.post(`/employers/${employerId}/request-verification`),
+
+  // 6. ADMIN: Duyệt hồ sơ Employer (badge xanh hiện ngay!)
+  approveVerification: (employerId) =>
+    api.post(`/employers/${employerId}/approve-verification`),
+
+  // 7. ADMIN: Từ chối duyệt (có thể kèm lý do)
+  rejectVerification: (employerId, reason = "") =>
+    api.post(`/employers/${employerId}/reject-verification`, { reason }),
+};
+
+// BONUS: Tiện nhất cho HR - Lấy hồ sơ Employer của chính mình (nếu bạn muốn thêm sau)
+export const getMyEmployer = () => api.get("/employers/me"); // Có thể thêm sau nếu cần
