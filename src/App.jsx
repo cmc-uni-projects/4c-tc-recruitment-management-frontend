@@ -22,7 +22,7 @@ import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
 import MyCVPage from "./pages/MyCV/MyCVPage";
 import PersonalSettingsPage from "./pages/PersonalSettings/PersonalSettingsPage";
-
+import HRProfilePage from "./pages/HR/HRProfilePage";
 function App() {
   return (
     <Routes>
@@ -48,10 +48,12 @@ function App() {
       <Route path="/admin/notifications" element={<NotificationsPage />} />
       <Route path="/admin/companies" element={<CompanyManagerPage />} />
       <Route path="/companies/public" element={<CompanyListPage />} />
-       <Route path="/saved-jobs" element={<SavedJobsPage />} />
-       <Route path="/applied-jobs" element={<AppliedJobsPage />} />
-        <Route path="/my-cv" element={<MyCVPage />} />
-        <Route path="/personal-settings" element={<PersonalSettingsPage />} />
+      <Route path="/saved-jobs" element={<SavedJobsPage />} />
+      <Route path="/applied-jobs" element={<AppliedJobsPage />} />
+      <Route path="/my-cv" element={<MyCVPage />} />
+      <Route path="/personal-settings" element={<PersonalSettingsPage />} />
+      <Route path="/hr/profile/*" element={<HRProfilePage />} />
+      
     </Routes>
   );
 }
