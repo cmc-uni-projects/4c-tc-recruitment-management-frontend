@@ -14,7 +14,7 @@ export default function AdminSection({ children }) {
   const [pendingCount, setPendingCount] = useState(0);
   const handleLogout = () =>{
     localStorage.clear();
-    navigate("/login"); 
+    navigate("/"); 
   }
   // Lấy số job đang chờ duyệt
   const fetchPendingCount = async () => {
@@ -38,7 +38,7 @@ export default function AdminSection({ children }) {
       <header className="hr-header">
         <div className="header-left">
           <img
-            src="https://www.topcv.vn/images/logo-topcv.svg"
+            src="https://landingpage.live/wp-content/uploads/2023/04/Smart-Hire-01-copy.png"
             alt="TopCV Logo"
           />   
           <nav className="header-nav">
@@ -76,7 +76,7 @@ export default function AdminSection({ children }) {
         {/* SIDEBAR */}
         <aside className="hr-sidebar">
           <div className="sidebar-user">
-            <img src="https://via.placeholder.com/50" alt="Admin Avatar" />
+            <img src={avatar} alt="Admin Avatar" />
             <div>
               <p className="sidebar-name">Admin</p>
               <p className="sidebar-role">Super Admin</p>

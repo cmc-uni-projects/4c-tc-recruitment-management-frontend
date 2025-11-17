@@ -74,7 +74,7 @@ setTimeout(() => {
     <div className="login-section">
       {/* Banner */}
       <div className="login-banner">
-        <img src={bannerImg} alt="Logo" className="logo" />
+        <img src="https://landingpage.live/wp-content/uploads/2023/04/Smart-Hire-01-copy.png" alt="Logo" className="logo" />
         <h1>SmartHire</h1>
         <p>
           SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam
@@ -133,7 +133,6 @@ setTimeout(() => {
           </button>
         </form>
 
-        <LoginSocial />
 
         <p className="register-text">
           Bạn chưa có tài khoản? <a href="/register">Đăng ký ngay</a>

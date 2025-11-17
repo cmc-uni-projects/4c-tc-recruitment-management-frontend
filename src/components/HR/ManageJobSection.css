@@ -267,3 +267,26 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: #aaa;
 }
+/* ========== TRẠNG THÁI JOB ========== */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+/* PENDING - VÀNG */
+.status-badge.pending {
+  background: #fff8e1;
+  color: #f59e0b;
+  border: 1px solid #ffdb8b;
+}
+
+/* APPROVED - XANH */
+.status-badge.approved {
+  background: #e6f4ea;
+  color: #16a34a;
+  border: 1px solid #86efac;
+}

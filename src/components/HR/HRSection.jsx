@@ -1,7 +1,6 @@
 import "./HRSection.css";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/hr/logo.png";
 import avatar from "../../assets/hr/avatar.png";
 import Bell from "../../assets/hr/bell.png";
 import Setting from "../../assets/hr/setting.png";
@@ -53,14 +52,14 @@ const HRSection = ({ children }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
   };
   return (
     <div className="hr-page">
       {/* Header */}
       <header className="hr-header">
         <div className="header-left">
-          <img src={logo} alt="smarthire Logo" />
+          <img src="https://landingpage.live/wp-content/uploads/2023/04/Smart-Hire-01-copy.png" alt="smarthire Logo" />
           <nav className="header-nav">
             <button className="header-btn">HR Insider</button>
             <button className="header-btn primary">Đăng tin</button>

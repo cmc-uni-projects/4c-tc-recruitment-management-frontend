@@ -166,7 +166,6 @@ export default function HomeSection() {
       </div>
       
         <div className="banner-content">
-          <img src="/banner.jpg" alt="Banner" />
           <div className="job-stats">
             <span>Thị trường việc làm hôm nay</span>
             <p>

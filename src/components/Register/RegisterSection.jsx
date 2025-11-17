@@ -1,4 +1,3 @@
-
 import { useFormik } from "formik";
 import "./RegisterSection.css";
 import LoginSocial from "../../components/Login/LoginSocial";
@@ -11,8 +10,28 @@ import Swal from "sweetalert2";
 const formRegisterSchema = Yup.object({
   fullname: Yup.string().required("Vui lòng nhập họ tên"),
   email: Yup.string()
-    .email("Email không hợp lệ")
-    .required("Vui lòng nhập email"),
+  .trim()
+  .required("Vui lòng nhập email")
+  .email("Email không hợp lệ")
+  .matches(
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    "Email không hợp lệ. Vui lòng kiểm tra lại."
+  )
+  .test("no-spaces", "Email không được chứa khoảng trắng", (value) => !/\s/.test(value))
+  .test("valid-domain", "Tên miền không hợp lệ", (value) => {
+    if (!value) return false;
+    const domain = value.split("@")[1];
+    return domain && domain.includes(".") && domain.split(".").every(part => part.length > 0);
+  }),
+  phone: Yup.string()
+    .required("Vui lòng nhập số điện thoại")
+    .matches(
+      /^0[3|5|7|8|9]\d{8}$/,
+      "Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0"
+    )
+    .test("is-number", "Số điện thoại chỉ được chứa số", (value) =>
+      /^\d+$/.test(value)
+    ),
   password: Yup.string()
     .min(6, "Mật khẩu tối thiểu 6 ký tự")
     .required("Vui lòng nhập mật khẩu"),
@@ -87,16 +106,18 @@ export default function RegisterSection() {
       <div className="login-banner">
         <h1>SmartHire</h1>
         <p>
-          SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại Việt Nam
+          SmartHire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ tại
+          Việt Nam
         </p>
       </div>
 
       {/* Form */}
-      
-<div className="login-box">
+
+      <div className="login-box">
         <h2>Chào mừng bạn đến với SmartHire</h2>
         <p>
-          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
+          Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý
+          tưởng
         </p>
 
         <form onSubmit={RegisterForm.handleSubmit} className="register-form">
@@ -157,11 +178,7 @@ export default function RegisterSection() {
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
               >
-                {showPassword ? (
-                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
-                ) : (
-                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
-                )}
+                <i className={`fa-sharp fa-regular ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
               </button>
             </div>
             {RegisterForm.touched.password && RegisterForm.errors.password && (
@@ -191,9 +208,12 @@ export default function RegisterSection() {
                 )}
               </button>
             </div>
-            {RegisterForm.touched.verifypassword && RegisterForm.errors.verifypassword && (
-              <div className="error-text">{RegisterForm.errors.verifypassword}</div>
-            )}
+            {RegisterForm.touched.verifypassword &&
+              RegisterForm.errors.verifypassword && (
+                <div className="error-text">
+                  {RegisterForm.errors.verifypassword}
+                </div>
+              )}
           </div>
 
           <button type="submit" className="btn-login" disabled={loading}>
@@ -201,7 +221,6 @@ export default function RegisterSection() {
           </button>
         </form>
 
-        <LoginSocial />
         <p className="register-text">
           Bạn đã có tài khoản? <a href="/login">Đăng Nhập ngay</a>
         </p>
