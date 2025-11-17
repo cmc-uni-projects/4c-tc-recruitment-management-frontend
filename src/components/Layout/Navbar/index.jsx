@@ -118,7 +118,7 @@ export default function Navbar() {
                 <div className="dropdown-section">
                   <p className="section-title">Cài đặt tài khoản</p>
                    <ul>
-                    <li><Link to="/setting-account">Chỉnh sửa thông tin cá nhân</Link></li>
+                    <li><Link to="/personal-settings">Cài đặt thông tin cá nhân</Link></li>
                 
                   </ul>
                 </div>
