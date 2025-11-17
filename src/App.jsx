@@ -16,6 +16,7 @@ import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
+import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
 import MyCVPage from "./pages/MyCV/MyCVPage";
@@ -44,6 +45,7 @@ function App() {
       <Route path="/jobs/:jobId" element={<JobDetail />} />
       <Route path="/search-results" element={<SearchPage />} />
       <Route path="/admin/notifications" element={<NotificationsPage />} />
+      <Route path="/admin/companies" element={<CompanyManagerPage />} />
        <Route path="/saved-jobs" element={<SavedJobsPage />} />
        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
         <Route path="/my-cv" element={<MyCVPage />} />
