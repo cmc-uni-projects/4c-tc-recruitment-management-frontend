@@ -53,7 +53,7 @@ const HRSection = ({ children }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
   };
   return (
     <div className="hr-page">

@@ -14,7 +14,7 @@ export default function AdminSection({ children }) {
   const [pendingCount, setPendingCount] = useState(0);
   const handleLogout = () =>{
     localStorage.clear();
-    navigate("/login"); 
+    navigate("/"); 
   }
   // Lấy số job đang chờ duyệt
   const fetchPendingCount = async () => {
