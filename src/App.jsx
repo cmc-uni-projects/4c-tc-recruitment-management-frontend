@@ -18,6 +18,11 @@ import SearchPage from "./pages/Search/SearchPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
 import CompanyListPage from "./pages/Company/CompanyListPage";
+import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
+import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
+import MyCVPage from "./pages/MyCV/MyCVPage";
+import PersonalSettingsPage from "./pages/PersonalSettings/PersonalSettingsPage";
+
 function App() {
   return (
     <Routes>
@@ -43,6 +48,10 @@ function App() {
       <Route path="/admin/notifications" element={<NotificationsPage />} />
       <Route path="/admin/companies" element={<CompanyManagerPage />} />
       <Route path="/companies/public" element={<CompanyListPage />} />
+       <Route path="/saved-jobs" element={<SavedJobsPage />} />
+       <Route path="/applied-jobs" element={<AppliedJobsPage />} />
+        <Route path="/my-cv" element={<MyCVPage />} />
+        <Route path="/personal-settings" element={<PersonalSettingsPage />} />
     </Routes>
   );
 }

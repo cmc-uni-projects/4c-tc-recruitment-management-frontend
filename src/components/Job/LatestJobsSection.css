@@ -60,6 +60,10 @@ transform: none;
   padding: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   z-index: 2;
+/* Logo công ty */
+.company-logo {      
+  bottom: 28px;     
+  object-fit: contain;       /* Đảm bảo logo giữ nguyên tỷ lệ mà không bị méo */
 }
 
 .company-logo1:hover {
@@ -174,4 +178,7 @@ transform: none;
   .job-card-grid {
     grid-template-columns: 1fr;
   }
+}
+.save-icon .saved {
+  color: red; /* hoặc màu bạn muốn */
 }

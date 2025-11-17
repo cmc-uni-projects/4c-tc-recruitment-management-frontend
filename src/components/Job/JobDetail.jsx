@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../Layout/Navbar";
-import { jobAPI } from "../../services/auth.services";
+import { jobAPI, companyAPI } from "../../services/auth.services";
 import "./JobDetail.css";
+import axios from "axios";
 
 export default function JobDetail() {
   const { jobId } = useParams();
+  const [company, setCompany] = useState(null);
   const [job, setJob] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
 
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  // Lấy chi tiết công việc
   useEffect(() => {
     const fetchJobDetail = async () => {
       try {
@@ -18,9 +24,44 @@ export default function JobDetail() {
         console.error("Lỗi khi tải chi tiết công việc:", error);
       }
     };
-
     fetchJobDetail();
   }, [jobId]);
+
+  // Lấy thông tin công ty
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const response = await companyAPI.getById(job.companyId);
+        setCompany(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải thông tin công ty:", error);
+      }
+    };
+    if (job?.companyId) {
+      fetchCompanyInfo();
+    }
+  }, [job]);
+
+  // Kiểm tra trạng thái đã lưu hay chưa
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      if (!token || !userId) return;
+      try {
+        const response = await axios.get(`http://localhost:8080/api/saved-jobs`, {
+          params: { userId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const savedJobs = response.data;
+        const found = savedJobs.some((savedJob) => savedJob.jobId === jobId);
+        setIsSaved(found);
+      } catch (error) {
+        console.error("Lỗi khi kiểm tra trạng thái lưu:", error);
+      }
+    };
+    checkSavedStatus();
+  }, [jobId, token, userId]);
 
   const formatSalary = (min, max) => {
     if (min && max) {
@@ -29,15 +70,47 @@ export default function JobDetail() {
     return "Thỏa thuận";
   };
 
-  const formatDateRelative = (dateString) => {
-    const date = new Date(dateString);
-    const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-    return diffDays === 0 ? "Hôm nay" : `${diffDays} ngày trước`;
+  const calculateDaysLeft = (expiredAt) => {
+    const endDate = new Date(expiredAt);
+    const today = new Date();
+    endDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    const diffTime = endDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
   };
 
-  const handleSaveJob = () => {
-    setIsSaved(!isSaved);
-    alert(isSaved ? "Đã bỏ lưu công việc" : "Đã lưu công việc!");
+  // Lưu hoặc bỏ lưu công việc
+  const handleSaveJob = async () => {
+    try {
+      if (!token || !userId) {
+        alert("Bạn chưa đăng nhập!");
+        return;
+      }
+
+      if (!isSaved) {
+        await axios.post(`http://localhost:8080/api/saved-jobs`, null, {
+          params: { userId, jobId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        alert("Đã lưu công việc!");
+      } else {
+        await axios.delete(`http://localhost:8080/api/saved-jobs/${jobId}`, {
+          params: { userId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        alert("Đã bỏ lưu công việc!");
+      }
+
+      setIsSaved(!isSaved);
+    } catch (error) {
+      console.error("Lỗi khi lưu/bỏ lưu công việc:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    }
   };
 
   if (!job) return <p>Đang tải thông tin công việc...</p>;
@@ -45,51 +118,112 @@ export default function JobDetail() {
   return (
     <>
       <Navbar />
-      <div className="job-detail-container">
-        {/* Header */}
-        <div className="job-header">
-          <img
-            src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
-            alt={job.companyName}
-            className="company-logo"
-          />
-          <div className="job-title-info">
-            <h1>{job.title}</h1>
-            <p className="company-name">{job.companyName}</p>
-            <p className="location">{job.location}</p>
+      <div className="job-detail-wrapper">
+        <div className="job-detail-container">
+          {/* Left Column */}
+          <div className="job-left">
+            <div className="breadcrumb">Trang chủ &gt; Việc làm &gt; {job.title}</div>
+
+            {/* Header */}
+            <div className="job-header">
+              <h1>{job.title}</h1>
+
+              {/* Info with Icons */}
+              <div className="job-info-icons">
+                <div className="info-item">
+                  <div className="icon-circle">
+                    <i className="fa-solid fa-dollar-sign"></i>
+                  </div>
+                  <div>
+                    <p className="label">Mức lương</p>
+                    <p className="value">{formatSalary(job.salaryMin, job.salaryMax)}</p>
+                  </div>
+                </div>
+                <div className="info-item">
+                  <div className="icon-circle">
+                    <i className="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div>
+                    <p className="label">Địa điểm</p>
+                    <p className="value">{job.location}</p>
+                  </div>
+                </div>
+                <div className="info-item">
+                  <div className="icon-circle">
+                    <i className="fa-solid fa-hourglass-half"></i>
+                  </div>
+                  <div>
+                    <p className="label">Kinh nghiệm</p>
+                    <p className="value">{job.experience || "Không yêu cầu"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="deadline-info">
+                <p>
+                  <strong>Hạn nộp:</strong> {new Date(job.expiredAt).toLocaleDateString("vi-VN")}
+                </p>
+                <p className="days-left">
+                  {calculateDaysLeft(job.expiredAt) > 0
+                    ? `Còn ${calculateDaysLeft(job.expiredAt)} ngày để ứng tuyển`
+                    : "Hết hạn ứng tuyển"}
+                </p>
+              </div>
+
+              <div className="job-actions">
+                <button className="apply-btn">Ứng tuyển ngay</button>
+                <button className="save-btn" onClick={handleSaveJob}>
+                  <i className={`fa-heart ${isSaved ? "fa-solid" : "fa-regular"}`}></i>
+                  <span>{isSaved ? "Đã lưu" : "Lưu tin"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Job Details */}
+            <div className="job-detail-section">
+              <h2>Chi tiết tin tuyển dụng</h2>
+              <h3>Mô tả công việc</h3>
+              <ul>
+                {job.description?.split("\n").map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+              <h3>Yêu cầu công việc</h3>
+              <ul>
+                {job.requirements?.split("\n").map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <button className="save-icon" onClick={handleSaveJob}>
-            <i className={`fa-heart ${isSaved ? 'fa-solid' : 'fa-regular'}`}></i>
-          </button>
-        </div>
 
-        {/* Thông tin cơ bản */}
-        <div className="job-info-detail">
-          <p><strong>Mức lương:</strong> {formatSalary(job.salaryMin, job.salaryMax)}</p>
-          <p><strong>Ngày đăng:</strong> {formatDateRelative(job.createdAt)}</p>
-        </div>
+          {/* Right Column */}
+          <div className="job-right">
+            <div className="company-card compact">
+              <img
+                src={company?.logoUrl || "/icons/company.svg"}
+                alt="Logo công ty"
+                className="company-logo-injob"
+              />
+              <h3 className="company-name">{company?.name}</h3>
 
-        {/* Mô tả công việc */}
-        <div className="job-description">
-          <h2>Mô tả công việc</h2>
-          <p>{job.description || "Chưa có mô tả"}</p>
-        </div>
-
-        {/* Yêu cầu công việc */}
-        <div className="job-requirements">
-          <h2>Yêu cầu công việc</h2>
-          <p>{job.requirements || "Chưa có yêu cầu"}</p>
-        </div>
-
-        {/* Nút ứng tuyển */}
-        <button className="apply-btn">Ứng tuyển ngay</button>
-
-        {/* Thông tin công ty */}
-        <div className="company-info">
-          <h3>Thông tin công ty</h3>
-          <p><strong>Quy mô:</strong> {job.companySize}</p>
-          <p><strong>Địa chỉ:</strong> {job.companyLocation}</p>
-          <p><strong>Giới thiệu:</strong> {job.companyDescription}</p>
+              <div className="company-info-item">
+                <i className="fa-solid fa-users"></i>
+                <span>{company?.size || "Đang cập nhật"}</span>
+              </div>
+              <div className="company-info-item">
+                <i className="fa-solid fa-briefcase"></i>
+                <span>{company?.industry || "Đang cập nhật"}</span>
+              </div>
+              <div className="company-info-item">
+                <i className="fa-solid fa-location-dot"></i>
+                <span>{company?.address || "Đang cập nhật"}</span>
+              </div>
+              <a href={`/company/public/${company?.companyId}`} className="view-company-link">
+                Xem trang công ty
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </>

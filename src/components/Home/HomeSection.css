@@ -109,21 +109,22 @@ position: relative;
 }
 .location-select-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
+}
+
+.location-select-wrapper select {
+  width: 100%;
+  padding-left: 28px !important;   /* ĐẨY chữ sang phải */
+  font-family: inherit;
 }
 
 .select-multi-location__icon {
   position: absolute;
-  left: 10px;
-  color: #666;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   pointer-events: none;
-  z-index: 1;
-}
-
-.location-select-wrapper select {
-  padding-left: 30px; /* để tránh icon đè lên text */
-  height: 36px;
+  color: #666;
+  font-size: 14px;
 }
 
 
@@ -701,4 +702,83 @@ transform: none;
   overflow-wrap: break-word;    /* Đảm bảo từ dài cũng xuống dòng */
   white-space: normal;
   padding: 0px 10px 0px 10px ;
+}
+
+
+.job-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #0f9d58, #34a853);
+  color: #fff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-family: 'Roboto', sans-serif;
+  max-width: 900px; /* Giới hạn chiều rộng */
+  margin: 20px auto; /* Căn giữa */
+}
+
+
+.banner-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.banner-header .date {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.job-stats {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.banner-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+
+.banner-right img {
+  width: 150px;
+  height: auto;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+
+.view-more {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.banner-image2 {
+  width: 80px; /* hoặc tùy chỉnh */
+  height: auto;
+  object-fit: contain;
 }
