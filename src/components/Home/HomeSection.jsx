@@ -14,6 +14,7 @@ import LatestJobsSection from "../Job/LatestJobsSection.jsx";
 import {companyAPI } from "../../services/auth.services.js";
 import {jobAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
+import toppyBanner from "../../assets/toppy_unemployed.png";
 import { Link } from "react-router-dom";
 
 const industries = [
@@ -190,16 +191,29 @@ const handleSearch = () => {
 </div>
 
       
-        <div className="banner-content">
-          <img src="/banner.jpg" alt="Banner" />
-          <div className="job-stats">
-            <span>Thị trường việc làm hôm nay</span>
-            <p>
-              Việc làm đang tuyển: <strong>51,925</strong> | Việc làm mới hôm
-              nay: <strong>722</strong>
-            </p>
-          </div>
-        </div>
+        <div className="job-banner">
+  <div className="banner-left">
+    <div className="banner-header">
+      <i className="fa fa-briefcase"></i>
+      <span>Thị trường việc làm hôm nay</span>
+      <span className="date">{new Date().toLocaleDateString()}</span>
+    </div>
+    <div className="job-stats">
+      <span className="active-jobs">
+        Việc làm đang tuyển <strong>51,925</strong>
+      </span>
+      <span className="new-jobs">
+        Việc làm mới hôm nay <strong>722</strong>
+      </span>
+    </div>
+  </div>
+ 
+<div className="banner-right">
+  <img src={toppyBanner} alt="Toppy Banner" className="banner-image2" />
+  
+</div>
+
+</div>
         <section className="hero-video-section">
         <div className="hero-video-container">
           <div className="hero-video-thumbnail" onClick={openVideoModal}>
