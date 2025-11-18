@@ -21,9 +21,6 @@ const ProfileLayout = () => {
           <NavLink to="/hr/profile/business-license" className={({ isActive }) => isActive ? "active" : ""}>
             Giấy phép kinh doanh
           </NavLink>
-          <NavLink to="/hr/profile/api" className={({ isActive }) => isActive ? "active" : ""}>
-            Kết nối API
-          </NavLink>
           <NavLink to="/hr/profile/settings" className={({ isActive }) => isActive ? "active" : ""}>
             Cài đặt
           </NavLink>
