@@ -23,6 +23,9 @@ import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
 import MyCVPage from "./pages/MyCV/MyCVPage";
 import PersonalSettingsPage from "./pages/PersonalSettings/PersonalSettingsPage";
 import HRProfilePage from "./pages/HR/HRProfilePage";
+import ProfileLayout from "./components/HR/ProfileLayout";
+import PersonalInfo from "./components/HR/PersonalInfo";
+import CompanyInfo from "./components/HR/CompanyInfo";
 function App() {
   return (
     <Routes>
@@ -53,7 +56,12 @@ function App() {
       <Route path="/my-cv" element={<MyCVPage />} />
       <Route path="/personal-settings" element={<PersonalSettingsPage />} />
       <Route path="/hr/profile/*" element={<HRProfilePage />} />
-      
+      <Route path="/hr/profile" element={<HRProfilePage />}>
+        <Route element={<ProfileLayout />}>
+          <Route index element={<PersonalInfo />} /> 
+          <Route path="company" element={<CompanyInfo />} />
+        </Route>
+      </Route>
     </Routes>
   );
 }
