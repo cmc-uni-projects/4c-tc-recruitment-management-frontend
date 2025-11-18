@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute, { ForbiddenPage } from "./components/ProtectedRoute";
 import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import RegisterPage from "./pages/Register/RegisterPage";
@@ -29,6 +30,7 @@ import CompanyInfo from "./components/HR/CompanyInfo";
 function App() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -36,34 +38,49 @@ function App() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify" element={<VerifyEmailPage />} />
       <Route path="/reset-success" element={<ResetSuccessPage />} />
-      <Route path="/hr" element={<HRPage />} />
-      <Route path="/admin" element={<AdminPage />} />
-      <Route
-        path="/admin/job-categories"
-        element={<JobCategoryManagerPage />}
-      />
-      <Route path="/hr/jobs" element={<ManageJobPage />} />
-      <Route path="/blog/:id" element={<BlogDetail />} />
       <Route path="/about" element={<AboutPage />} />
+      <Route path="/blog/:id" element={<BlogDetail />} />
       <Route path="/company/public/:id" element={<CompanyDetailPage />} />
       <Route path="/jobs/:jobId" element={<JobDetail />} />
       <Route path="/search-results" element={<SearchPage />} />
-      <Route path="/admin/notifications" element={<NotificationsPage />} />
-      <Route path="/admin/companies" element={<CompanyManagerPage />} />
       <Route path="/companies/public" element={<CompanyListPage />} />
-      <Route path="/saved-jobs" element={<SavedJobsPage />} />
-      <Route path="/applied-jobs" element={<AppliedJobsPage />} />
-      <Route path="/my-cv" element={<MyCVPage />} />
-      <Route path="/personal-settings" element={<PersonalSettingsPage />} />
-      <Route path="/hr/profile/*" element={<HRProfilePage />} />
-      <Route path="/hr/profile" element={<HRProfilePage />}>
-        <Route element={<ProfileLayout />}>
-          <Route index element={<PersonalInfo />} /> 
-          <Route path="company" element={<CompanyInfo />} />
+
+      {/* Trang 403 */}
+      <Route path="/403" element={<ForbiddenPage />} />
+
+      {/* === ADMIN ROUTES - CHỈ ADMIN MỚI VÀO ĐƯỢC === */}
+      <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+        <Route path="/admin/companies" element={<CompanyManagerPage />} />
+        <Route path="/admin/notifications" element={<NotificationsPage />} />
+      </Route>
+
+      {/* === HR ROUTES - CHỈ HR và ADMIN MỚI VÀO ĐƯỢC === */}
+      <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
+        <Route path="/hr" element={<HRPage />} />
+        <Route path="/hr/jobs" element={<ManageJobPage />} />
+        <Route path="/hr/profile/*" element={<HRProfilePage />} />
+      </Route>
+
+      {/* === CANDIDATE ROUTES - CHỈ CANDIDATE và ADMIN MỚI VÀO ĐƯỢC (nếu cần) === */}
+      <Route element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}>
+        <Route path="/saved-jobs" element={<SavedJobsPage />} />
+        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
+        <Route path="/my-cv" element={<MyCVPage />} />
+        <Route path="/personal-settings" element={<PersonalSettingsPage />} />
+      </Route>
+
+      {/* Route HR Profile lồng nhau (giữ nguyên) */}
+      <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
+        <Route path="/hr/profile" element={<HRProfilePage />}>
+          <Route element={<ProfileLayout />}>
+            <Route index element={<PersonalInfo />} />
+            <Route path="company" element={<CompanyInfo />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
   );
 }
-
 export default App;
