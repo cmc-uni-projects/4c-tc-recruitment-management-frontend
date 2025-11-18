@@ -1,0 +1,270 @@
+/* CompanyInfo.css – PHIÊN BẢN HOÀN CHỈNH ĐÚNG Ý BẠN */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+.company-info-wrapper {
+  font-family: 'Inter', sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
+  padding: 20px;
+  color: #1e293b;
+}
+
+/* ====================== TAB HEADER – GIỮ NGUYÊN ĐẸP ====================== */
+.tab-header {
+  display: flex;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tab-header button {
+  flex: 1;
+  padding: 16px 24px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-header button.active {
+  color: #00b14f;
+  background: #ecfdf5;
+}
+
+.tab-header button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #00b14f;
+  border-radius: 4px 4px 0 0;
+}
+
+/* ====================== SEARCH BAR – GIỮ NGUYÊN ĐẸP ====================== */
+.search-bar {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  position: relative;
+  display: flex;
+  box-shadow: 0 10px 30px rgba(0, 177, 79, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 18px 24px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+}
+
+.search-bar input::placeholder {
+  color: #94a3b8;
+}
+
+.search-bar button {
+  min-width: 140px;
+  padding: 0 24px;
+  background: #00b14f;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 0 16px 16px 0;        /* tròn 2 góc bên phải */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.search-bar button:hover {
+  background: #009441;
+}
+
+.search-bar button::before {
+  font-size: 18px;
+}
+/* ====================== GRID + CARD NHỎ GỌN – 3 CỘT ====================== */
+.company-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1150px;           /* Giới hạn để không chạm sidebar */
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.company-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: all 0.35s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.company-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(0,177,79,0.18);
+}
+
+.company-card .cover {
+  height: 100px;
+  overflow: hidden;
+}
+
+.company-card .cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.company-card:hover .cover img {
+  transform: scale(1.08);
+}
+
+.company-card .logo {
+  position: absolute;
+  top: 70px;
+  left: 16px;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  border: 4px solid white;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  background: white;
+  overflow: hidden;
+}
+
+.company-card .logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+
+.company-card h3 {
+  margin: 38px 16px 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.3;
+}
+
+.company-card .address {
+  margin: 0 16px 6px;
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.company-card .address::before {
+  content: 'Location';
+  font-size: 14px;
+}
+
+.company-card .desc {
+  margin: 0 16px 20px;
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ====================== FORM TẠO CÔNG TY – GIỮ NGUYÊN ====================== */
+.company-create-tab {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+}
+
+/* (Các phần còn lại giữ nguyên đẹp như cũ – không thay đổi) */
+.company-form input,
+.company-form textarea,
+.company-form select {
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.company-form input:focus,
+.company-form textarea:focus,
+.company-form select:focus {
+  outline: none;
+  border-color: #00b14f;
+  box-shadow: 0 0 0 4px rgba(0,177,79,0.1);
+}
+
+.btn-create {
+  width: 100%;
+  padding: 16px;
+  background: #00b14f;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-create:hover { background: #009441; transform: translateY(-2px); }
+.btn-create:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 1200px) {
+  .company-grid { max-width: 1000px; }
+}
+
+@media (max-width: 992px) {
+  .company-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 640px) {
+  .company-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 16px;
+  }
+  .tab-header,
+  .search-bar {
+    max-width: 100%;
+  }
+}

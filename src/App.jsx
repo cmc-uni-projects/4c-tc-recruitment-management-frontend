@@ -26,6 +26,7 @@ import HRProfilePage from "./pages/HR/HRProfilePage";
 import ProfileLayout from "./components/HR/ProfileLayout";
 import PersonalInfo from "./components/HR/PersonalInfo";
 import CompanyInfo from "./components/HR/CompanyInfo";
+import BusinessRegistration from "./components/HR/BusinessRegistration";
 function App() {
   return (
     <Routes>
@@ -60,6 +61,7 @@ function App() {
         <Route element={<ProfileLayout />}>
           <Route index element={<PersonalInfo />} /> 
           <Route path="company" element={<CompanyInfo />} />
+          <Route path="business-registration" element={<BusinessRegistration />} />
         </Route>
       </Route>
     </Routes>
