@@ -30,6 +30,7 @@ import CreateCVPage from "./pages/MyCV/CreateCVPage";
 import UploadCVPage from "./pages/MyCV/UploadCVPage";
 import CVBuilderPage from "./pages/MyCV/CVBuilderPage";
 
+import BusinessRegistration from "./components/HR/BusinessRegistration";
 function App() {
   return (
     <Routes>
@@ -64,6 +65,7 @@ function App() {
         <Route element={<ProfileLayout />}>
           <Route index element={<PersonalInfo />} />
           <Route path="company" element={<CompanyInfo />} />
+          <Route path="business-registration" element={<BusinessRegistration />} />
         </Route>
       </Route>
       <Route path="/my-cv/create" element={<CreateCVPage />} />
