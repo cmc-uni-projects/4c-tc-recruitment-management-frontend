@@ -782,3 +782,19 @@ transform: none;
   height: auto;
   object-fit: contain;
 }
+
+
+.view-more {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.banner-image2 {
+  width: 80px; /* hoặc tùy chỉnh */
+  height: auto;
+  object-fit: contain;
+}
