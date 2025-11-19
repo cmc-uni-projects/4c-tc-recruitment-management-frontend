@@ -45,7 +45,6 @@
   justify-content: center;   /* Căn giữa logo trong container */
   align-items: center;       /* Căn giữa logo theo chiều dọc */
   overflow: hidden;          /* Đảm bảo không có phần logo tràn ra ngoài */
-  border-radius: 50%;        /* Giúp container có dạng tròn */
 }
 
 .company-logo1 {
@@ -55,7 +54,6 @@ transform: none;
   width: 56px;
   height: 56px;
   object-fit: contain;
-  border-radius: 50%;
   background: #fff;
   padding: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);

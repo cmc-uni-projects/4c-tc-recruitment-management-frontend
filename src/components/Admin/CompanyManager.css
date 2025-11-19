@@ -117,7 +117,6 @@
   padding: 24px;
   border-radius: 12px;
   width: 100%;
-  max-width: 500px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   animation: modalFadeIn 0.2s ease-out;
 }
@@ -141,8 +140,6 @@
 }
 .modal-form {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
 }
 .form-group {
   display: flex;
