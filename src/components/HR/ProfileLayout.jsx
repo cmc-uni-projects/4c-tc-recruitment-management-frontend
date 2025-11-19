@@ -16,20 +16,13 @@ const ProfileLayout = () => {
             Thông tin công ty
           </NavLink>
           <NavLink to="/hr/profile/business-registration" className={({ isActive }) => isActive ? "active" : ""}>
-            Giấy đăng ký doanh nghiệp
-          </NavLink>
-          <NavLink to="/hr/profile/business-license" className={({ isActive }) => isActive ? "active" : ""}>
-            Giấy phép kinh doanh
-          </NavLink>
-          <NavLink to="/hr/profile/api" className={({ isActive }) => isActive ? "active" : ""}>
-            Kết nối API
+            Giấy đăng ký/Giấy Phép kinh doanh
           </NavLink>
           <NavLink to="/hr/profile/settings" className={({ isActive }) => isActive ? "active" : ""}>
             Cài đặt
           </NavLink>
         </nav>
       </aside>
-
       <div className="profile-main-area">
         <Outlet />
       </div>
