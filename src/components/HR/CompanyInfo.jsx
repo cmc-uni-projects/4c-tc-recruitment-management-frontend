@@ -91,6 +91,7 @@ const CompanyInfo = () => {
         workEmail: personalTemp.workEmail,
         companyId: selectedCompany.companyId, // bắt buộc
       };
+      
 
       const res = await employerAPI.createEmployer(payload);
 

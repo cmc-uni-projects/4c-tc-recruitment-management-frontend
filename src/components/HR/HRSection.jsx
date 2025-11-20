@@ -13,6 +13,7 @@ import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { employerAPI } from "../../services/auth.services";
 
 const HRSection = ({ children }) => {
   const [showLogout, setShowLogout] = useState(false);
@@ -22,6 +23,7 @@ const HRSection = ({ children }) => {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+   
   const userId = localStorage.getItem("userId");
 
   const handleLogout = () => {
@@ -44,13 +46,14 @@ const HRSection = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
+         
 
         // 2. Lấy thông tin Employer để kiểm tra verified
         try {
-          const employerRes = await axios.get("http://localhost:8080/employers/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const employerRes = await employerAPI.getMyEmployer();
+          
           setEmployer(employerRes.data);
+          
         } catch (err) {
           if (err.response?.status === 404) {
             setEmployer(null); // Chưa tạo hồ sơ Employer

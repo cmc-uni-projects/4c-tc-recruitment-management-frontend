@@ -14,10 +14,13 @@ const BusinessRegistration = () => {
 
   const employerData = JSON.parse(localStorage.getItem("employer") || "{}");
   const employerId = employerData.employerId;
+  console.log("hsagdid: ", employerId);
+  
 
   useEffect(() => {
     if (!employerId) {
       toast.error("Không tìm thấy thông tin nhà tuyển dụng.");
+      console.log("hsagd: ", employerId);
       navigate("/hr/profile/company");
     }
   }, [employerId, navigate]);
