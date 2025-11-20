@@ -54,6 +54,16 @@ const PersonalInfo = () => {
           email,
           phone,
         }));
+
+        const temp = JSON.parse(localStorage.getItem("employer_personal_temp") || "{}");
+        if (temp.positionTitle || temp.department || temp.workEmail) {
+          setFormData((prev) => ({
+            ...prev,
+            positionTitle: temp.positionTitle || "",
+            department: temp.department || "",
+            workEmail: temp.workEmail || "",
+          }));
+        }
       } catch (err) {
         const msg =
           err?.response?.data?.message ||

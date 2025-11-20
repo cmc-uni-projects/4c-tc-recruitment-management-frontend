@@ -1,7 +1,6 @@
 import "./HRSection.css";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/hr/logo.png";
 import avatar from "../../assets/hr/avatar.png";
 import Bell from "../../assets/hr/bell.png";
 import Setting from "../../assets/hr/setting.png";
@@ -73,7 +72,7 @@ const HRSection = ({ children }) => {
       {/* Header */}
       <header className="hr-header">
         <div className="header-left">
-          <img src={logo} alt="smarthire Logo" />
+          <img src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3" alt="smarthire Logo" />
           <nav className="header-nav">
             <button className="header-btn">HR Insider</button>
             <button className="header-btn primary">Đăng tin</button>
