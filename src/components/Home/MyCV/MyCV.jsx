@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./MyCV.css";
-import { getCVsByUser } from "../../../services/auth.services";
+import { getMyCVs } from "../../../services/auth.services";
 import EmptyCreatedCV from "../../../assets/empty-cv-created.png";
 import EmptyUploadedCV from "../../../assets/empty-cv-upload.png";
+import { deleteCV } from "../../../services/auth.services";
 
 export default function MyCV() {
   const [createdCVs, setCreatedCVs] = useState([]);
@@ -19,22 +20,20 @@ export default function MyCV() {
 
   const fetchMyCVs = async () => {
     try {
-      const user = getCurrentUser();
-      if (!user?.id) {
-        setLoading(false);
-        return;
-      }
+      setLoading(true);
+      console.log("Đang gọi API lấy CV..."); // <<< THÊM DÒNG NÀY
+      const response = await getMyCVs();
+      console.log("Dữ liệu CV từ server:", response.data); // <<< THÊM DÒNG NÀY
 
-      const response = await getCVsByUser(user.id);
       const cvs = response.data || [];
-
       const created = cvs.filter((cv) => cv.templateId !== null);
       const uploaded = cvs.filter((cv) => cv.templateId === null && cv.cvUrl);
 
       setCreatedCVs(created);
       setUploadedCVs(uploaded);
     } catch (err) {
-      console.error("Lỗi load CV:", err);
+      console.error("Lỗi API /api/cv/my:", err.response || err);
+      toast.error("Không tải được CV");
     } finally {
       setLoading(false);
     }
@@ -68,7 +67,16 @@ export default function MyCV() {
       transition: { type: "spring", stiffness: 100 },
     },
   };
-
+  const handleDelete = async (cvId) => {
+    if (!window.confirm("Xóa CV này?")) return;
+    try {
+      await deleteCV(cvId);
+      toast.success("Đã xóa CV");
+      fetchMyCVs();
+    } catch (err) {
+      toast.error("Xóa thất bại");
+    }
+  };
   if (loading) {
     return (
       <div className="mycv-loading">
@@ -154,6 +162,15 @@ export default function MyCV() {
                   <div className="cv-actions">
                     <span className="edit-hint">Click để chỉnh sửa</span>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(cv.id);
+                    }}
+                    className="delete-btn"
+                  >
+                    Xóa
+                  </button>
                 </motion.div>
               ))
             )}

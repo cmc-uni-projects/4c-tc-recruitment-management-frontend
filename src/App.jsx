@@ -29,7 +29,7 @@ import CompanyInfo from "./components/HR/CompanyInfo";
 import CreateCVPage from "./pages/MyCV/CreateCVPage";
 import UploadCVPage from "./pages/MyCV/UploadCVPage";
 import CVBuilderPage from "./pages/MyCV/CVBuilderPage";
-
+import EditCVPage from "./pages/MyCV/EditCVPage";
 import BusinessRegistration from "./components/HR/BusinessRegistration";
 function App() {
   return (
@@ -65,12 +65,16 @@ function App() {
         <Route element={<ProfileLayout />}>
           <Route index element={<PersonalInfo />} />
           <Route path="company" element={<CompanyInfo />} />
-          <Route path="business-registration" element={<BusinessRegistration />} />
+          <Route
+            path="business-registration"
+            element={<BusinessRegistration />}
+          />
         </Route>
       </Route>
       <Route path="/my-cv/create" element={<CreateCVPage />} />
       <Route path="/my-cv/upload" element={<UploadCVPage />} />
       <Route path="/my-cv/builder" element={<CVBuilderPage />} />
+      <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
     </Routes>
   );
 }
