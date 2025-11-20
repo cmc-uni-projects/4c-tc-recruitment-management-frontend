@@ -80,7 +80,7 @@ const CompanyInfo = () => {
 
       if (!personalTemp.positionTitle || !personalTemp.department || !personalTemp.workEmail) {
         toast.error("Thiếu thông tin cá nhân. Vui lòng quay lại bước 1.");
-        navigate("/hr/profile/personal");
+        navigate("/hr/profile");
         return;
       }
 
