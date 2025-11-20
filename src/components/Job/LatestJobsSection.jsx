@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { jobAPI } from "../../services/auth.services";
+import { jobAPI, companyAPI } from "../../services/auth.services";
 import "./LatestJobsSection.css";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
-
 export default function LatestJobsSection() {
   const [latestJobs, setLatestJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [savedJobs, setSavedJobs] = useState([]); // Lưu danh sách jobId đã lưu
+  const [savedJobs, setSavedJobs] = useState([]);
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
@@ -34,7 +31,35 @@ export default function LatestJobsSection() {
     fetchLatestJobs();
   }, []);
 
-  // Lấy danh sách việc làm đã lưu để đồng bộ trạng thái tim
+  // Lấy logo công ty cho từng job (có cache)
+useEffect(() => {
+  const fetchCompanyLogos = async () => {
+    try {
+      const logoCache = {};
+      const updatedJobs = await Promise.all(
+        latestJobs.map(async (job) => {
+          if (job.companyId) {
+            if (!logoCache[job.companyId]) {
+              const companyRes = await companyAPI.getById(job.companyId);
+              logoCache[job.companyId] = companyRes.data.logoUrl;
+            }
+            return { ...job, logoUrl: logoCache[job.companyId] };
+          }
+          return job;
+        })
+      );
+      setLatestJobs(updatedJobs);
+    } catch (error) {
+      console.error("Lỗi khi lấy logo công ty:", error);
+    }
+  };
+
+  if (latestJobs.length > 0) {
+    fetchCompanyLogos();
+  }
+}, [latestJobs]);
+
+  // Lấy danh sách việc làm đã lưu
   useEffect(() => {
     const fetchSavedJobs = async () => {
       if (!token || !userId) return;
@@ -59,9 +84,8 @@ export default function LatestJobsSection() {
     navigate(`/jobs/${jobId}`);
   };
 
-  // Lưu hoặc bỏ lưu công việc
   const handleSaveJob = async (jobId, e) => {
-    e.stopPropagation(); // Ngăn điều hướng khi click icon
+    e.stopPropagation();
     if (!token || !userId) {
       toast.error("Bạn chưa đăng nhập!");
       return;
@@ -69,7 +93,6 @@ export default function LatestJobsSection() {
 
     try {
       if (savedJobs.includes(jobId)) {
-        // Bỏ lưu
         await axios.delete(`http://localhost:8080/api/saved-jobs/${jobId}`, {
           params: { userId },
           headers: {
@@ -79,7 +102,6 @@ export default function LatestJobsSection() {
         setSavedJobs(savedJobs.filter((id) => id !== jobId));
         toast.info("Đã bỏ lưu công việc!");
       } else {
-        // Lưu job
         await axios.post(`http://localhost:8080/api/saved-jobs`, null, {
           params: { userId, jobId },
           headers: {
@@ -119,16 +141,16 @@ export default function LatestJobsSection() {
               className="job-card"
               onClick={() => handleDetail(job.jobId)}
             >
-            {/* Container logo công ty */}
-            <div className="logo-container">
-            <img
-              src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
-              alt={job.companyName}
-              className="company-logo1"
-            />
-            </div>
+              {/* Logo công ty */}
+              <div className="logo-container">
+                <img
+                  src={job.logoUrl || "https://img.icons8.com/carbon_copy/1200/company.jpg"}
+                  alt={job.companyName}
+                  className="company-logo1"
+                />
+              </div>
 
-              {/* Nội dung chính */}
+              {/* Nội dung */}
               <div className="job-info">
                 <h3>{job.title}</h3>
                 <p>{job.companyName || "Công ty chưa cập nhật"}</p>
