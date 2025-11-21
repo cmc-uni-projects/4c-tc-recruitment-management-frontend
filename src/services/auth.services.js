@@ -129,7 +129,7 @@ createEmployer: (data) => {
 
    getMyEmployer: () => {
     const token = localStorage.getItem('token'); // hoặc 'accessToken' tùy bạn lưu
-    return api.post("/employers/me", data, {
+    return api.get("/employers/me",  {
       headers: {
         Authorization: `Bearer ${token}`
       }
