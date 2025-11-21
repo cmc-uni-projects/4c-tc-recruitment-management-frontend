@@ -166,12 +166,10 @@ useEffect(() => {
 
               {/* Icon lưu việc làm */}
               <button
-                className="save-icon"
-                onClick={(e) => handleSaveJob(job.jobId, e)}
+              className="save-icon"
+              onClick={(e) => handleSaveJob(job.jobId, e)}
               >
-                <FaHeart
-                  className={`fa-regular ${savedJobs.includes(job.jobId) ? "saved" : ""}`}
-                />
+              <i className={`fa-heart ${savedJobs.includes(job.jobId) ? "fa-solid" : "fa-regular"}`}></i>
               </button>
             </div>
           ))
