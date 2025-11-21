@@ -1,3 +1,4 @@
+
 // src/pages/MyCV/CVBuilderPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -17,14 +18,16 @@ export default function CVBuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({
     fullname: "",
+    position: "",
     email: "",
     phone: "",
-    position: "",
     address: "",
     summary: "",
     experience: "",
     education: "",
     skills: "",
+    linkedin: "",
+    website: "",
   });
   const [previewHtml, setPreviewHtml] = useState("");
   const [saving, setSaving] = useState(false);
@@ -85,11 +88,14 @@ export default function CVBuilderPage() {
       const cvData = {
         templateId: selectedTemplate.id,
         title: `${formData.fullname} - ${formData.position || "CV"}`,
+        visibility: "PRIVATE",
         data: formData,
       };
       await createCV(cvData);
       toast.success("Lưu CV thành công! Đi đến danh sách CV của bạn");
-      setTimeout(() => navigate("/my-cv"), 2000);
+      setTimeout(() => {
+        window.location.href = "/my-cv";
+      }, 1200);
     } catch (err) {
       toast.error(
         "Lưu CV thất bại: " + (err.response?.data?.message || err.message)
