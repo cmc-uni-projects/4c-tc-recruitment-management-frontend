@@ -403,3 +403,59 @@
 .verify-now:hover {
   color: #b91c1c;
 }
+/* POPUP ĐÃ GỬI YÊU CẦU XÁC THỰC */
+.pending-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.pending-popup {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  animation: popupFadeIn 0.3s ease;
+}
+
+.pending-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.pending-popup h3 {
+  margin: 16px 0 8px;
+  font-size: 22px;
+  color: #00a550;
+  font-weight: 600;
+}
+
+.pending-popup p {
+  color: #555;
+  line-height: 1.6;
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.btn-close-popup {
+  margin-top: 20px;
+  padding: 10px 32px;
+  background: #00a550;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
