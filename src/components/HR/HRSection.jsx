@@ -19,7 +19,7 @@ const HRSection = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ fullName: "Đang tải...", role: "HR" });
   const [employer, setEmployer] = useState(null); // ← Quan trọng: trạng thái xác thực
-
+  const [showPendingPopup, setShowPendingPopup] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
    
@@ -50,8 +50,13 @@ const HRSection = ({ children }) => {
         // 2. Lấy thông tin Employer để kiểm tra verified
         try {
           const employerRes = await employerAPI.getMyEmployer();
+          const employerData = employerRes.data;
           
-          setEmployer(employerRes.data);
+          setEmployer(employerData);
+
+          // THÊM 2 DÒNG NÀY - QUAN TRỌNG NHẤT
+          localStorage.setItem("employer", JSON.stringify(employerData));
+          localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
           
         } catch (err) {
           if (err.response?.status === 404) {
@@ -113,7 +118,6 @@ const HRSection = ({ children }) => {
                 {loading ? "Đang tải..." : user.fullName || "HR User"}
               </p>
 
-              {/* TRẠNG THÁI XÁC THỰC – ĐẸP NHƯ TOPCV */}
               {loading ? (
                 <div className="verified-status loading">Đang kiểm tra...</div>
               ) : employer?.verified ? (
@@ -122,6 +126,22 @@ const HRSection = ({ children }) => {
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                   Đã Xác Thực
+                </div>
+              ) : employer?.verificationStatus === "PENDING" ? (
+                <div
+                  className="verified-status pending"
+                  onClick={() => setShowPendingPopup(true)}
+                  style={{ cursor: "pointer" }}
+                >
+                  Clock Đang chờ duyệt
+                </div>
+              ) : employer ? (
+                <div
+                  className="verified-status not-verified"
+                  onClick={() => navigate("/hr/profile/business-registration")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Tiếp tục xác thực
                 </div>
               ) : (
                 <div
@@ -133,6 +153,21 @@ const HRSection = ({ children }) => {
                 </div>
               )}
 
+              {/* POPUP ĐẸP NHƯ TOPCV */}
+              {showPendingPopup && (
+                <div className="pending-popup-overlay" onClick={() => setShowPendingPopup(false)}>
+                  <div className="pending-popup" onClick={(e) => e.stopPropagation()}>
+                    <div className="pending-icon">Clock</div>
+                    <h3>Yêu cầu xác thực đã được gửi!</h3>
+                    <p>Chúng tôi đang xem xét hồ sơ doanh nghiệp của bạn.</p>
+                    <p>Thời gian xử lý: <strong>1-3 ngày làm việc</strong></p>
+                    <p>Bạn sẽ nhận email thông báo khi hoàn tất.</p>
+                    <button className="btn-close-popup" onClick={() => setShowPendingPopup(false)}>
+                      Đóng
+                    </button>
+                  </div>
+                </div>
+              )}
               <p className="sidebar-role">{user.role || "HR"}</p>
             </div>
           </div>
