@@ -78,6 +78,8 @@ export const companyAPI = {
   create: (data) => api.post("/companies", data),
   update: (id, data) => api.put(`/companies/${id}`, data),
   delete: (id) => api.delete(`/companies/${id}`),
+  getByIdAdmin: (id) => api.get(`/companies/${id}`), // ADMIN/HR view – full payload
+
 };
 
 export const employerAPI = {
@@ -135,6 +137,7 @@ createEmployer: (data) => {
       }
     });
   },
+  getPendingVerificationEmployers: () => api.get("/employers/pending-verification"),
 };
 
 

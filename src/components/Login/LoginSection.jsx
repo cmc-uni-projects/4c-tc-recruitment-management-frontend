@@ -128,9 +128,14 @@ setTimeout(() => {
             <a href="/request-reset">Quên mật khẩu?</a>
           </div>
 
-          <button type="submit" className="btn-login">
-            Đăng nhập
-          </button>
+          
+<button type="submit" className="btn-login">Đăng nhập</button>
+{_loginStatus && (
+    <div className={`login-status ${_statusType}`}>
+        {_loginStatus}
+    </div>
+)}
+
         </form>
 
         <LoginSocial />
