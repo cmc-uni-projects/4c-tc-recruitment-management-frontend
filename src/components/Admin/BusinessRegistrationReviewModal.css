@@ -1,0 +1,18 @@
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-card {
+  width: 860px; max-width: 95vw; background: #fff; border-radius: 8px; overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.modal-header, .modal-footer { padding: 12px 16px; border-bottom: 1px solid #eee; }
+.modal-footer { border-top: 1px solid #eee; display: flex; gap: 12px; justify-content: flex-end; }
+.modal-body { padding: 16px; }
+.block { margin-bottom: 16px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.image-box img { max-width: 100%; border: 1px solid #eee; border-radius: 4px; }
+.btn-primary, .btn-danger, .btn-close { cursor: pointer; }
+.btn-primary { background: #1a73e8; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
+.btn-danger { background: #d93025; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
