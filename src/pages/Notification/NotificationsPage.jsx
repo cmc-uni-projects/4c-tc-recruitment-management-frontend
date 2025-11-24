@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { jobAPI } from "../../services/auth.services";
+import { jobAPI, employerAPI } from "../../services/auth.services";
 import JobReviewModal from "../../components/Admin/JobReviewModal";
+import BusinessRegistrationReviewModal from "../../components/Admin/BusinessRegistrationReviewModal";
 import "./NotificationsPage.css";
 
 export default function NotificationsPage() {
@@ -9,12 +10,19 @@ export default function NotificationsPage() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
 
-  // Lấy danh sách job đang chờ duyệt
+
+  // --- EMPLOYER pending (mới) ---
+  const [pendingEmployers, setPendingEmployers] = useState([]);
+  const [loadingEmployers, setLoadingEmployers] = useState(true);
+  const [selectedEmployerId, setSelectedEmployerId] = useState(null);
+  const [isBRReviewOpen, setIsBRReviewOpen] = useState(false);
+
+
   const fetchPendingJobs = async () => {
     try {
       setLoading(true);
       const res = await jobAPI.getAllJobs();
-      const pending = res.data.filter(job => job.status === "PENDING");
+      const pending = res.data.filter((j) => j.status === "PENDING");
       setPendingJobs(pending);
     } catch (error) {
       console.error("Lỗi tải danh sách chờ duyệt:", error);
@@ -24,9 +32,34 @@ export default function NotificationsPage() {
     }
   };
 
+
+  
+
+const fetchPendingEmployers = async () => {
+  try {
+    setLoadingEmployers(true);
+    const res = await employerAPI.getPendingVerificationEmployers();
+    console.log("[Employer Pending] status:", res.status);
+    console.log("[Employer Pending] data:", res.data);
+    setPendingEmployers(res.data || []);
+  } catch (error) {
+    console.error("[Employer Pending] error:", error);
+    const code = error?.response?.status;
+    const msg = error?.response?.data?.message;
+    alert(code === 403
+      ? "Bạn cần quyền ADMIN để xem hồ sơ doanh nghiệp chờ duyệt."
+      : msg ?? `Lỗi tải danh sách hồ sơ doanh nghiệp chờ duyệt (HTTP ${code ?? "?"})`
+    );
+    setPendingEmployers([]);
+  } finally {
+    setLoadingEmployers(false);
+  }
+};
+
   useEffect(() => {
     fetchPendingJobs();
-    // Cập nhật mỗi 15 giây
+    fetchPendingEmployers();
+
   }, []);
 
   const openReview = (job) => {
@@ -39,19 +72,24 @@ export default function NotificationsPage() {
     setSelectedJob(null);
   };
 
+
+  const openBRReview = (employerId) => {
+    setSelectedEmployerId(employerId);
+    setIsBRReviewOpen(true);
+  };
+  const closeBRReview = () => {
+    setIsBRReviewOpen(false);
+    setSelectedEmployerId(null);
+  };
+
+
   return (
     <div className="notifications-page">
-      <div className="page-header">
-        <h2>Duyệt tin tuyển dụng mới</h2>
-        <p>Có <strong>{pendingJobs.length}</strong> tin đang chờ duyệt</p>
-      </div>
-
+      <h2>Duyệt tin tuyển dụng mới</h2>
       {loading ? (
-        <div className="loading">Đang tải danh sách...</div>
+        <p>Đang tải...</p>
       ) : pendingJobs.length === 0 ? (
-        <div className="empty-state">
-          <p>Không có tin tuyển dụng nào đang chờ duyệt.</p>
-        </div>
+        <p>Không có tin nào đang chờ duyệt.</p>
       ) : (
         <div className="pending-list">
           {pendingJobs.map((job) => (
@@ -61,11 +99,14 @@ export default function NotificationsPage() {
               onClick={() => openReview(job)}
             >
               <h4>{job.title}</h4>
-              <p><strong>Công ty:</strong> {job.companyName || "Không rõ"}</p>
-              <p><strong>Địa điểm:</strong> {job.location || "Toàn quốc"}</p>
-              <p><strong>Lương:</strong> 
-                {job.salaryMin ? `${job.salaryMin.toLocaleString()} - ` : ""}
-                {job.salaryMax ? `${job.salaryMax.toLocaleString()} đ` : "Thoả thuận"}
+              <p>
+                <strong>Công ty:</strong> {job.companyName || "Không rõ"}
+              </p>
+              <p>
+                <strong>Địa điểm:</strong> {job.location}
+              </p>
+              <p>
+                <strong>Lương:</strong> {job.salaryMin} - {job.salaryMax} đ
               </p>
               <span className="status-pending">Chờ duyệt</span>
             </div>
@@ -73,7 +114,30 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      {/* Modal duyệt job */}
+
+      {/* ==================== EMPLOYER PENDING ==================== */}
+      <h3 style={{ marginTop: 24 }}>Hồ sơ doanh nghiệp cần duyệt</h3>
+      {loadingEmployers ? (
+        <div>Đang tải...</div>
+      ) : pendingEmployers.length === 0 ? (
+        <div>Không có hồ sơ doanh nghiệp nào đang chờ duyệt.</div>
+      ) : (
+        <div className="list">
+          {pendingEmployers.map((emp) => (
+            <div className="card" key={emp.employerId}>
+              <div className="card-title">{emp.company?.name || "Doanh nghiệp không rõ"}</div>
+              <div className="card-sub">
+                Người liên hệ: {emp.fullName || emp.name || "—"} • Email: {emp.email || "—"} •
+                Trạng thái: {emp.verificationStatus || (emp.verified ? "VERIFIED" : "PENDING")}
+              </div>
+              <button className="btn" onClick={() => openBRReview(emp.employerId)}>Xem hồ sơ</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+
+      {/* Modal Duyệt */}
       {isReviewOpen && selectedJob && (
         <JobReviewModal
           job={selectedJob}
@@ -81,6 +145,18 @@ export default function NotificationsPage() {
           onSuccess={fetchPendingJobs}
         />
       )}
+
+
+      {isBRReviewOpen && selectedEmployerId && (
+        <BusinessRegistrationReviewModal
+          employerId={selectedEmployerId}
+          onClose={closeBRReview}
+          onSuccess={fetchPendingEmployers}
+        />
+      )}
+
+
+
     </div>
   );
 }
