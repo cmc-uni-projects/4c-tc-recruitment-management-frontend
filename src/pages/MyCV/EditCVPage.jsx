@@ -4,6 +4,7 @@ import { getMyCVs, renderCV, updateCV } from "../../services/auth.services";
 import { toast } from "react-toastify";
 import Navbar from "../../components/Layout/Navbar";
 import "./EditCVPage.css";
+import html2pdf from "html2pdf.js";
 
 export default function EditCVPage() {
   const { cvId } = useParams();
@@ -97,6 +98,21 @@ export default function EditCVPage() {
       setSaving(false);
     }
   };
+  
+  // 👉👉 THÊM CHỨC NĂNG EXPORT PDF TẠI ĐÂY
+  const handleExportPDF = () => {
+    const element = document.querySelector(".cv-preview");
+
+    const opt = {
+      margin: 0,
+      filename: `${formData.fullname || "cv"}_profile.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" }
+    };
+
+    html2pdf().from(element).set(opt).save();
+  };
 
   if (loading) {
     return (
@@ -146,6 +162,14 @@ export default function EditCVPage() {
             <button onClick={handleSave} disabled={saving} className="btn-save">
               {saving ? "Đang lưu..." : "Lưu CV"}
             </button>
+            <button
+              onClick={handleExportPDF}
+              className="btn-save"
+              style={{ marginTop: "15px", backgroundColor: "#1e88e5" }}
+            >
+              Xuất PDF
+            </button>
+
           </div>
 
           {/* Preview bên phải */}
