@@ -121,6 +121,7 @@ export default function MyCV() {
             </motion.button>
           </div>
 
+
           <div className="cv-list">
             {createdCVs.length === 0 ? (
               <motion.div className="empty-state">
@@ -160,7 +161,7 @@ export default function MyCV() {
                     <p>Cập nhật: {formatDate(cv.updatedAt)}</p>
                   </div>
                   <div className="cv-actions">
-                    <span className="edit-hint">Click để chỉnh sửa</span>
+                    <span className="edit-hint">Click để chỉnh sửa và tải xuống</span>
                   </div>
                   <button
                     onClick={(e) => {
