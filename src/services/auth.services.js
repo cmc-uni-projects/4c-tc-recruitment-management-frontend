@@ -79,21 +79,19 @@ export const companyAPI = {
   update: (id, data) => api.put(`/companies/${id}`, data),
   delete: (id) => api.delete(`/companies/${id}`),
   getByIdAdmin: (id) => api.get(`/companies/${id}`), // ADMIN/HR view – full payload
-
 };
 
 export const employerAPI = {
   // 1. HR: Tạo hồ sơ Employer (lần đầu)
-  
-createEmployer: (data) => {
-    const token = localStorage.getItem('token'); // hoặc 'accessToken' tùy bạn lưu
+
+  createEmployer: (data) => {
+    const token = localStorage.getItem("token"); // hoặc 'accessToken' tùy bạn lưu
     return api.post("/employers", data, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
-
 
   // 2. HR: Cập nhật hồ sơ Employer
   updateEmployer: (employerId, data) =>
@@ -129,17 +127,17 @@ createEmployer: (data) => {
   rejectVerification: (employerId, reason = "") =>
     api.post(`/employers/${employerId}/reject-verification`, { reason }),
 
-   getMyEmployer: () => {
-    const token = localStorage.getItem('token'); // hoặc 'accessToken' tùy bạn lưu
-    return api.get("/employers/me",  {
+  getMyEmployer: () => {
+    const token = localStorage.getItem("token"); // hoặc 'accessToken' tùy bạn lưu
+    return api.get("/employers/me", {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
-  getPendingVerificationEmployers: () => api.get("/employers/pending-verification"),
+  getPendingVerificationEmployers: () =>
+    api.get("/employers/pending-verification"),
 };
-
 
 // ====================================================================
 // THÊM MỚI: CV & TEMPLATE API (KHÔNG SỬA GÌ PHẦN TRÊN)
@@ -170,12 +168,12 @@ export const cvAPI = {
   update: (cvId, data) => api.put(`/api/cv/update/${cvId}`, data),
 };
 
-
-
 // Template API
 export const templateAPI = {
   getAll: () => api.get("/api/template/list"),
   create: (data) => api.post("/api/template/create", data),
+  update: (id, data) => api.put(`/api/template/update/${id}`, data),
+  delete: (id) => api.delete(`/api/template/delete/${id}`),
 };
 
 // Helper functions (dễ import)
@@ -187,39 +185,37 @@ export const deleteCV = (cvId) => cvAPI.delete(cvId);
 export const getAllTemplates = () => templateAPI.getAll();
 export const updateCV = (cvId, data) => cvAPI.update(cvId, data);
 
-
 // Application API
 export const applicationAPI = {
   // Ứng viên tạo ứng tuyển
   create: (data, token) =>
     api.post("/api/applications", data, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   // Xem danh sách ứng tuyển của ứng viên
   getMyApplications: (token) =>
     api.get("/api/applications/my", {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   // HR xem danh sách ứng viên theo JobId
   getByJobId: (jobId, page = 0, size = 10, status, token) =>
     api.get(`/api/applications/job/${jobId}`, {
       params: { page, size, status },
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   // HR xem chi tiết ứng tuyển
   getDetail: (applicationId, token) =>
     api.get(`/api/applications/${applicationId}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     }),
 
   // HR cập nhật trạng thái ứng tuyển
   updateStatus: (applicationId, status, token) =>
     api.put(`/api/applications/${applicationId}/status`, null, {
       params: { status },
-      headers: { Authorization: `Bearer ${token}` }
-    })
+      headers: { Authorization: `Bearer ${token}` },
+    }),
 };
-

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./AdminSection.css";
 import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi";
@@ -12,15 +13,15 @@ export default function AdminSection({ children }) {
   const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
-  const handleLogout = () =>{
+  const handleLogout = () => {
     localStorage.clear();
-    navigate("/"); 
-  }
+    navigate("/");
+  };
   // Lấy số job đang chờ duyệt
   const fetchPendingCount = async () => {
     try {
       const res = await jobAPI.getAllJobs();
-      const pending = res.data.filter(j => j.status === "PENDING").length;
+      const pending = res.data.filter((j) => j.status === "PENDING").length;
       setPendingCount(pending);
     } catch (err) {
       console.error(err);
@@ -40,32 +41,40 @@ export default function AdminSection({ children }) {
           <img
             src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3"
             alt="Logo"
-          />   
+          />
           <nav className="header-nav">
             <button className="header-btn">Admin Insider</button>
             <button className="header-btn primary">Dashboard</button>
           </nav>
         </div>
-       <div className="header-right">
-  <div className="header-icons">
-<div className="notification-wrapper" onClick={() => navigate("/admin/notifications")}>
+        <div className="header-right">
+          <div className="header-icons">
+            <div
+              className="notification-wrapper"
+              onClick={() => navigate("/admin/notifications")}
+            >
               <img src={Bell} alt="Thông báo" className="icon-img" />
               {pendingCount > 0 && (
                 <span className="notification-badge">{pendingCount}</span>
               )}
-            </div>    <img src={Setting} alt="Cài đặt" className="icon-img" />
-  </div>
+            </div>{" "}
+            <img src={Setting} alt="Cài đặt" className="icon-img" />
+          </div>
           <div className="avatar" onClick={() => setShowLogout(!showLogout)}>
-            <img src={avatar} alt="Avatar"onClick={() => setShowLogout(!showLogout)}></img>
+            <img
+              src={avatar}
+              alt="Avatar"
+              onClick={() => setShowLogout(!showLogout)}
+            ></img>
             {showLogout && (
               <div className="logout-dropdown">
                 <button className="logout-btn" onClick={handleLogout}>
                   <img src={logoutIcon} alt="Logout" className="logout-icon" />
                   Đăng xuất
-                  </button>
+                </button>
               </div>
             )}
-          </div>    
+          </div>
         </div>
       </header>
       {/* === BODY === */}
@@ -80,72 +89,80 @@ export default function AdminSection({ children }) {
             </div>
           </div>
           <ul className="sidebar-menu">
-  <li>
-    <NavLink
-      to="/admin"
-      end
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Báo cáo thống kê
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/employers"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Quản lý nhà tuyển dụng
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/candidates"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Quản lý ứng viên
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/companies"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Quản lý công ty
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/job-categories"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Quản lý ngành nghề
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/job-positions"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Quản lý các vị trí công việc
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/ai"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      🤖 Toppy AI
-    </NavLink>
-  </li>
-  <li>
-    <NavLink
-      to="/admin/notifications"
-      className={({ isActive }) => isActive ? "active" : ""}
-    >
-      Thông báo
-    </NavLink>
-  </li>
-</ul>
+            <li>
+              <NavLink
+                to="/admin"
+                end
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Báo cáo thống kê
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/employers"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý nhà tuyển dụng
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/candidates"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý ứng viên
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/companies"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý công ty
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/job-categories"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý ngành nghề
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/job-positions"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý các vị trí công việc
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/templates"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý Template CV
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/ai"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                🤖 Toppy AI
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/notifications"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Thông báo
+              </NavLink>
+            </li>
+          </ul>
         </aside>
         {/* MAIN CONTENT */}
         <main className="hr-content">{children}</main>

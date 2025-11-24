@@ -1,0 +1,166 @@
+.template-manager {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.add-btn {
+  background: #00b14f;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-btn:hover {
+  background: #00943d;
+}
+
+.template-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.template-table th,
+.template-table td {
+  border: 1px solid #e5e7eb;
+  padding: 12px 10px;
+  text-align: left;
+}
+
+.template-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.thumbnail {
+  width: 80px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.view-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  background: #1d4ed8;
+}
+
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 90%;
+  max-width: 1100px; /* Tối đa 1100px */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: modalFadeIn 0.3s ease-out;
+  padding: 32px;
+}
+
+.preview-container {
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.actions button {
+  margin-right: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #1d4ed8;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+.no-image {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 13px;
+}
+
+.preview-modal {
+  max-width: 1000px;
+  width: 90%;
+}
+
+.preview-container {
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  background: white;
+  min-height: 500px;
+  border-radius: 8px;
+  overflow: auto;
+}
