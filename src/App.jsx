@@ -24,6 +24,7 @@ import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import ManageJobPage from "./pages/HR/ManageJobPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
+import TemplateManagerPage from "./pages/Admin/TemplateManagerPage";
 
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
@@ -71,6 +72,7 @@ function App() {
           <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
           <Route path="/admin/companies" element={<CompanyManagerPage />} />
           <Route path="/admin/notifications" element={<NotificationsPage />} />
+          <Route path="/admin/templates" element={<TemplateManagerPage />} />
         </Route>
 
         {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
