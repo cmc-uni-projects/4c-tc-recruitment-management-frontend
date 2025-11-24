@@ -54,17 +54,36 @@ const PersonalInfo = () => {
           email,
           phone,
         }));
+
+        // THÊM: Đọc employer từ localStorage nếu có
+        const savedEmployer = JSON.parse(localStorage.getItem("employer") || "null");
+        if (savedEmployer) {
+          setFormData((prev) => ({
+            ...prev,
+            positionTitle: savedEmployer.positionTitle || "",
+            department: savedEmployer.department || "",
+            workEmail: savedEmployer.workEmail || "",
+          }));
+        } else {
+          // Nếu không có employer thì mới đọc temp (trường hợp đang làm dở)
+          const temp = JSON.parse(localStorage.getItem("employer_personal_temp") || "{}");
+          if (temp.positionTitle || temp.department || temp.workEmail) {
+            setFormData((prev) => ({
+              ...prev,
+              positionTitle: temp.positionTitle || "",
+              department: temp.department || "",
+              workEmail: temp.workEmail || "",
+            }));
+          }
+        }
       } catch (err) {
-        const msg =
-          err?.response?.data?.message ||
-          err?.message ||
-          "Không lấy được thông tin người dùng.";
+        const msg = err?.response?.data?.message || err?.message || "Không lấy được thông tin người dùng.";
         toast.error(msg);
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-
+    
     return () => {
       mounted = false;
     };

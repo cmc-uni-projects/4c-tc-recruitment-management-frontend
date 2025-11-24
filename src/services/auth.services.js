@@ -82,7 +82,16 @@ export const companyAPI = {
 
 export const employerAPI = {
   // 1. HR: Tạo hồ sơ Employer (lần đầu)
-  createEmployer: (data) => api.post("/employers", data),
+  
+createEmployer: (data) => {
+    const token = localStorage.getItem('token'); // hoặc 'accessToken' tùy bạn lưu
+    return api.post("/employers", data, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  },
+
 
   // 2. HR: Cập nhật hồ sơ Employer
   updateEmployer: (employerId, data) =>
@@ -117,10 +126,17 @@ export const employerAPI = {
   // 7. ADMIN: Từ chối duyệt (có thể kèm lý do)
   rejectVerification: (employerId, reason = "") =>
     api.post(`/employers/${employerId}/reject-verification`, { reason }),
+
+   getMyEmployer: () => {
+    const token = localStorage.getItem('token'); // hoặc 'accessToken' tùy bạn lưu
+    return api.get("/employers/me",  {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  },
 };
 
-// BONUS: Tiện nhất cho HR - Lấy hồ sơ Employer của chính mình (nếu bạn muốn thêm sau)
-export const getMyEmployer = () => api.get("/employers/me"); // Có thể thêm sau nếu cần
 
 // ====================================================================
 // THÊM MỚI: CV & TEMPLATE API (KHÔNG SỬA GÌ PHẦN TRÊN)

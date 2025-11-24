@@ -1,7 +1,6 @@
 import "./HRSection.css";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import logo from "../../assets/hr/logo.png";
 import avatar from "../../assets/hr/avatar.png";
 import Bell from "../../assets/hr/bell.png";
 import Setting from "../../assets/hr/setting.png";
@@ -13,15 +12,17 @@ import logoutIcon from "../../assets/hr/logout.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { employerAPI } from "../../services/auth.services";
 
 const HRSection = ({ children }) => {
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState({ fullName: "Đang tải...", role: "HR" });
   const [employer, setEmployer] = useState(null); // ← Quan trọng: trạng thái xác thực
-
+  const [showPendingPopup, setShowPendingPopup] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+   
   const userId = localStorage.getItem("userId");
 
   const handleLogout = () => {
@@ -44,13 +45,19 @@ const HRSection = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
+         
 
         // 2. Lấy thông tin Employer để kiểm tra verified
         try {
-          const employerRes = await axios.get("http://localhost:8080/employers/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setEmployer(employerRes.data);
+          const employerRes = await employerAPI.getMyEmployer();
+          const employerData = employerRes.data;
+          
+          setEmployer(employerData);
+
+          // THÊM 2 DÒNG NÀY - QUAN TRỌNG NHẤT
+          localStorage.setItem("employer", JSON.stringify(employerData));
+          localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
+          
         } catch (err) {
           if (err.response?.status === 404) {
             setEmployer(null); // Chưa tạo hồ sơ Employer
@@ -70,7 +77,7 @@ const HRSection = ({ children }) => {
       {/* Header */}
       <header className="hr-header">
         <div className="header-left">
-          <img src={logo} alt="smarthire Logo" />
+          <img src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3" alt="smarthire Logo" />
           <nav className="header-nav">
             <button className="header-btn">HR Insider</button>
             <button className="header-btn primary">Đăng tin</button>
@@ -111,7 +118,6 @@ const HRSection = ({ children }) => {
                 {loading ? "Đang tải..." : user.fullName || "HR User"}
               </p>
 
-              {/* TRẠNG THÁI XÁC THỰC – ĐẸP NHƯ TOPCV */}
               {loading ? (
                 <div className="verified-status loading">Đang kiểm tra...</div>
               ) : employer?.verified ? (
@@ -120,6 +126,22 @@ const HRSection = ({ children }) => {
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                   Đã Xác Thực
+                </div>
+              ) : employer?.verificationStatus === "PENDING" ? (
+                <div
+                  className="verified-status pending"
+                  onClick={() => setShowPendingPopup(true)}
+                  style={{ cursor: "pointer" }}
+                >
+                  Clock Đang chờ duyệt
+                </div>
+              ) : employer ? (
+                <div
+                  className="verified-status not-verified"
+                  onClick={() => navigate("/hr/profile/business-registration")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Tiếp tục xác thực
                 </div>
               ) : (
                 <div
@@ -131,6 +153,21 @@ const HRSection = ({ children }) => {
                 </div>
               )}
 
+              {/* POPUP ĐẸP NHƯ TOPCV */}
+              {showPendingPopup && (
+                <div className="pending-popup-overlay" onClick={() => setShowPendingPopup(false)}>
+                  <div className="pending-popup" onClick={(e) => e.stopPropagation()}>
+                    <div className="pending-icon">Clock</div>
+                    <h3>Yêu cầu xác thực đã được gửi!</h3>
+                    <p>Chúng tôi đang xem xét hồ sơ doanh nghiệp của bạn.</p>
+                    <p>Thời gian xử lý: <strong>1-3 ngày làm việc</strong></p>
+                    <p>Bạn sẽ nhận email thông báo khi hoàn tất.</p>
+                    <button className="btn-close-popup" onClick={() => setShowPendingPopup(false)}>
+                      Đóng
+                    </button>
+                  </div>
+                </div>
+              )}
               <p className="sidebar-role">{user.role || "HR"}</p>
             </div>
           </div>

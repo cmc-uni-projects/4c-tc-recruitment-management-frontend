@@ -38,15 +38,12 @@ export default function AdminSection({ children }) {
       <header className="hr-header">
         <div className="header-left">
           <img
-            src="https://www.topcv.vn/images/logo-topcv.svg"
-            alt="TopCV Logo"
+            src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3"
+            alt="Logo"
           />   
           <nav className="header-nav">
-            <button className="header-btn">HR Insider</button>
-            <button className="header-btn primary">Đăng tin</button>
-            <button className="header-btn">Tìm CV</button>
-            <button className="header-btn">Connect</button>
-            <button className="header-btn">Insights</button>
+            <button className="header-btn">Admin Insider</button>
+            <button className="header-btn primary">Dashboard</button>
           </nav>
         </div>
        <div className="header-right">
@@ -76,7 +73,7 @@ export default function AdminSection({ children }) {
         {/* SIDEBAR */}
         <aside className="hr-sidebar">
           <div className="sidebar-user">
-            <img src="https://via.placeholder.com/50" alt="Admin Avatar" />
+            <img src={avatar} alt="Admin Avatar" />
             <div>
               <p className="sidebar-name">Admin</p>
               <p className="sidebar-role">Super Admin</p>

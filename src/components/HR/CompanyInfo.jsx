@@ -27,6 +27,21 @@ const CompanyInfo = () => {
     foundedYear: "",
   });
 
+  // THÊM: Kiểm tra nếu đã có employer thì skip luôn
+  useEffect(() => {
+    const existingEmployer = JSON.parse(localStorage.getItem("employer") || "null");
+    
+    if (existingEmployer) {
+      // Nếu đã gửi xác thực → hiện popup luôn
+      if (existingEmployer.verificationStatus === "PENDING" || existingEmployer.verified) {
+        navigate("/hr"); // hoặc tạo trang riêng nếu muốn
+        return;
+      }
+      // Nếu chỉ thiếu upload → nhảy thẳng vào upload
+      navigate("/hr/profile/business-registration");
+    }
+  }, [navigate]);
+
   useEffect(() => {
     fetchCompanies();
   }, []);
@@ -80,7 +95,7 @@ const CompanyInfo = () => {
 
       if (!personalTemp.positionTitle || !personalTemp.department || !personalTemp.workEmail) {
         toast.error("Thiếu thông tin cá nhân. Vui lòng quay lại bước 1.");
-        navigate("/hr/profile/personal");
+        navigate("/hr/profile");
         return;
       }
 
@@ -91,6 +106,7 @@ const CompanyInfo = () => {
         workEmail: personalTemp.workEmail,
         companyId: selectedCompany.companyId, // bắt buộc
       };
+      
 
       const res = await employerAPI.createEmployer(payload);
 

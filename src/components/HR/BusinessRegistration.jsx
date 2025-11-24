@@ -14,13 +14,20 @@ const BusinessRegistration = () => {
 
   const employerData = JSON.parse(localStorage.getItem("employer") || "{}");
   const employerId = employerData.employerId;
+  console.log("hsagdid: ", employerId);
+  
 
   useEffect(() => {
+    if (employerData?.verificationStatus === "PENDING" || employerData?.verified) {
+      navigate("/hr");
+      return;
+    }
+
     if (!employerId) {
       toast.error("Không tìm thấy thông tin nhà tuyển dụng.");
       navigate("/hr/profile/company");
     }
-  }, [employerId, navigate]);
+  }, [employerData, employerId, navigate]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -62,12 +69,22 @@ const BusinessRegistration = () => {
       // B2: Gửi yêu cầu xác minh
       await employerAPI.requestVerification(employerId);
 
+      // QUAN TRỌNG NHẤT: GỌI LẠI API ĐỂ LẤY DỮ LIỆU MỚI NHẤT TỪ SERVER
+    const updatedRes = await employerAPI.getMyEmployer();
+    const updatedEmployer = updatedRes.data;
+
+    // CẬP NHẬT LẠI localStorage VỚI DỮ LIỆU MỚI (có verificationStatus: "PENDING")
+    localStorage.setItem("employer", JSON.stringify(updatedEmployer));
+    if (updatedEmployer.company) {
+      localStorage.setItem("selectedCompany", JSON.stringify(updatedEmployer.company));
+    }
+
       // HIỆN POPUP THÀNH CÔNG + CHUYỂN TRANG
       setShowSuccessPopup(true);
 
       // Sau 3.5 giây tự động về trang HR Dashboard
       setTimeout(() => {
-        navigate("/hr");
+        window.location.href = "/hr";
       }, 3500);
 
     } catch (err) {
