@@ -1,8 +1,9 @@
+
 // src/pages/MyCV/CreateCVPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getCVsByUser,
+  getMyCVs,
   uploadCV,
   getAllTemplates,
   createCV,

@@ -30,6 +30,7 @@ import PersonalSettingsPage from "./pages/PersonalSettings/PersonalSettingsPage"
 import CreateCVPage from "./pages/MyCV/CreateCVPage";
 import UploadCVPage from "./pages/MyCV/UploadCVPage";
 import CVBuilderPage from "./pages/MyCV/CVBuilderPage";
+import EditCVPage from "./pages/MyCV/EditCVPage";
 
 import HRProfilePage from "./pages/HR/HRProfilePage";
 import ProfileLayout from "./components/HR/ProfileLayout";
@@ -93,10 +94,11 @@ function App() {
         <Route path="/applied-jobs" element={<AppliedJobsPage />} />
         <Route path="/my-cv" element={<MyCVPage />} />
         <Route path="/personal-settings" element={<PersonalSettingsPage />} />
-        <Route path="/my-cv/create" element={<CreateCVPage />} />
-        <Route path="/my-cv/upload" element={<UploadCVPage />} />
-        <Route path="/my-cv/builder" element={<CVBuilderPage />} />
       </Route>
+      <Route path="/my-cv/create" element={<CreateCVPage />} />
+      <Route path="/my-cv/upload" element={<UploadCVPage />} />
+      <Route path="/my-cv/builder" element={<CVBuilderPage />} />
+      <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
     </Routes>
   );
 }

@@ -144,14 +144,30 @@ createEmployer: (data) => {
 
 // CV API
 export const cvAPI = {
-  getByUser: (userId) => api.get(`/api/cv/user/${userId}`),
-  create: (data) => api.post("/api/cv/create", data),
-  delete: (cvId) => api.delete(`/api/cv/${cvId}`),
+  // Lấy danh sách CV của user hiện tại (dùng token)
+  getMyCVs: () => api.get("/api/cv/my"),
+
+  // Tạo CV từ builder (gửi data + templateId)
+  createWithData: (data) => api.post("/api/cv/create-with-data", data),
+
+  // Upload file CV
   upload: (formData) =>
     api.post("/api/cv/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     }),
+
+  // Xem trước CV (render HTML + data)
+  renderCV: (cvId) => api.get(`/api/cv/render/${cvId}`),
+
+  // Xóa CV
+  delete: (cvId) => api.delete(`/api/cv/${cvId}`),
+
+  update: (cvId, data) => api.put(`/api/cv/update/${cvId}`, data),
 };
+
+
 
 // Template API
 export const templateAPI = {
@@ -160,8 +176,12 @@ export const templateAPI = {
 };
 
 // Helper functions (dễ import)
-export const getCVsByUser = (userId) => cvAPI.getByUser(userId);
-export const createCV = (data) => cvAPI.create(data);
-export const deleteCV = (cvId) => cvAPI.delete(cvId);
+export const getMyCVs = () => cvAPI.getMyCVs("/api/cv/my");
+export const createCV = (data) => cvAPI.createWithData(data);
 export const uploadCV = (formData) => cvAPI.upload(formData);
+export const renderCV = (cvId) => cvAPI.renderCV(cvId);
+export const deleteCV = (cvId) => cvAPI.delete(cvId);
 export const getAllTemplates = () => templateAPI.getAll();
+export const updateCV = (cvId, data) => cvAPI.update(cvId, data);
+
+
