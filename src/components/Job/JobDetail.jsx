@@ -4,17 +4,19 @@ import Navbar from "../Layout/Navbar";
 import { jobAPI, companyAPI } from "../../services/auth.services";
 import "./JobDetail.css";
 import axios from "axios";
+import ApplyForm from "../Applications/ApplyForm";
+import { Modal, Box } from "@mui/material";
 
 export default function JobDetail() {
   const { jobId } = useParams();
   const [company, setCompany] = useState(null);
   const [job, setJob] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
+  const [showApplyForm, setShowApplyForm] = useState(false);
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
-  // Lấy chi tiết công việc
   useEffect(() => {
     const fetchJobDetail = async () => {
       try {
@@ -27,7 +29,6 @@ export default function JobDetail() {
     fetchJobDetail();
   }, [jobId]);
 
-  // Lấy thông tin công ty
   useEffect(() => {
     const fetchCompanyInfo = async () => {
       try {
@@ -42,16 +43,13 @@ export default function JobDetail() {
     }
   }, [job]);
 
-  // Kiểm tra trạng thái đã lưu hay chưa
   useEffect(() => {
     const checkSavedStatus = async () => {
       if (!token || !userId) return;
       try {
         const response = await axios.get(`http://localhost:8080/api/saved-jobs`, {
           params: { userId },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const savedJobs = response.data;
         const found = savedJobs.some((savedJob) => savedJob.jobId === jobId);
@@ -80,7 +78,6 @@ export default function JobDetail() {
     return diffDays > 0 ? diffDays : 0;
   };
 
-  // Lưu hoặc bỏ lưu công việc
   const handleSaveJob = async () => {
     try {
       if (!token || !userId) {
@@ -91,17 +88,13 @@ export default function JobDetail() {
       if (!isSaved) {
         await axios.post(`http://localhost:8080/api/saved-jobs`, null, {
           params: { userId, jobId },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         alert("Đã lưu công việc!");
       } else {
         await axios.delete(`http://localhost:8080/api/saved-jobs/${jobId}`, {
           params: { userId },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         alert("Đã bỏ lưu công việc!");
       }
@@ -124,11 +117,9 @@ export default function JobDetail() {
           <div className="job-left">
             <div className="breadcrumb">Trang chủ &gt; Việc làm &gt; {job.title}</div>
 
-            {/* Header */}
             <div className="job-header">
               <h1>{job.title}</h1>
 
-              {/* Info with Icons */}
               <div className="job-info-icons">
                 <div className="info-item">
                   <div className="icon-circle">
@@ -171,7 +162,9 @@ export default function JobDetail() {
               </div>
 
               <div className="job-actions">
-                <button className="apply-btn">Ứng tuyển ngay</button>
+                <button className="apply-btn" onClick={() => setShowApplyForm(true)}>
+                  Ứng tuyển ngay
+                </button>
                 <button className="save-btn" onClick={handleSaveJob}>
                   <i className={`fa-heart ${isSaved ? "fa-solid" : "fa-regular"}`}></i>
                   <span>{isSaved ? "Đã lưu" : "Lưu tin"}</span>
@@ -179,7 +172,6 @@ export default function JobDetail() {
               </div>
             </div>
 
-            {/* Job Details */}
             <div className="job-detail-section">
               <h2>Chi tiết tin tuyển dụng</h2>
               <h3>Mô tả công việc</h3>
@@ -206,7 +198,6 @@ export default function JobDetail() {
                 className="company-logo-injob"
               />
               <h3 className="company-name">{company?.name}</h3>
-
               <div className="company-info-item">
                 <i className="fa-solid fa-users"></i>
                 <span>{company?.size || "Đang cập nhật"}</span>
@@ -226,6 +217,13 @@ export default function JobDetail() {
           </div>
         </div>
       </div>
+
+      {/* Modal hiển thị form ứng tuyển */}
+      
+      <Modal open={showApplyForm} onClose={() => setShowApplyForm(false)}>
+      <ApplyForm jobId={job.jobId} jobTitle={job.title} onClose={() => setShowApplyForm(false)} />
+      </Modal>
+
     </>
   );
 }

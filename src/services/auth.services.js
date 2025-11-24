@@ -185,3 +185,38 @@ export const getAllTemplates = () => templateAPI.getAll();
 export const updateCV = (cvId, data) => cvAPI.update(cvId, data);
 
 
+// Application API
+export const applicationAPI = {
+  // Ứng viên tạo ứng tuyển
+  create: (data, token) =>
+    api.post("/api/applications", data, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // Xem danh sách ứng tuyển của ứng viên
+  getMyApplications: (token) =>
+    api.get("/api/applications/my", {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // HR xem danh sách ứng viên theo JobId
+  getByJobId: (jobId, page = 0, size = 10, status, token) =>
+    api.get(`/api/applications/job/${jobId}`, {
+      params: { page, size, status },
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // HR xem chi tiết ứng tuyển
+  getDetail: (applicationId, token) =>
+    api.get(`/api/applications/${applicationId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+
+  // HR cập nhật trạng thái ứng tuyển
+  updateStatus: (applicationId, status, token) =>
+    api.put(`/api/applications/${applicationId}/status`, null, {
+      params: { status },
+      headers: { Authorization: `Bearer ${token}` }
+    })
+};
+
