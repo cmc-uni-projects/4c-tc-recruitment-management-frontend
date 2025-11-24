@@ -163,7 +163,7 @@ export default function UploadCVPage() {
         </div>
       </div>
 
-      <ToastContainer position="top-center" autoClose={3000} />
+     
     </>
   );
 }
