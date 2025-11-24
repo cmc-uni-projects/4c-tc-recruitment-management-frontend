@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import HomePage from "./pages/Home/HomePage";
@@ -43,63 +45,68 @@ import ProtectedRoute, { ForbiddenPage } from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Routes>
-      {/* ============================= PUBLIC ROUTES ============================= */}
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/request-reset" element={<RequestResetPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/verify" element={<VerifyEmailPage />} />
-      <Route path="/reset-success" element={<ResetSuccessPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/blog/:id" element={<BlogDetail />} />
-      <Route path="/company/public/:id" element={<CompanyDetailPage />} />
-      <Route path="/jobs/:jobId" element={<JobDetail />} />
-      <Route path="/search-results" element={<SearchPage />} />
-      <Route path="/companies/public" element={<CompanyListPage />} />
+    <>
+      <Routes>
+        {/* ============================= PUBLIC ROUTES ============================= */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/request-reset" element={<RequestResetPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify" element={<VerifyEmailPage />} />
+        <Route path="/reset-success" element={<ResetSuccessPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
+        <Route path="/company/public/:id" element={<CompanyDetailPage />} />
+        <Route path="/jobs/:jobId" element={<JobDetail />} />
+        <Route path="/search-results" element={<SearchPage />} />
+        <Route path="/companies/public" element={<CompanyListPage />} />
 
-      {/* Trang lỗi 403 */}
-      <Route path="/403" element={<ForbiddenPage />} />
+        {/* Trang lỗi 403 */}
+        <Route path="/403" element={<ForbiddenPage />} />
 
-      {/* ============================= ADMIN ROUTES - Chỉ ADMIN ============================= */}
-      <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
-        <Route path="/admin/companies" element={<CompanyManagerPage />} />
-        <Route path="/admin/notifications" element={<NotificationsPage />} />
-      </Route>
-
-      {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
-      <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
-        <Route path="/hr" element={<HRPage />} />
-        <Route path="/hr/jobs" element={<ManageJobPage />} />
-
-        {/* HR Profile (có layout lồng nhau) */}
-        <Route path="/hr/profile" element={<HRProfilePage />}>
-          <Route element={<ProfileLayout />}>
-            <Route index element={<PersonalInfo />} />
-            <Route path="company" element={<CompanyInfo />} />
-            <Route path="business-registration" element={<BusinessRegistration />} />
-          </Route>
+        {/* ============================= ADMIN ROUTES - Chỉ ADMIN ============================= */}
+        <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+          <Route path="/admin/companies" element={<CompanyManagerPage />} />
+          <Route path="/admin/notifications" element={<NotificationsPage />} />
         </Route>
 
-        {/* Các route /hr/profile/* khác nếu có */}
-        <Route path="/hr/profile/*" element={<HRProfilePage />} />
-      </Route>
+        {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
+        <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
+          <Route path="/hr" element={<HRPage />} />
+          <Route path="/hr/jobs" element={<ManageJobPage />} />
 
-      {/* ============================= CANDIDATE ROUTES - CANDIDATE + ADMIN ============================= */}
-      <Route element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}>
-        <Route path="/saved-jobs" element={<SavedJobsPage />} />
-        <Route path="/applied-jobs" element={<AppliedJobsPage />} />
-        <Route path="/my-cv" element={<MyCVPage />} />
-        <Route path="/personal-settings" element={<PersonalSettingsPage />} />
-      </Route>
-      <Route path="/my-cv/create" element={<CreateCVPage />} />
-      <Route path="/my-cv/upload" element={<UploadCVPage />} />
-      <Route path="/my-cv/builder" element={<CVBuilderPage />} />
-      <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
-    </Routes>
+          {/* HR Profile (có layout lồng nhau) */}
+          <Route path="/hr/profile" element={<HRProfilePage />}>
+            <Route element={<ProfileLayout />}>
+              <Route index element={<PersonalInfo />} />
+              <Route path="company" element={<CompanyInfo />} />
+              <Route path="business-registration" element={<BusinessRegistration />} />
+            </Route>
+          </Route>
+
+          {/* Các route /hr/profile/* khác nếu có */}
+          <Route path="/hr/profile/*" element={<HRProfilePage />} />
+        </Route>
+
+        {/* ============================= CANDIDATE ROUTES - CANDIDATE + ADMIN ============================= */}
+        <Route element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}>
+          <Route path="/saved-jobs" element={<SavedJobsPage />} />
+          <Route path="/applied-jobs" element={<AppliedJobsPage />} />
+          <Route path="/my-cv" element={<MyCVPage />} />
+          <Route path="/personal-settings" element={<PersonalSettingsPage />} />
+        </Route>
+
+        {/* CV Routes */}
+        <Route path="/my-cv/create" element={<CreateCVPage />} />
+        <Route path="/my-cv/upload" element={<UploadCVPage />} />
+        <Route path="/my-cv/builder" element={<CVBuilderPage />} />
+        <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
+      </Routes>
+      <ToastContainer position="top-right" autoClose={2000} theme="colored" />
+    </>
   );
 }
 
