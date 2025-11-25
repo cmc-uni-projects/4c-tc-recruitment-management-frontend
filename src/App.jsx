@@ -22,6 +22,7 @@ import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import ManageJobPage from "./pages/HR/ManageJobPage";
+import ManageCompanyPage from "./pages/HR/ManageCompanyPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
 import TemplateManagerPage from "./pages/Admin/TemplateManagerPage";
@@ -82,6 +83,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
           <Route path="/hr" element={<HRPage />} />
           <Route path="/hr/jobs" element={<ManageJobPage />} />
+          <Route path="/hr/companies" element={<ManageCompanyPage />} />
 
           {/* HR Profile (có layout lồng nhau) */}
           <Route path="/hr/profile" element={<HRProfilePage />}>
