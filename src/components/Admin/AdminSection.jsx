@@ -9,10 +9,13 @@ import Bell from "../../assets/hr/bell.png";
 import Setting from "../../assets/hr/setting.png";
 import { useNavigate } from "react-router-dom";
 import { jobAPI } from "../../services/auth.services";
+import NotificationsPage from "../../pages/Notification/NotificationsPage.jsx";
+
 export default function AdminSection({ children }) {
   const [showLogout, setShowLogout] = useState(false);
   const navigate = useNavigate();
   const [pendingCount, setPendingCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -33,6 +36,17 @@ export default function AdminSection({ children }) {
     const interval = setInterval(fetchPendingCount, 10000); // Cập nhật mỗi 10s
     return () => clearInterval(interval);
   }, []);
+
+  // Khi bấm chuông: bật chế độ hiển thị Notifications + reset về trang chính nếu cần
+  const handleBellClick = (e) => {
+    e.preventDefault();
+    setShowNotifications(true);
+    // Optional: nếu bạn muốn URL vẫn là /admin khi mở thông báo
+    navigate("/admin", { replace: true });
+  };
+
+  
+
   return (
     <div className="hr-page">
       {/* === HEADER === */}
@@ -49,15 +63,12 @@ export default function AdminSection({ children }) {
         </div>
         <div className="header-right">
           <div className="header-icons">
-            <div
-              className="notification-wrapper"
-              onClick={() => navigate("/admin/notifications")}
-            >
+            <div className="notification-wrapper" onClick={handleBellClick}>
               <img src={Bell} alt="Thông báo" className="icon-img" />
               {pendingCount > 0 && (
                 <span className="notification-badge">{pendingCount}</span>
               )}
-            </div>{" "}
+            </div>
             <img src={Setting} alt="Cài đặt" className="icon-img" />
           </div>
           <div className="avatar" onClick={() => setShowLogout(!showLogout)}>
@@ -154,18 +165,20 @@ export default function AdminSection({ children }) {
                 🤖 Toppy AI
               </NavLink>
             </li>
-            <li>
+            {/*<li>
               <NavLink
                 to="/admin/notifications"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 Thông báo
               </NavLink>
-            </li>
+            </li>*/}
           </ul>
         </aside>
         {/* MAIN CONTENT */}
-        <main className="hr-content">{children}</main>
+        <main className="hr-content">
+          {showNotifications ? <NotificationsPage /> : children}{" "}
+        </main>
       </div>
     </div>
   );
