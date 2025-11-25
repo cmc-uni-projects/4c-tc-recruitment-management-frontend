@@ -274,7 +274,7 @@ const CompanyInfo = () => {
           {/* Tab: Chọn công ty */}
           {activeTab === "select" && (
             <div className="company-select-tab">
-              <div className="search-bar">
+              <div className="search-bar1">
                 <input
                   type="text"
                   placeholder="Nhập tên công ty..."
