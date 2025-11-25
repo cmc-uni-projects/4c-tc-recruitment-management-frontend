@@ -14,5 +14,5 @@
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .image-box img { max-width: 100%; border: 1px solid #eee; border-radius: 4px; }
 .btn-primary, .btn-danger, .btn-close { cursor: pointer; }
-.btn-primary { background: #1a73e8; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
+.btn-primary { background: #00b14f; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
 .btn-danger { background: #d93025; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; }
