@@ -12,6 +12,7 @@ import {
   Alert
 } from "@mui/material";
 import "./ApplyForm.css"; // Import CSS
+import { toast } from "react-toastify";
 
 const ApplyForm = ({ jobId, jobTitle, onClose }) => {
   const [cvs, setCvs] = useState([]);
@@ -26,22 +27,24 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
       .catch((err) => console.error("Lỗi khi tải CV:", err));
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedCv && selectedOption === "other") {
-      alert("Vui lòng chọn CV");
-      return;
-    }
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (!selectedCv && selectedOption === "other") {
+      toast.error("Vui lòng chọn CV");
+    return;
+  }
+
 
     const data = { jobId, cvId: selectedCv || cvs[0]?.id, notes };
 
     try {
       await applicationAPI.create(data, token);
-      alert("Ứng tuyển thành công!");
+      toast.success("Ứng tuyển thành công!");
       onClose();
     } catch (error) {
       console.error(error);
-      alert("Có lỗi xảy ra khi ứng tuyển");
+      toast.error("Có lỗi xảy ra khi ứng tuyển");
     }
   };
 
@@ -60,14 +63,13 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
           label={`CV ứng tuyển gần nhất: ${cvs[0]?.title || "Chưa có CV"}`}
         />
         <FormControlLabel value="other" control={<Radio />} label="Chọn CV khác trong thư viện CV của tôi" />
-        <FormControlLabel value="upload" control={<Radio />} label="Tải lên CV từ máy tính" />
       </RadioGroup>
 
       {selectedOption === "other" && (
         <TextField
           select
           fullWidth
-          label="Chọn CV"
+
           value={selectedCv}
           onChange={(e) => setSelectedCv(e.target.value)}
           className="cv-select"

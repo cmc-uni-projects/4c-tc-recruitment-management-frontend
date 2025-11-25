@@ -22,8 +22,10 @@ import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import JobCategoryManagerPage from "./pages/Admin/JobCategoryManagerPage";
 import ManageJobPage from "./pages/HR/ManageJobPage";
+import ManageCompanyPage from "./pages/HR/ManageCompanyPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
+import TemplateManagerPage from "./pages/Admin/TemplateManagerPage";
 
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
@@ -68,22 +70,30 @@ function App() {
         {/* ============================= ADMIN ROUTES - Chỉ ADMIN ============================= */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+          <Route
+            path="/admin/job-categories"
+            element={<JobCategoryManagerPage />}
+          />
           <Route path="/admin/companies" element={<CompanyManagerPage />} />
           <Route path="/admin/notifications" element={<NotificationsPage />} />
+          <Route path="/admin/templates" element={<TemplateManagerPage />} />
         </Route>
 
         {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
         <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
           <Route path="/hr" element={<HRPage />} />
           <Route path="/hr/jobs" element={<ManageJobPage />} />
+          <Route path="/hr/companies" element={<ManageCompanyPage />} />
 
           {/* HR Profile (có layout lồng nhau) */}
           <Route path="/hr/profile" element={<HRProfilePage />}>
             <Route element={<ProfileLayout />}>
               <Route index element={<PersonalInfo />} />
               <Route path="company" element={<CompanyInfo />} />
-              <Route path="business-registration" element={<BusinessRegistration />} />
+              <Route
+                path="business-registration"
+                element={<BusinessRegistration />}
+              />
             </Route>
           </Route>
 
@@ -92,7 +102,9 @@ function App() {
         </Route>
 
         {/* ============================= CANDIDATE ROUTES - CANDIDATE + ADMIN ============================= */}
-        <Route element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}>
+        <Route
+          element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}
+        >
           <Route path="/saved-jobs" element={<SavedJobsPage />} />
           <Route path="/applied-jobs" element={<AppliedJobsPage />} />
           <Route path="/my-cv" element={<MyCVPage />} />
@@ -105,7 +117,7 @@ function App() {
         <Route path="/my-cv/builder" element={<CVBuilderPage />} />
         <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
       </Routes>
-      <ToastContainer position="top-right" autoClose={2000} theme="colored" />
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </>
   );
 }
