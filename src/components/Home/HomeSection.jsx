@@ -242,7 +242,9 @@ const handleSearch = () => {
       {/* === HERO VIDEO SECTION === */}
       
       {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
-      <LatestJobsSection />
+      <div id="latest-jobs">
+        <LatestJobsSection />
+        </div>
       {/* === NGÀNH NGHỀ NỔI BẬT === */}
       <section className="industry-section">
         <div className="industry-header">
