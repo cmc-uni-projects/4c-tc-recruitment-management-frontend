@@ -7,6 +7,8 @@ import { getMyCVs } from "../../../services/auth.services";
 import EmptyCreatedCV from "../../../assets/empty-cv-created.png";
 import EmptyUploadedCV from "../../../assets/empty-cv-upload.png";
 import { deleteCV } from "../../../services/auth.services";
+import { toast } from "react-toastify";
+
 
 export default function MyCV() {
   const [createdCVs, setCreatedCVs] = useState([]);
@@ -72,7 +74,7 @@ export default function MyCV() {
     try {
       await deleteCV(cvId);
       toast.success("Đã xóa CV");
-      fetchMyCVs();
+      await fetchMyCVs();
     } catch (err) {
       toast.error("Xóa thất bại");
     }
@@ -179,6 +181,7 @@ export default function MyCV() {
         </motion.div>
 
         {/* CV đã tải lên */}
+        
         <motion.div variants={itemVariants} className="cv-section">
           <div className="cv-section-header">
             <div>
@@ -225,6 +228,15 @@ export default function MyCV() {
                       <p>Tải lên: {formatDate(cv.updatedAt)}</p>
                     </div>
                   </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(cv.id);
+                    }}
+                    className="delete-btn"
+                  >
+                    Xóa
+                  </button>
                 </motion.div>
               ))
             )}
