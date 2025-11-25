@@ -66,10 +66,26 @@ export default function Navbar() {
           <span className="cv">Hire</span>
         </Link>
         <ul className="nav-links">
-          <li>Việc làm</li>
+          <li
+            onClick={() => {
+              const section = document.getElementById("latest-jobs");
+              if (section) {
+                section.scrollIntoView({ behavior: "smooth" });
+              } else {
+                navigate("/#latest-jobs");
+                setTimeout(() => {
+                  const el = document.getElementById("latest-jobs");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }, 300);
+              }
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            Việc làm
+          </li>
+
           <Link to="/companies/public" className="nav-link">Công ty</Link>
           <li>Cẩm nang nghề nghiệp</li>
-          <li>TopCV Pro</li>
         </ul>
       </div>
 

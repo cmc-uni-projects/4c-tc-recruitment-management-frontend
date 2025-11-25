@@ -143,7 +143,7 @@ const handleSearch = () => {
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         {/* Thanh tìm kiếm chính */}
       {/* === SEARCH BAR (REWRITTEN) === */}
-<div className="search-bar">
+<div className="search-bar2">
 
   {/* Category Dropdown - Đồng bộ với API */}
   <select
@@ -242,7 +242,9 @@ const handleSearch = () => {
       {/* === HERO VIDEO SECTION === */}
       
       {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
-      <LatestJobsSection />
+      <div id="latest-jobs">
+        <LatestJobsSection />
+        </div>
       {/* === NGÀNH NGHỀ NỔI BẬT === */}
       <section className="industry-section">
         <div className="industry-header">

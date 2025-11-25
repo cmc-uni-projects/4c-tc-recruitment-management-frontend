@@ -127,6 +127,9 @@ export const employerAPI = {
   rejectVerification: (employerId, reason = "") =>
     api.post(`/employers/${employerId}/reject-verification`, { reason }),
 
+// 8. HR: lấy danh sách HR thuộc công ty của HR hiện tại
+  getMyCompanyEmployers: () => api.get("/employers/by-company/me"),
+
   getMyEmployer: () => {
     const token = localStorage.getItem("token"); // hoặc 'accessToken' tùy bạn lưu
     return api.get("/employers/me", {
