@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import "./ManageJobSection.css";
 import {
@@ -6,11 +5,15 @@ import {
   jobCategoryAPI,
   companyAPI,
   applicationAPI,
+  employerAPI,
 } from "../../services/auth.services";
 
 function ManageJobSection() {
   const [dropdownLoading, setDropdownLoading] = useState(false);
   const [companies, setCompanies] = useState([]);
+  const [companyDisplayName, setCompanyDisplayName] = useState(
+    "Đang tải công ty..."
+  );
   const [categories, setCategories] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,39 +38,44 @@ function ManageJobSection() {
   });
   const [errors, setErrors] = useState({});
 
-const openViewModal = async (job) => {
-  setViewJob(job);
-  setIsViewModalOpen(true);
-  setLoadingApplications(true);
+  const openViewModal = async (job) => {
+    setViewJob(job);
+    setIsViewModalOpen(true);
+    setLoadingApplications(true);
 
-  try {
-    const token = localStorage.getItem("token");
-    const res = await applicationAPI.getByJobId(job.jobId, 0, 10, null, token);
-    console.log("Ứng viên:", res.data); // Kiểm tra dữ liệu trả về
+    try {
+      const token = localStorage.getItem("token");
+      const res = await applicationAPI.getByJobId(
+        job.jobId,
+        0,
+        10,
+        null,
+        token
+      );
+      console.log("Ứng viên:", res.data); // Kiểm tra dữ liệu trả về
 
-    // Nếu API trả về dạng phân trang
-    const apps = res.data.content ? res.data.content : res.data;
-    setApplications(Array.isArray(apps) ? apps : []);
-  } catch (err) {
-    console.error("Lỗi khi tải ứng viên:", err);
+      // Nếu API trả về dạng phân trang
+      const apps = res.data.content ? res.data.content : res.data;
+      setApplications(Array.isArray(apps) ? apps : []);
+    } catch (err) {
+      console.error("Lỗi khi tải ứng viên:", err);
+      setApplications([]);
+    } finally {
+      setLoadingApplications(false);
+    }
+  };
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setViewJob(null);
     setApplications([]);
-  } finally {
-    setLoadingApplications(false);
-  }
-};
-
-const closeViewModal = () => {
-  setIsViewModalOpen(false);
-  setViewJob(null);
-  setApplications([]);
-};
-
+  };
 
   // ✅ Load danh sách Job
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const res = await jobAPI.getAllJobs();
+      const res = await jobAPI.getMyCompanyJobs();
       setJobs(res.data);
     } catch (err) {
       console.error("Lỗi khi tải danh sách job:", err);
@@ -96,13 +104,96 @@ const closeViewModal = () => {
   };
 
   useEffect(() => {
-    fetchJobs();
-    fetchDropdownData();
-  }, []);
+    const loadCompanyInfo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
+        setCompanyDisplayName("Đang tải công ty...");
+        let companyName = null;
+        let companyId = null;
+
+        // 1. Ưu tiên lấy từ job đã đăng (nếu có)
+        try {
+          const jobRes = await jobAPI.getMyCompanyJobs();
+          const jobsList = jobRes.data || [];
+
+          if (jobsList.length > 0) {
+            const job = jobsList[0];
+            companyName = job.companyName || "Công ty của bạn";
+            companyId = job.companyId;
+
+            localStorage.setItem(
+              "myCompany",
+              JSON.stringify({ companyId, name: companyName })
+            );
+            localStorage.setItem("companyName", companyName);
+            setCompanyDisplayName(companyName);
+            setForm((prev) => ({ ...prev, companyId }));
+
+            setJobs(jobsList);
+            await fetchDropdownData();
+            setLoading(false);
+            return; // Đã có công ty → thoát luôn
+          }
+        } catch (err) {
+          console.warn("Chưa có job nào hoặc lỗi không nghiêm trọng:", err);
+          // Tiếp tục bước 2
+        }
+
+        // 2. Nếu chưa có job → lấy từ API thông tin employer
+        try {
+          const res = await employerAPI.getMyEmployer();
+          const company = res.data?.company || res.data; // một số backend trả thẳng object
+
+          if (company?.companyId || company?.id) {
+            companyId = company.companyId || company.id;
+            companyName = company.name || company.companyName || "Công ty của bạn";
+
+            localStorage.setItem(
+              "myCompany",
+              JSON.stringify({ companyId, name: companyName })
+            );
+            localStorage.setItem("companyName", companyName);
+            setCompanyDisplayName(companyName);
+            setForm((prev) => ({ ...prev, companyId }));
+          } else {
+            setCompanyDisplayName("Chưa liên kết công ty");
+          }
+        } catch (err) {
+          console.error("Không lấy được thông tin công ty từ employerAPI:", err);
+          setCompanyDisplayName("Chưa liên kết công ty");
+        }
+
+        // Load lại job (có thể rỗng) + dropdown
+        try {
+          const jobRes = await jobAPI.getMyCompanyJobs();
+          setJobs(jobRes.data || []);
+        } catch {
+          // Người dùng chưa có job → hoàn toàn bình thường
+        }
+
+        await fetchDropdownData();
+        setLoading(false);
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu trang:", err);
+        setCompanyDisplayName("Lỗi hệ thống");
+        setLoading(false);
+      }
+    };
+
+    loadCompanyInfo();
+  }, []);
   // ✅ Mở modal
   const openModal = async (job = null) => {
     await fetchDropdownData();
+    const myCompany = JSON.parse(localStorage.getItem("myCompany") || "null");
+
+    // Lưu tên công ty để hiển thị
+    if (myCompany?.name) {
+      localStorage.setItem("companyName", myCompany.name);
+    }
+
     if (job) {
       setForm({
         title: job.title,
@@ -114,9 +205,10 @@ const closeViewModal = () => {
         salaryMax: job.salaryMax || "",
         experienceRequired: job.experienceRequired || "",
         expiredAt: job.expiredAt ? job.expiredAt.slice(0, 16) : "",
-        companyId: job.companyId || "",
+        companyId: job.companyId || myCompany?.companyId || "",
         categoryId: job.categoryId || "",
       });
+
       setEditingId(job.jobId);
     } else {
       setForm({
@@ -129,7 +221,7 @@ const closeViewModal = () => {
         salaryMax: "",
         experienceRequired: "",
         expiredAt: "",
-        companyId: "",
+        companyId: myCompany?.companyId || "",
         categoryId: "",
       });
       setEditingId(null);
@@ -154,13 +246,15 @@ const closeViewModal = () => {
     const now = new Date();
 
     if (!form.title.trim()) newErrors.title = "Tên vị trí không được để trống!";
-    if (!form.companyId) newErrors.companyId = "Vui lòng chọn công ty!";
+    //if (!form.companyId) newErrors.companyId = "Vui lòng chọn công ty!";
     if (!form.categoryId) newErrors.categoryId = "Vui lòng chọn danh mục!";
     if (salaryMin <= 0) newErrors.salaryMin = "Lương tối thiểu phải > 0!";
     if (salaryMax <= 0) newErrors.salaryMax = "Lương tối đa phải > 0!";
-    if (salaryMin >= salaryMax) newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
+    if (salaryMin >= salaryMax)
+      newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
     if (!form.expiredAt) newErrors.expiredAt = "Vui lòng chọn ngày hết hạn!";
-    if (expiredDate <= now) newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
+    if (expiredDate <= now)
+      newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
 
     return newErrors;
   };
@@ -241,14 +335,33 @@ const closeViewModal = () => {
                     </td>
                     <td>{job.experienceRequired || 0} năm</td>
                     <td>
-                      <small className={`status-badge ${job.status?.toLowerCase() || "pending"}`}>
+                      <small
+                        className={`status-badge ${
+                          job.status?.toLowerCase() || "pending"
+                        }`}
+                      >
                         {job.status || "PENDING"}
                       </small>
                     </td>
                     <td className="actions">
-                      <button className="view-btn" onClick={() => openViewModal(job)}>Xem</button>
-                      <button className="edit-btn" onClick={() => openModal(job)}>Sửa</button>
-                      <button className="delete-btn" onClick={() => handleDelete(job.jobId)}>Xóa</button>
+                      <button
+                        className="view-btn"
+                        onClick={() => openViewModal(job)}
+                      >
+                        Xem
+                      </button>
+                      <button
+                        className="edit-btn"
+                        onClick={() => openModal(job)}
+                      >
+                        Sửa
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(job.jobId)}
+                      >
+                        Xóa
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -259,59 +372,83 @@ const closeViewModal = () => {
       </div>
 
       {/* Modal */}
-{isViewModalOpen && viewJob && (
-  <div className="modal-overlay" onClick={closeViewModal}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <h3>Chi tiết công việc</h3>
-      <div className="job-detail">
-        <p><strong>Tiêu đề:</strong> {viewJob.title}</p>
-        <p><strong>Mô tả:</strong> {viewJob.description || "Không có"}</p>
-        <p><strong>Yêu cầu:</strong> {viewJob.requirements || "Không có"}</p>
-        <p><strong>Địa điểm:</strong> {viewJob.location || "-"}</p>
-        <p><strong>Loại công việc:</strong> {viewJob.jobType}</p>
-        <p><strong>Lương:</strong> {viewJob.salaryMin?.toLocaleString()} - {viewJob.salaryMax?.toLocaleString()} đ</p>
-        <p><strong>Kinh nghiệm:</strong> {viewJob.experienceRequired || 0} năm</p>
-        <p><strong>Ngày hết hạn:</strong> {viewJob.expiredAt}</p>
-        <p><strong>Công ty:</strong> {viewJob.companyName || viewJob.companyId}</p>
-        <p><strong>Danh mục:</strong> {viewJob.categoryName || viewJob.categoryId}</p>
-      </div>
+      {isViewModalOpen && viewJob && (
+        <div className="modal-overlay" onClick={closeViewModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Chi tiết công việc</h3>
+            <div className="job-detail">
+              <p>
+                <strong>Tiêu đề:</strong> {viewJob.title}
+              </p>
+              <p>
+                <strong>Mô tả:</strong> {viewJob.description || "Không có"}
+              </p>
+              <p>
+                <strong>Yêu cầu:</strong> {viewJob.requirements || "Không có"}
+              </p>
+              <p>
+                <strong>Địa điểm:</strong> {viewJob.location || "-"}
+              </p>
+              <p>
+                <strong>Loại công việc:</strong> {viewJob.jobType}
+              </p>
+              <p>
+                <strong>Lương:</strong> {viewJob.salaryMin?.toLocaleString()} -{" "}
+                {viewJob.salaryMax?.toLocaleString()} đ
+              </p>
+              <p>
+                <strong>Kinh nghiệm:</strong> {viewJob.experienceRequired || 0}{" "}
+                năm
+              </p>
+              <p>
+                <strong>Ngày hết hạn:</strong> {viewJob.expiredAt}
+              </p>
+              <p>
+                <strong>Công ty:</strong>{" "}
+                {viewJob.companyName || viewJob.companyId}
+              </p>
+              <p>
+                <strong>Danh mục:</strong>{" "}
+                {viewJob.categoryName || viewJob.categoryId}
+              </p>
+            </div>
 
-      <h4>Danh sách ứng viên</h4>
-      {loadingApplications ? (
-        <p>Đang tải ứng viên...</p>
-      ) : applications.length === 0 ? (
-        <p>Chưa có ứng viên nào ứng tuyển.</p>
-      ) : (
-        <table className="application-table">
-          <thead>
-            <tr>
-              <th>Tên ứng viên</th>
-              <th>Email</th>
-              <th>Ngày ứng tuyển</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((app) => (
-              <tr key={app.id}>
-                <td>{app.candidateName}</td>
-                <td>{app.email}</td>
-                <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
-                <td>{app.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            <h4>Danh sách ứng viên</h4>
+            {loadingApplications ? (
+              <p>Đang tải ứng viên...</p>
+            ) : applications.length === 0 ? (
+              <p>Chưa có ứng viên nào ứng tuyển.</p>
+            ) : (
+              <table className="application-table">
+                <thead>
+                  <tr>
+                    <th>Tên ứng viên</th>
+                    <th>Email</th>
+                    <th>Ngày ứng tuyển</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applications.map((app) => (
+                    <tr key={app.id}>
+                      <td>{app.candidateName}</td>
+                      <td>{app.email}</td>
+                      <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
+                      <td>{app.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <div className="modal-actions">
+              <button className="cancel-btn" onClick={closeViewModal}>
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-
-      <div className="modal-actions">
-        <button className="cancel-btn" onClick={closeViewModal}>Đóng</button>
-      </div>
-    </div>
-  </div>
-)}
-
-
 
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
@@ -335,7 +472,9 @@ const closeViewModal = () => {
                 <textarea
                   rows="3"
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                 />
               </div>
 
@@ -344,7 +483,9 @@ const closeViewModal = () => {
                 <textarea
                   rows="2"
                   value={form.requirements}
-                  onChange={(e) => setForm({ ...form, requirements: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, requirements: e.target.value })
+                  }
                 />
               </div>
 
@@ -353,7 +494,9 @@ const closeViewModal = () => {
                 <input
                   type="text"
                   value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, location: e.target.value })
+                  }
                 />
               </div>
 
@@ -361,7 +504,9 @@ const closeViewModal = () => {
                 <label>Loại công việc</label>
                 <select
                   value={form.jobType}
-                  onChange={(e) => setForm({ ...form, jobType: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, jobType: e.target.value })
+                  }
                 >
                   <option value="FULL_TIME">FULL_TIME</option>
                   <option value="PART_TIME">PART_TIME</option>
@@ -375,9 +520,13 @@ const closeViewModal = () => {
                 <input
                   type="number"
                   value={form.salaryMin}
-                  onChange={(e) => setForm({ ...form, salaryMin: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, salaryMin: e.target.value })
+                  }
                 />
-                {errors.salaryMin && <p className="error-text">{errors.salaryMin}</p>}
+                {errors.salaryMin && (
+                  <p className="error-text">{errors.salaryMin}</p>
+                )}
               </div>
 
               <div className="form-group">
@@ -385,9 +534,13 @@ const closeViewModal = () => {
                 <input
                   type="number"
                   value={form.salaryMax}
-                  onChange={(e) => setForm({ ...form, salaryMax: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, salaryMax: e.target.value })
+                  }
                 />
-                {errors.salaryMax && <p className="error-text">{errors.salaryMax}</p>}
+                {errors.salaryMax && (
+                  <p className="error-text">{errors.salaryMax}</p>
+                )}
               </div>
 
               <div className="form-group">
@@ -395,7 +548,9 @@ const closeViewModal = () => {
                 <input
                   type="number"
                   value={form.experienceRequired}
-                  onChange={(e) => setForm({ ...form, experienceRequired: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, experienceRequired: e.target.value })
+                  }
                 />
               </div>
 
@@ -404,41 +559,35 @@ const closeViewModal = () => {
                 <input
                   type="datetime-local"
                   value={form.expiredAt}
-                  onChange={(e) => setForm({ ...form, expiredAt: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, expiredAt: e.target.value })
+                  }
                 />
-                {errors.expiredAt && <p className="error-text">{errors.expiredAt}</p>}
+                {errors.expiredAt && (
+                  <p className="error-text">{errors.expiredAt}</p>
+                )}
               </div>
 
-              {/* Dropdown Công ty */}
+              {/* TỰ ĐỘNG LẤY CÔNG TY CỦA HR – KHÔNG CHO CHỌN (CHUẨN TOPCV) */}
               <div className="form-group">
                 <label>Công ty *</label>
-                {dropdownLoading ? (
-                  <select disabled><option>Đang tải...</option></select>
-                ) : (
-                  <select
-                    value={form.companyId}
-                    onChange={(e) => setForm({ ...form, companyId: e.target.value })}
-                  >
-                    <option value="">-- Chọn công ty --</option>
-                    {companies.map((comp) => (
-                      <option key={comp.companyId} value={comp.companyId}>
-                        {comp.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                {errors.companyId && <p className="error-text">{errors.companyId}</p>}
+                <div className="readonly-field">{companyDisplayName}</div>
+                <input type="hidden" name="companyId" value={form.companyId} />
               </div>
 
               {/* Dropdown Danh mục */}
               <div className="form-group">
                 <label>Danh mục nghề *</label>
                 {dropdownLoading ? (
-                  <select disabled><option>Đang tải...</option></select>
+                  <select disabled>
+                    <option>Đang tải...</option>
+                  </select>
                 ) : (
                   <select
                     value={form.categoryId}
-                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, categoryId: e.target.value })
+                    }
                   >
                     <option value="">-- Chọn danh mục --</option>
                     {categories.map((cat) => (
@@ -448,11 +597,19 @@ const closeViewModal = () => {
                     ))}
                   </select>
                 )}
-                {errors.categoryId && <p className="error-text">{errors.categoryId}</p>}
+                {errors.categoryId && (
+                  <p className="error-text">{errors.categoryId}</p>
+                )}
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={closeModal}>Hủy</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={closeModal}
+                >
+                  Hủy
+                </button>
                 <button type="submit" className="submit-btn">
                   {editingId ? "Cập nhật" : "Thêm mới"}
                 </button>

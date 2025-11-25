@@ -67,6 +67,9 @@ export const jobAPI = {
 
   // 9. Lấy chi tiết job theo ID
   getJobDetail: (id) => api.get(`/jobs/${id}`),
+
+  getMyCompanyJobs: () => api.get("/jobs/my-company"),
+
 };
 
 // Company API

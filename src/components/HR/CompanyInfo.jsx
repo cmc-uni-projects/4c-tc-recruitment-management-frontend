@@ -138,7 +138,7 @@ const CompanyInfo = () => {
       try {
         const res = await companyAPI.getAllActive();
         setCompanies(res.data || []);
-      } catch (err) {
+      } catch {
         toast.error("Không thể tải danh sách công ty");
       } finally {
         setLoadingCompanies(false);
