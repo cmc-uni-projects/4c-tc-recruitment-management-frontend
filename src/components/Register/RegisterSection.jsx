@@ -219,7 +219,6 @@ export default function RegisterSection() {
           </button>
         </form>
 
-        <LoginSocial />
         <p className="register-text">
           Bạn đã có tài khoản? <a href="/login">Đăng Nhập ngay</a>
         </p>

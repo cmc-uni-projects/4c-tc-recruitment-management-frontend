@@ -138,8 +138,6 @@ setTimeout(() => {
 
         </form>
 
-        <LoginSocial />
-
         <p className="register-text">
           Bạn chưa có tài khoản? <a href="/register">Đăng ký ngay</a>
         </p>
