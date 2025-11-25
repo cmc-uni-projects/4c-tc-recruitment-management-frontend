@@ -9,6 +9,8 @@ import exploreCV from "../../assets/hr/exploreCV.png";
 import exploreService from "../../assets/hr/explore_service.png";
 import cvIcon from "../../assets/hr/CV.png";
 import logoutIcon from "../../assets/hr/logout.png";
+import clockIcon from "../../assets/hr/padlock.png";
+import shieldIcon from "../../assets/hr/shield.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -22,8 +24,12 @@ const HRSection = ({ children }) => {
   const [showPendingPopup, setShowPendingPopup] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-   
+
   const userId = localStorage.getItem("userId");
+
+  // MỚI: State cho popup xác thực
+  const [showVerifyBlocker, setShowVerifyBlocker] = useState(false);
+  const [blockerStatus, setBlockerStatus] = useState("");
 
   const handleLogout = () => {
     localStorage.clear();
@@ -41,23 +47,27 @@ const HRSection = ({ children }) => {
         setLoading(true);
 
         // 1. Lấy thông tin User
-        const userRes = await axios.get(`http://localhost:8080/users/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const userRes = await axios.get(
+          `http://localhost:8080/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setUser(userRes.data);
-         
 
         // 2. Lấy thông tin Employer để kiểm tra verified
         try {
           const employerRes = await employerAPI.getMyEmployer();
           const employerData = employerRes.data;
-          
+
           setEmployer(employerData);
 
           // THÊM 2 DÒNG NÀY - QUAN TRỌNG NHẤT
           localStorage.setItem("employer", JSON.stringify(employerData));
-          localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
-          
+          localStorage.setItem(
+            "selectedCompany",
+            JSON.stringify(employerData.company)
+          );
         } catch (err) {
           if (err.response?.status === 404) {
             setEmployer(null); // Chưa tạo hồ sơ Employer
@@ -72,12 +82,44 @@ const HRSection = ({ children }) => {
 
     fetchData();
   }, [token, userId]);
+
+  // Hàm kiểm tra xác thực - dùng cho sidebar
+  const requireVerification = (e) => {
+    if (employer?.verified) return true;
+
+    if (!employer) {
+      e.preventDefault();
+      setBlockerStatus("NOT_CREATED");
+      setShowVerifyBlocker(true);
+      return false;
+    }
+
+    if (employer.verificationStatus === "PENDING") {
+      e.preventDefault();
+      setBlockerStatus("PENDING");
+      setShowVerifyBlocker(true);
+      return false;
+    }
+
+    if (!employer.verified && employer.verificationStatus !== "APPROVED") {
+      e.preventDefault();
+      setBlockerStatus("NOT_VERIFIED");
+      setShowVerifyBlocker(true);
+      return false;
+    }
+
+    return true;
+  };
+
   return (
     <div className="hr-page">
       {/* Header */}
       <header className="hr-header">
         <div className="header-left">
-          <img src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3" alt="smarthire Logo" />
+          <img
+            src="https://tse3.mm.bing.net/th/id/OIP.oE2SOiMAVel-yjTAu-i-egHaE5?rs=1&pid=ImgDetMain&o=7&rm=3"
+            alt="smarthire Logo"
+          />
           <nav className="header-nav">
             <button className="header-btn">HR Insider</button>
             <button className="header-btn primary">Đăng tin</button>
@@ -122,7 +164,14 @@ const HRSection = ({ children }) => {
                 <div className="verified-status loading">Đang kiểm tra...</div>
               ) : employer?.verified ? (
                 <div className="verified-status verified">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  >
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                   Đã Xác Thực
@@ -155,14 +204,25 @@ const HRSection = ({ children }) => {
 
               {/* POPUP ĐẸP NHƯ TOPCV */}
               {showPendingPopup && (
-                <div className="pending-popup-overlay" onClick={() => setShowPendingPopup(false)}>
-                  <div className="pending-popup" onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="pending-popup-overlay"
+                  onClick={() => setShowPendingPopup(false)}
+                >
+                  <div
+                    className="pending-popup"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <div className="pending-icon">Clock</div>
                     <h3>Yêu cầu xác thực đã được gửi!</h3>
                     <p>Chúng tôi đang xem xét hồ sơ doanh nghiệp của bạn.</p>
-                    <p>Thời gian xử lý: <strong>1-3 ngày làm việc</strong></p>
+                    <p>
+                      Thời gian xử lý: <strong>1-3 ngày làm việc</strong>
+                    </p>
                     <p>Bạn sẽ nhận email thông báo khi hoàn tất.</p>
-                    <button className="btn-close-popup" onClick={() => setShowPendingPopup(false)}>
+                    <button
+                      className="btn-close-popup"
+                      onClick={() => setShowPendingPopup(false)}
+                    >
                       Đóng
                     </button>
                   </div>
@@ -185,6 +245,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/companies"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={(e) => requireVerification(e, "/hr/companies")}
               >
                 Quản Lý Công Ty
               </NavLink>
@@ -193,18 +254,12 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/jobs"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={(e) => requireVerification(e, "/hr/jobs")}
               >
                 Quản Lý Tin Tuyển Dụng
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/hr/candidates"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Quản lý Ứng Viên
-              </NavLink>
-            </li>
+
             <li>
               <NavLink
                 to="/hr/ai"
@@ -217,6 +272,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/statistics"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={(e) => requireVerification(e, "/hr/statistics")}
               >
                 Thống Kê Tuyển dụng
               </NavLink>
@@ -225,6 +281,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/activities"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={(e) => requireVerification(e, "/hr/activities")}
               >
                 Hoạt Động
               </NavLink>
@@ -295,6 +352,116 @@ const HRSection = ({ children }) => {
           )}
         </main>
       </div>
+
+      {/* POPUP XÁC THỰC NHỎ XINH - HIỆN TRÊN GIAO DIỆN */}
+      {showVerifyBlocker && (
+        <div
+          className="verification-blocker-overlay"
+          onClick={() => setShowVerifyBlocker(false)}
+        >
+          <div
+            className="verification-blocker-popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="blocker-icon">
+              {blockerStatus === "PENDING" ? (
+                <img
+                  src={clockIcon}
+                  alt="Đang chờ duyệt"
+                  style={{ width: 64, height: 64 }}
+                />
+              ) : (
+                <img
+                  src={shieldIcon}
+                  alt="Cần xác thực"
+                  style={{ width: 64, height: 64 }}
+                />
+              )}
+            </div>
+
+            {blockerStatus === "NOT_CREATED" && (
+              <>
+                <h3>Bạn chưa tạo hồ sơ doanh nghiệp</h3>
+                <p>
+                  Vui lòng tạo và xác thực thông tin công ty để sử dụng tính
+                  năng này.
+                </p>
+                <div className="blocker-actions">
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setShowVerifyBlocker(false)}
+                  >
+                    Để sau
+                  </button>
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      setShowVerifyBlocker(false);
+                      navigate("/hr/profile");
+                    }}
+                  >
+                    Tạo hồ sơ ngay
+                  </button>
+                </div>
+              </>
+            )}
+
+            {blockerStatus === "PENDING" && (
+              <>
+                <h3>Hồ sơ đang chờ duyệt</h3>
+                <p>
+                  Chúng tôi đang xem xét hồ sơ doanh nghiệp của bạn (1-3 ngày
+                  làm việc).
+                </p>
+                <div className="blocker-actions">
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setShowVerifyBlocker(false)}
+                  >
+                    Để sau
+                  </button>
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      setShowVerifyBlocker(false);
+                      navigate("/hr/profile/business-registration");
+                    }}
+                  >
+                    Xem chi tiết
+                  </button>
+                </div>
+              </>
+            )}
+
+            {blockerStatus === "NOT_VERIFIED" && (
+              <>
+                <h3>Xác thực doanh nghiệp chưa hoàn tất</h3>
+                <p>
+                  Hồ sơ của bạn chưa được duyệt hoặc bị từ chối. Vui lòng bổ
+                  sung lại.
+                </p>
+                <div className="blocker-actions">
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setShowVerifyBlocker(false)}
+                  >
+                    Để sau
+                  </button>
+                  <button
+                    className="btn-primary"
+                    onClick={() => {
+                      setShowVerifyBlocker(false);
+                      navigate("/hr/profile/business-registration");
+                    }}
+                  >
+                    Tiếp tục xác thực
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
