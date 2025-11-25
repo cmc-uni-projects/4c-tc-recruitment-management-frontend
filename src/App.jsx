@@ -117,7 +117,7 @@ function App() {
         <Route path="/my-cv/builder" element={<CVBuilderPage />} />
         <Route path="/my-cv/edit/:cvId" element={<EditCVPage />} />
       </Routes>
-      <ToastContainer position="top-right" autoClose={2000} theme="colored" />
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </>
   );
 }
