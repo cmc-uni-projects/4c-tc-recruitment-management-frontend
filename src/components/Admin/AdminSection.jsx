@@ -151,6 +151,14 @@ export default function AdminSection({ children }) {
             </li>
             <li>
               <NavLink
+                to="/admin/templates"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
+                Quản lý Template CV
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
                 to="/admin/ai"
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
