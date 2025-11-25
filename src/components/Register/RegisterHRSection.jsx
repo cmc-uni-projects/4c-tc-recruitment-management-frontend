@@ -1,3 +1,4 @@
+
 // src/components/RegisterHRSection.jsx
 import { useFormik } from "formik";
 import "./RegisterHRSection.css";
@@ -7,16 +8,25 @@ import { register } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-// Schema xác thực cho form đăng ký
+// === Thêm regex VN mobile ===
+const VN_MOBILE_REGEX = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+
+// === Cập nhật schema ===
 const formRegisterSchema = Yup.object({
   fullname: Yup.string().required("Vui lòng nhập họ tên"),
   email: Yup.string()
     .email("Email không hợp lệ")
     .matches(
-      /^[a-zA-Z0-9._%+-]+@(?!.*(company|companydomain|org))[^@]+$/, // Regex kiểm tra email công ty
+      /^[a-zA-Z0-9._%+-]+@(?!.*(company|companydomain|org))[^@]+$/,
       "Cảnh báo: Bạn đang sử dụng email cá nhân, khuyến khích dùng email công ty."
     )
     .required("Vui lòng nhập email"),
+  phone: Yup.string()
+    .transform((value) =>
+      (value || "").trim().replace(/[\s\-.()]/g, "")
+    )
+    .matches(VN_MOBILE_REGEX, "Số điện thoại không hợp lệ. Ví dụ: 0912345678 hoặc +84912345678")
+    .required("Vui lòng nhập số điện thoại"),
   password: Yup.string()
     .min(6, "Mật khẩu tối thiểu 6 ký tự")
     .required("Vui lòng nhập mật khẩu"),
@@ -38,21 +48,20 @@ export default function RegisterHRSection() {
       phone: "",
       password: "",
       verifypassword: "",
-      role: "HR", // Đặt mặc định là HR
+      role: "HR",
     },
     validationSchema: formRegisterSchema,
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        // Thêm role vào payload
         const payload = {
           fullName: values.fullname,
           email: values.email,
           phone: values.phone,
           password: values.password,
-          role: values.role, // Gửi vai trò HR
+          role: values.role,
         };
-        const response = await register(payload); // Đăng ký với cùng một endpoint
+        const response = await register(payload);
         Swal.fire({
           icon: "success",
           title: "Đăng ký thành công!",
@@ -85,7 +94,7 @@ export default function RegisterHRSection() {
       <div className="login-box">
         <h2>Đăng ký Nhà Tuyển Dụng</h2>
         <form onSubmit={RegisterForm.handleSubmit} className="register-form">
-          {/* Các trường thông tin đăng ký */}
+          {/* Họ tên */}
           <div className="form-group">
             <label>Họ và Tên</label>
             <input
@@ -100,6 +109,7 @@ export default function RegisterHRSection() {
             )}
           </div>
 
+          {/* Email */}
           <div className="form-group">
             <label>Email</label>
             <input
@@ -109,28 +119,35 @@ export default function RegisterHRSection() {
               placeholder="Nhập Email"
               value={RegisterForm.values.email}
             />
-            <div className="warning-text">
-                    Khuyến cáo sử dụng email công ty!
-            </div>
+            <div className="warning-text">Khuyến cáo sử dụng email công ty!</div>
             {RegisterForm.touched.email && RegisterForm.errors.email && (
               <div className="error-text">{RegisterForm.errors.email}</div>
             )}
           </div>
 
+          {/* Số điện thoại */}
           <div className="form-group">
             <label>Số điện thoại</label>
             <input
               type="text"
               name="phone"
-              onChange={RegisterForm.handleChange}
-              placeholder="Nhập số điện thoại"
+              placeholder="VD: 0912345678 hoặc +84912345678"
               value={RegisterForm.values.phone}
+              onBlur={RegisterForm.handleBlur}
+              onChange={(e) => {
+                const raw = e.target.value;
+                const normalized = raw
+                  .replace(/[^\d+]/g, "")
+                  .replace(/(?!^)\+/g, "");
+                RegisterForm.setFieldValue("phone", normalized);
+              }}
             />
             {RegisterForm.touched.phone && RegisterForm.errors.phone && (
               <div className="error-text">{RegisterForm.errors.phone}</div>
             )}
           </div>
 
+          {/* Mật khẩu */}
           <div className="form-group">
             <label>Mật khẩu</label>
             <div className="password-wrapper">
@@ -144,12 +161,12 @@ export default function RegisterHRSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)} // Toggle showPassword state
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i>
                 ) : (
-                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i>
                 )}
               </button>
             </div>
@@ -158,6 +175,7 @@ export default function RegisterHRSection() {
             )}
           </div>
 
+          {/* Xác nhận mật khẩu */}
           <div className="form-group">
             <label>Xác nhận Mật khẩu</label>
             <div className="password-wrapper">
@@ -171,18 +189,21 @@ export default function RegisterHRSection() {
               <button
                 type="button"
                 className="toggle-password"
-                onClick={() => setShowVerifyPassword(!showVerifyPassword)} // Toggle showVerifyPassword state
+                onClick={() => setShowVerifyPassword(!showVerifyPassword)}
               >
                 {showVerifyPassword ? (
-                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i> // Mắt có gạch chéo
+                  <i className="fa-sharp fa-regular fa-eye-slash password-icon"></i>
                 ) : (
-                  <i className="fa-sharp fa-regular fa-eye password-icon"></i> // Mắt bình thường
+                  <i className="fa-sharp fa-regular fa-eye password-icon"></i>
                 )}
               </button>
             </div>
-            {RegisterForm.touched.verifypassword && RegisterForm.errors.verifypassword && (
-              <div className="error-text">{RegisterForm.errors.verifypassword}</div>
-            )}
+            {RegisterForm.touched.verifypassword &&
+              RegisterForm.errors.verifypassword && (
+                <div className="error-text">
+                  {RegisterForm.errors.verifypassword}
+                </div>
+              )}
           </div>
 
           <button type="submit" className="btn-login" disabled={loading}>
