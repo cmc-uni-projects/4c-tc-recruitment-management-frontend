@@ -56,7 +56,7 @@
 }
 
 /* ====================== SEARCH BAR – GIỮ NGUYÊN ĐẸP ====================== */
-.search-bar {
+.search-bar1 {
   max-width: 720px;
   margin: 0 auto 40px;
   position: relative;
@@ -67,7 +67,7 @@
   background: white;
 }
 
-.search-bar input {
+.search-bar1 input {
   flex: 1;
   padding: 18px 24px;
   border: none;
@@ -76,11 +76,11 @@
   background: transparent;
 }
 
-.search-bar input::placeholder {
+.search-bar1 input::placeholder {
   color: #94a3b8;
 }
 
-.search-bar button {
+.search-bar1 button {
   min-width: 140px;
   padding: 0 24px;
   background: #00b14f;
@@ -97,11 +97,11 @@
   gap: 8px;
 }
 
-.search-bar button:hover {
+.search-bar1 button:hover {
   background: #009441;
 }
 
-.search-bar button::before {
+.search-bar1 button::before {
   font-size: 18px;
 }
 /* ====================== GRID + CARD NHỎ GỌN – 3 CỘT ====================== */
@@ -267,4 +267,11 @@
   .search-bar {
     max-width: 100%;
   }
+}
+
+.field-error1 {
+  margin-bottom: 10px;
+  margin-top: -20px;
+  color: #b91c1c;
+  font-size: 13px;
 }
