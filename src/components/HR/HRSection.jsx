@@ -22,8 +22,56 @@ const HRSection = ({ children }) => {
   const [showPendingPopup, setShowPendingPopup] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-   
+  // THÊM: popup bắt buộc xác thực
+  const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const [verifyPopupMessage, setVerifyPopupMessage] = useState("Bạn cần xác thực doanh nghiệp trước khi sử dụng chức năng này.");
   const userId = localStorage.getItem("userId");
+
+
+  const getEmployerFromCache = () => {
+    // ưu tiên state, fallback localStorage (vì bạn đã set ở useEffect)
+    // HRSection.jsx có set: localStorage.setItem("employer", JSON.stringify(employerData));
+    // và localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
+    // [1](https://cmcglobalcompany-my.sharepoint.com/personal/pklinh3_cmcglobal_vn/Documents/Microsoft%20Copilot%20Chat%20Files/HRSection.jsx)
+    if (employer) return employer;
+    try {
+      const cached = localStorage.getItem("employer");
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  };
+
+
+  const isVerified = (emp) => {
+    // Theo cách bạn render: emp?.verified === true hoặc verificationStatus === "APPROVED"
+    // và nếu === "PENDING" thì coi như chưa thể dùng chức năng.
+    return !!(emp?.verified || emp?.verificationStatus === "APPROVED");
+  };
+
+  const checkEmployerBeforeNavigate = async (requireVerified = true) => {
+    const emp = getEmployerFromCache();
+
+    // chưa có hồ sơ employer
+    if (!emp) {
+      setVerifyPopupMessage("Bạn chưa có hồ sơ doanh nghiệp. Vui lòng tạo hồ sơ và xác thực trước khi sử dụng chức năng này.");
+      setShowVerifyPopup(true);
+      return false;
+    }
+    // đang chờ duyệt
+    if (emp?.verificationStatus === "PENDING") {
+      setShowPendingPopup(true);
+      return false;
+    }
+    // chưa verified
+    if (requireVerified && !isVerified(emp)) {
+      setVerifyPopupMessage("Hồ sơ doanh nghiệp chưa được xác thực. Hãy hoàn tất xác thực để tiếp tục.");
+      setShowVerifyPopup(true);
+      return false;
+    }
+    return true; // ok cho phép điều hướng
+  };
+
 
   const handleLogout = () => {
     localStorage.clear();
@@ -45,19 +93,19 @@ const HRSection = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(userRes.data);
-         
+
 
         // 2. Lấy thông tin Employer để kiểm tra verified
         try {
           const employerRes = await employerAPI.getMyEmployer();
           const employerData = employerRes.data;
-          
+
           setEmployer(employerData);
 
           // THÊM 2 DÒNG NÀY - QUAN TRỌNG NHẤT
           localStorage.setItem("employer", JSON.stringify(employerData));
           localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
-          
+
         } catch (err) {
           if (err.response?.status === 404) {
             setEmployer(null); // Chưa tạo hồ sơ Employer
@@ -153,6 +201,38 @@ const HRSection = ({ children }) => {
                 </div>
               )}
 
+
+              {showVerifyPopup && (
+                <div className="pending-popup-overlay" onClick={() => setShowVerifyPopup(false)}>
+                  <div className="pending-popup" onClick={(e) => e.stopPropagation()}>
+                    <div className="pending-icon">Shield</div>
+                    <h3>Yêu cầu xác thực doanh nghiệp</h3>
+                    <p>{verifyPopupMessage}</p>
+                    <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                      <button
+                        className="btn-close-popup"
+                        onClick={() => {
+                          setShowVerifyPopup(false);
+                        }}
+                      >
+                        Đóng
+                      </button>
+                      <button
+                        className="btn-close-popup"
+                        onClick={() => {
+                          setShowVerifyPopup(false);
+                          // điều hướng tới trang upload GPKD / gửi xác thực
+                          navigate("/hr/profile/business-registration");
+                        }}
+                      >
+                        Xác thực ngay
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
               {/* POPUP ĐẸP NHƯ TOPCV */}
               {showPendingPopup && (
                 <div className="pending-popup-overlay" onClick={() => setShowPendingPopup(false)}>
@@ -185,26 +265,42 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/companies"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={async (e) => {
+                  const canGo = await checkEmployerBeforeNavigate(true); // yêu cầu verified
+                  if (!canGo) e.preventDefault();
+                }}
               >
                 Quản Lý Công Ty
               </NavLink>
             </li>
+
             <li>
               <NavLink
                 to="/hr/jobs"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={async (e) => {
+                  const canGo = await checkEmployerBeforeNavigate(true); // yêu cầu verified
+                  if (!canGo) e.preventDefault();
+                }}
               >
                 Quản Lý Tin Tuyển Dụng
               </NavLink>
             </li>
+
+
             <li>
               <NavLink
                 to="/hr/candidates"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={async (e) => {
+                  const canGo = await checkEmployerBeforeNavigate(true); // yêu cầu verified
+                  if (!canGo) e.preventDefault();
+                }}
               >
                 Quản lý Ứng Viên
               </NavLink>
             </li>
+
             <li>
               <NavLink
                 to="/hr/ai"
@@ -213,22 +309,34 @@ const HRSection = ({ children }) => {
                 🤖 TopCV AI (Đánh giá CV)
               </NavLink>
             </li>
+
             <li>
               <NavLink
                 to="/hr/statistics"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={async (e) => {
+                  const canGo = await checkEmployerBeforeNavigate(true);
+                  if (!canGo) e.preventDefault();
+                }}
               >
                 Thống Kê Tuyển dụng
               </NavLink>
             </li>
+
             <li>
               <NavLink
                 to="/hr/activities"
                 className={({ isActive }) => (isActive ? "active" : "")}
+                onClick={async (e) => {
+                  const canGo = await checkEmployerBeforeNavigate(true);
+                  if (!canGo) e.preventDefault();
+                }}
               >
                 Hoạt Động
               </NavLink>
             </li>
+
+
           </ul>
         </aside>
 

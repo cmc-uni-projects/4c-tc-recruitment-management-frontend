@@ -45,6 +45,8 @@ import BusinessRegistration from "./components/HR/BusinessRegistration";
 // Component bảo vệ
 import ProtectedRoute, { ForbiddenPage } from "./components/ProtectedRoute";
 
+import RequireEmployerVerified from "./RequireEmployerVerified";
+
 function App() {
   return (
     <>
@@ -80,26 +82,65 @@ function App() {
         </Route>
 
         {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
-        <Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
-          <Route path="/hr" element={<HRPage />} />
-          <Route path="/hr/jobs" element={<ManageJobPage />} />
-          <Route path="/hr/companies" element={<ManageCompanyPage />} />
+        
+<Route element={<ProtectedRoute allowedRoles={["HR", "ADMIN"]} />}>
+          {/* Dashboard HR: không yêu cầu verified để người dùng xem và được hướng dẫn xác thực */}
+          <Route
+            path="/hr"
+            element={
+              <RequireEmployerVerified requireVerified={false}>
+                <HRPage />
+              </RequireEmployerVerified>
+            }
+          />
 
-          {/* HR Profile (có layout lồng nhau) */}
-          <Route path="/hr/profile" element={<HRProfilePage />}>
+          {/* Quản Lý Tin Tuyển Dụng: BẮT BUỘC ĐÃ XÁC THỰC */}
+          <Route
+            path="/hr/jobs"
+            element={
+              <RequireEmployerVerified requireVerified={true}>
+                <ManageJobPage />
+              </RequireEmployerVerified>
+            }
+          />
+
+          {/* Quản Lý Công Ty: cũng BẮT BUỘC ĐÃ XÁC THỰC theo yêu cầu của bạn */}
+          <Route
+            path="/hr/companies"
+            element={
+              <RequireEmployerVerified requireVerified={true}>
+                <ManageCompanyPage />
+              </RequireEmployerVerified>
+            }
+          />
+
+          {/* HR Profile (layout lồng nhau) - cho phép vào để tạo/cập nhật/xác thực */}
+          <Route
+            path="/hr/profile"
+            element={
+              <RequireEmployerVerified requireVerified={false}>
+                <HRProfilePage />
+              </RequireEmployerVerified>
+            }
+          >
             <Route element={<ProfileLayout />}>
               <Route index element={<PersonalInfo />} />
               <Route path="company" element={<CompanyInfo />} />
-              <Route
-                path="business-registration"
-                element={<BusinessRegistration />}
-              />
+              <Route path="business-registration" element={<BusinessRegistration />} />
             </Route>
           </Route>
 
           {/* Các route /hr/profile/* khác nếu có */}
-          <Route path="/hr/profile/*" element={<HRProfilePage />} />
+          <Route
+            path="/hr/profile/*"
+            element={
+              <RequireEmployerVerified requireVerified={false}>
+                <HRProfilePage />
+              </RequireEmployerVerified>
+            }
+          />
         </Route>
+
 
         {/* ============================= CANDIDATE ROUTES - CANDIDATE + ADMIN ============================= */}
         <Route
