@@ -25,6 +25,7 @@ import ManageJobPage from "./pages/HR/ManageJobPage";
 import ManageCompanyPage from "./pages/HR/ManageCompanyPage";
 import NotificationsPage from "./pages/Notification/NotificationsPage";
 import CompanyManagerPage from "./pages/Admin/CompanyManagerPage";
+import TemplateManagerPage from "./pages/Admin/TemplateManagerPage";
 
 import SavedJobsPage from "./pages/SavedJobs/SavedJobsPage";
 import AppliedJobsPage from "./pages/AppliedJobs/AppliedJobsPage";
@@ -69,9 +70,13 @@ function App() {
         {/* ============================= ADMIN ROUTES - Chỉ ADMIN ============================= */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/job-categories" element={<JobCategoryManagerPage />} />
+          <Route
+            path="/admin/job-categories"
+            element={<JobCategoryManagerPage />}
+          />
           <Route path="/admin/companies" element={<CompanyManagerPage />} />
           <Route path="/admin/notifications" element={<NotificationsPage />} />
+          <Route path="/admin/templates" element={<TemplateManagerPage />} />
         </Route>
 
         {/* ============================= HR ROUTES - HR + ADMIN ============================= */}
@@ -85,7 +90,10 @@ function App() {
             <Route element={<ProfileLayout />}>
               <Route index element={<PersonalInfo />} />
               <Route path="company" element={<CompanyInfo />} />
-              <Route path="business-registration" element={<BusinessRegistration />} />
+              <Route
+                path="business-registration"
+                element={<BusinessRegistration />}
+              />
             </Route>
           </Route>
 
@@ -94,7 +102,9 @@ function App() {
         </Route>
 
         {/* ============================= CANDIDATE ROUTES - CANDIDATE + ADMIN ============================= */}
-        <Route element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}>
+        <Route
+          element={<ProtectedRoute allowedRoles={["CANDIDATE", "ADMIN"]} />}
+        >
           <Route path="/saved-jobs" element={<SavedJobsPage />} />
           <Route path="/applied-jobs" element={<AppliedJobsPage />} />
           <Route path="/my-cv" element={<MyCVPage />} />

@@ -1,73 +1,126 @@
+/* =============== NOTIFICATIONS PAGE – SIÊU ĐẸP, ĐỒNG BỘ, CHUYÊN NGHIỆP =============== */
 .notifications-page {
-  padding: 24px;
-  background: #f9f9fb;
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.page-header {
+.notifications-page > h2,
+.notifications-page > h3 {
+  font-weight: 700;
+  color: #1e293b;
   margin-bottom: 24px;
-}
-
-.page-header h2 {
   font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0 0 8px 0;
-}
-
-.page-header p {
-  color: #666;
-  font-size: 14px;
-}
-
-.loading, .empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #999;
-  font-size: 16px;
 }
 
 .pending-list {
   display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
 }
 
+/* =============== CARD CHUNG – ĐỒNG BỘ HOÀN TOÀN =============== */
 .pending-card {
   background: white;
-  border: 1px solid #ff9800;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
 }
 
 .pending-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-color: #94a3b8;
 }
 
-.pending-card h4 {
-  margin: 0 0 12px 0;
-  font-size: 18px;
-  color: #1a1a1a;
-  font-weight: 600;
+/* Viền trái + màu chủ đạo: XANH NGỌC ĐẬM (trùng cả 2 loại card) */
+.pending-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, #10b981, #059669);
+  border-radius: 16px 0 0 16px;
 }
 
-.pending-card p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.status-pending {
-  display: inline-block;
-  background: #ff9800;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
+/* Tag phân biệt loại */
+.pending-card::after {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 14px;
   border-radius: 20px;
-  margin-top: 12px;
+  color: white;
+  letter-spacing: 0.8px;
+}
+
+.pending-card.job-card::after {
+  content: "TIN TUYỂN DỤNG";
+  background: #ea580c;
+}
+
+.pending-card.employer-card::after {
+  content: "DOANH NGHIỆP";
+  background: #1d4ed8;
+}
+
+/* Tiêu đề */
+.pending-card .card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+/* Thông tin phụ */
+.pending-card .card-sub {
+  color: #64748b;
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* Nút trạng thái */
+.pending-card .status-pending {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 30px;
+  margin-top: 8px;
+}
+
+/* Nút hành động */
+.pending-card .btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.pending-card .btn:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Khi không có dữ liệu */
+.no-data {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+  font-size: 17px;
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
 }
