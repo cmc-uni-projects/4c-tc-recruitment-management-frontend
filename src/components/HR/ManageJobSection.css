@@ -46,7 +46,8 @@
 .category-table td {
   border: 1px solid #e5e7eb;
   padding: 12px 10px;
-  text-align: left;
+  text-align: center
+  ;
 }
 
 .category-table th {
@@ -59,31 +60,62 @@
   background: #f8fff9;
 }
 
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
 .actions button {
-  margin-right: 8px;
-  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 12px;
   font-size: 13px;
+  font-weight: 500;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.22s ease;
+  min-width: 68px;
 }
 
-.edit-btn {
-  background: #2563eb;
-  color: white;
+/* Nút XEM - xanh dương nhạt */
+.job-view-btn {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+.job-view-btn:hover {
+  background: #bbdefb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(21, 101, 192, 0.15);
 }
 
-.edit-btn:hover {
-  background: #1d4ed8;
+/* Nút SỬA - vàng cam nhạt */
+.job-edit-btn {
+  background: #fff8e1;
+  color: #b76e00;
+  border: 1px solid #ffecb3;
+}
+.job-edit-btn:hover {
+  background: #ffecb3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(183, 110, 0, 0.15);
 }
 
-.delete-btn {
-  background: #ef4444;
-  color: white;
+/* Nút XÓA - đỏ nhạt */
+.job-delete-btn {
+  background: #fce8e6;
+  color: #c62828;
+  border: 1px solid #ff9e9d;
 }
-
-.delete-btn:hover {
-  background: #dc2626;
+.job-delete-btn:hover {
+  background: #ff9e9d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(198, 40, 40, 0.15);
 }
 
 .no-data {
@@ -342,21 +374,31 @@
   background: #218838;
 }
 
+/* Badge đẹp, nhỏ, bo tròn, căn giữa tuyệt đối */
 .status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;   /* căn giữa chữ + tick */
+  gap: 5px;
+  min-width: 88px;           /* để 2 cái bằng nhau, không bị lệch */
+  padding: 6px 12px;
+  border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
+/* APPROVED */
 .status-badge.approved {
-  color: #fff;
-  background-color: #28a745; /* xanh lá */
+  background: #e6f7ee;
+  color: #0d8b42;
 }
 
+
+/* PENDING */
 .status-badge.pending {
-  color: #fff;
-  background-color: #dc3545; /* đỏ */
+  background: #fff4e6;
+  color: #b76e00;
 }
 
 .application-table {
@@ -375,14 +417,4 @@
   text-align: left;
 }
 
-.view-btn {
-  background: #28a745;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.view-btn:hover {
-  background: #218838;
-}
+

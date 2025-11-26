@@ -295,7 +295,7 @@ function ManageJobSection() {
     <div className="admin-content">
       <div className="job-category-manager">
         <div className="header">
-          <h2>Quản lý công việc</h2>
+          <h2>Quản lý Tin Tuyển Dụng - Đăng Tin</h2>
           <button className="add-btn" onClick={() => openModal()}>
             + Thêm Job
           </button>
@@ -345,19 +345,19 @@ function ManageJobSection() {
                     </td>
                     <td className="actions">
                       <button
-                        className="view-btn"
+                        className="job-view-btn"
                         onClick={() => openViewModal(job)}
                       >
                         Xem
                       </button>
                       <button
-                        className="edit-btn"
+                        className="job-edit-btn"
                         onClick={() => openModal(job)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="delete-btn"
+                        className="job-delete-btn"
                         onClick={() => handleDelete(job.jobId)}
                       >
                         Xóa
