@@ -155,7 +155,7 @@ export default function Navbar() {
               <button className="btn-outline">Đăng nhập</button>
             </Link>
             <Link to="/register">
-              <button className="btn-primary">Đăng ký</button>
+              <button className="re-btn-primary">Đăng ký</button>
             </Link>
           </>
         )}
