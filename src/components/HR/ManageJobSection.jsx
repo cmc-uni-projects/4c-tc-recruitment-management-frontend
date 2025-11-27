@@ -64,6 +64,52 @@ function ManageJobSection() {
       setLoadingApplications(false);
     }
   };
+  
+const vietnamProvinces = [
+  "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
+  "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bắc Ninh",
+  "Bến Tre", "Bình Dương", "Bình Định", "Bình Phước", "Bình Thuận",
+  "Cà Mau", "Cao Bằng", "Đắk Lắk", "Đắk Nông", "Điện Biên",
+  "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam",
+  "Hà Tĩnh", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa",
+  "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn",
+  "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
+  "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
+  "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
+  "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
+  "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+];
+
+// Thêm vào đầu component
+const [locations, setLocations] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
+
+// Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
+
+
+useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const res = await jobAPI.getApprovedJobs();
+      const jobs = res.data;
+      const dynamicLocations = jobs.map(job => job.location).filter(Boolean);
+      const uniqueLocations = [...new Set([...vietnamProvinces, ...dynamicLocations])];
+      setLocations(uniqueLocations);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách địa điểm:", error);
+      setLocations(vietnamProvinces); // fallback nếu API lỗi
+    }
+  };
+  fetchLocations();
+}, []);
+
+// Lọc danh sách theo searchTerm
+const filteredLocations = locations.filter(loc =>
+  loc.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+
+
 
   const closeViewModal = () => {
     setIsViewModalOpen(false);
@@ -489,16 +535,35 @@ function ManageJobSection() {
                 />
               </div>
 
-              <div className="form-group full-width">
-                <label>Địa điểm</label>
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={(e) =>
-                    setForm({ ...form, location: e.target.value })
-                  }
-                />
-              </div>
+              
+
+
+<div className="form-group full-width">
+  <label>Địa điểm</label>
+  
+  {/* Thanh tìm kiếm */}
+  <input
+    type="text"
+    placeholder="Tìm kiếm tỉnh/thành..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    style={{ marginBottom: "8px", padding: "6px", width: "100%" }}
+  />
+
+  {/* Dropdown */}
+  <select
+    value={form.location}
+    onChange={(e) => setForm({ ...form, location: e.target.value })}
+  >
+    <option value="">-- Chọn địa điểm --</option>
+    {filteredLocations.map((loc) => (
+      <option key={loc} value={loc}>{loc}</option>
+    ))}
+  </select>
+</div>
+
+
+
 
               <div className="form-group">
                 <label>Loại công việc</label>

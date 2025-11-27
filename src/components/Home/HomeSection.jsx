@@ -46,6 +46,34 @@ export default function HomeSection() {
   const [featuredCompanies, setFeaturedCompanies] = useState([]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [jobStats, setJobStats] = useState({ jobsPosting: 0, jobsNewToday: 0 });
+
+  
+useEffect(() => {
+  const fetchJobStats = async () => {
+    try {
+      // Lấy danh sách việc làm đã duyệt
+      const approvedRes = await jobAPI.getApprovedJobs();
+      const jobsPosting = approvedRes.data.length;
+
+      // Lấy danh sách việc làm mới nhất
+      const latestRes = await jobAPI.getLatestJobs();
+      const today = new Date().toISOString().split("T")[0];
+
+      // Đếm số việc làm mới hôm nay
+      const jobsNewToday = latestRes.data.filter(job =>
+        job.createdAt.startsWith(today)
+      ).length;
+
+      setJobStats({ jobsPosting, jobsNewToday });
+    } catch (error) {
+      console.error("Lỗi khi tải thống kê việc làm:", error);
+    }
+  };
+
+  fetchJobStats();
+}, []);
+
 
   useEffect(() => {
   const fetchLocations = async () => {
@@ -191,7 +219,8 @@ const handleSearch = () => {
 </div>
 
       
-        <div className="job-banner">
+       
+<div className="job-banner">
   <div className="banner-left">
     <div className="banner-header">
       <i className="fa fa-briefcase"></i>
@@ -200,20 +229,18 @@ const handleSearch = () => {
     </div>
     <div className="job-stats">
       <span className="active-jobs">
-        Việc làm đang tuyển <strong>51,925</strong>
+        Việc làm đang tuyển <strong>{jobStats.jobsPosting.toLocaleString()}</strong>
       </span>
       <span className="new-jobs">
-        Việc làm mới hôm nay <strong>722</strong>
+        Việc làm mới hôm nay <strong>{jobStats.jobsNewToday.toLocaleString()}</strong>
       </span>
     </div>
   </div>
- 
-<div className="banner-right">
-  <img src={toppyBanner} alt="Toppy Banner" className="banner-image2" />
-  
+  <div className="banner-right">
+    <img src={toppyBanner} alt="Toppy Banner" className="banner-image2" />
+  </div>
 </div>
 
-</div>
         <section className="hero-video-section">
         <div className="hero-video-container">
           <div className="hero-video-thumbnail" onClick={openVideoModal}>
