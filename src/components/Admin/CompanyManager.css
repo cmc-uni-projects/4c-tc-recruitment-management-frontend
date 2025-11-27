@@ -238,3 +238,89 @@ textarea { min-height: 100px; }
   color: #6b7280;
   font-style: italic;
 }
+/* ===== Verify badge ===== */
+.verify-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.verify-approve {
+  background: #e6ffed;
+  color: #036b26;
+  border: 1px solid #9ae6b4;
+}
+.verify-pending {
+  background: #fff7e6;
+  color: #8a5a00;
+  border: 1px solid #fbd38d;
+}
+.verify-reject {
+  background: #ffe6e6;
+  color: #8a0f0f;
+  border: 1px solid #feb2b2;
+}
+
+.verify-readonly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.verify-hint {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* ===== Featured toggle chip ===== */
+.chip {
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+}
+.chip-on {
+  background: #e6ffed;
+  color: #036b26;
+  border-color: #9ae6b4;
+}
+.chip-off {
+  background: #f9fafb;
+  color: #374151;
+}
+.chip-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Action buttons ===== */
+.approve-btn {
+  background: #10b981; /* emerald */
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.approve-btn:hover { background: #059669; }
+
+.reject-btn {
+  background: #f59e0b; /* amber */
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.reject-btn:hover { background: #d97706; }
+
+.btn-disabled,
+.approve-btn:disabled,
+.reject-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
