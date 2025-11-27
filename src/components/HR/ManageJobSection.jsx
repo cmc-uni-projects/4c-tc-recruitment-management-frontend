@@ -312,14 +312,13 @@ function ManageJobSection() {
                 <th>Loại</th>
                 <th>Lương</th>
                 <th>Kinh nghiệm</th>
-                <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
               {jobs.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="no-data">
+                  <td colSpan="6" className="no-data">
                     Chưa có công việc nào
                   </td>
                 </tr>
@@ -334,15 +333,7 @@ function ManageJobSection() {
                       {job.salaryMax?.toLocaleString()} đ
                     </td>
                     <td>{job.experienceRequired || 0} năm</td>
-                    <td>
-                      <small
-                        className={`status-badge ${
-                          job.status?.toLowerCase() || "pending"
-                        }`}
-                      >
-                        {job.status || "PENDING"}
-                      </small>
-                    </td>
+                   
                     <td className="actions">
                       <button
                         className="job-view-btn"
@@ -510,7 +501,7 @@ function ManageJobSection() {
                 >
                   <option value="FULL_TIME">FULL_TIME</option>
                   <option value="PART_TIME">PART_TIME</option>
-                  <option value="INTERNSHIP">INTERNSHIP</option>
+                  <option value="INTERN">INTERN</option>
                   <option value="REMOTE">REMOTE</option>
                 </select>
               </div>
