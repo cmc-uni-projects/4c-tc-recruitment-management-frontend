@@ -64,6 +64,140 @@ function ManageJobSection() {
       setLoadingApplications(false);
     }
   };
+  
+const vietnamProvinces = [
+  "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
+  "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bắc Ninh",
+  "Bến Tre", "Bình Dương", "Bình Định", "Bình Phước", "Bình Thuận",
+  "Cà Mau", "Cao Bằng", "Đắk Lắk", "Đắk Nông", "Điện Biên",
+  "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam",
+  "Hà Tĩnh", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa",
+  "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn",
+  "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
+  "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
+  "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
+  "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
+  "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+];
+
+
+function CitySelect({
+  value,
+  onChange,
+  options,          // string[]
+  placeholder = "Tìm kiếm tỉnh/thành...",
+  label = "Địa điểm",
+  required = true,
+  error
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+
+  const filtered = options.filter(item =>
+    item.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const selectValue = (val) => {
+    onChange(val);
+    setQuery(val);
+    setOpen(false);
+  };
+
+  const onInputFocus = () => {
+    setOpen(true);
+    setHighlightIndex(0);
+  };
+
+  const onKeyDown = (e) => {
+    if (!open) return;
+    if (e.key === "ArrowDown") {
+      setHighlightIndex((prev) => (prev + 1) % filtered.length);
+    } else if (e.key === "ArrowUp") {
+      setHighlightIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (filtered[highlightIndex]) selectValue(filtered[highlightIndex]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  return (
+    <div className="form-group full-width">
+      <label>{label}</label>
+      <input
+        type="text"
+        className={`combobox-input ${error ? "input-error" : ""}`}
+        placeholder={placeholder}
+        value={open ? query : (value || "")}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={onInputFocus}
+        onClick={() => setOpen(true)}
+        onKeyDown={onKeyDown}
+        required={required && !value}
+        aria-invalid={!!error}
+        aria-describedby={error ? "city-error" : undefined}
+      />
+      {open && (
+        <div className="combobox-list">
+          {filtered.length === 0 ? (
+            <div className="combobox-item combobox-empty">Không có kết quả</div>
+          ) : (
+            filtered.map((item, idx) => (
+              <div
+                key={item}
+                className={
+                  "combobox-item" +
+                  (idx === highlightIndex ? " combobox-item--active" : "")
+                }
+                onMouseEnter={() => setHighlightIndex(idx)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  selectValue(item);
+                }}
+              >
+                {item}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      {error && <p id="city-error" className="error-text">{error}</p>}
+    </div>
+  );
+}
+
+// Thêm vào đầu component
+const [locations, setLocations] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
+
+// Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
+
+
+useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const res = await jobAPI.getApprovedJobs();
+      const jobs = res.data;
+      const dynamicLocations = jobs.map(job => job.location).filter(Boolean);
+      const uniqueLocations = [...new Set([...vietnamProvinces, ...dynamicLocations])];
+      setLocations(uniqueLocations);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách địa điểm:", error);
+      setLocations(vietnamProvinces); // fallback nếu API lỗi
+    }
+  };
+  fetchLocations();
+}, []);
+
+// Lọc danh sách theo searchTerm
+const filteredLocations = locations.filter(loc =>
+  loc.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+
+
 
   const closeViewModal = () => {
     setIsViewModalOpen(false);
@@ -480,16 +614,23 @@ function ManageJobSection() {
                 />
               </div>
 
-              <div className="form-group full-width">
-                <label>Địa điểm</label>
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={(e) =>
-                    setForm({ ...form, location: e.target.value })
-                  }
-                />
-              </div>
+              
+
+
+
+<CitySelect
+  value={form.location}
+  onChange={(val) => setForm({ ...form, location: val })}
+  options={locations}
+  placeholder="Tìm kiếm tỉnh/thành..."
+  label="Địa điểm"
+  required
+  error={errors.location}
+/>
+
+
+
+
 
               <div className="form-group">
                 <label>Loại công việc</label>
