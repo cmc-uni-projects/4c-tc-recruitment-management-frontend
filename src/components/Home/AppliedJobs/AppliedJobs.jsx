@@ -12,7 +12,7 @@ export default function AppliedJobs() {
   // Map trạng thái sang tiếng Việt
   const statusMap = {
     PENDING: "Đang chờ xử lý",
-    INTERVIEW: "Phỏng vấn",
+    INTERVIEW: "NTD đã xem",
     APPROVED: "Được chấp nhận",
     REJECTED: "Từ chối",
   };
@@ -75,7 +75,7 @@ export default function AppliedJobs() {
           >
             <option>Tất cả</option>
             <option value="PENDING">Đang chờ xử lý</option>
-            <option value="INTERVIEW">Phỏng vấn</option>
+            <option value="INTERVIEW">NTD đã xem</option>
             <option value="APPROVED">Được chấp nhận</option>
             <option value="REJECTED">Từ chối</option>
           </select>
