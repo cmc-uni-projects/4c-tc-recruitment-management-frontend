@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import Navbar from "../../components/Layout/Navbar";
 import "./EditCVPage.css";
 import html2pdf from "html2pdf.js";
+import Swal from "sweetalert2";
 
 export default function EditCVPage() {
   const { cvId } = useParams();
@@ -35,7 +36,7 @@ export default function EditCVPage() {
         const found = res.data.find((c) => c.id === cvId);
 
         if (!found) {
-          toast.error("Không tìm thấy CV này");
+          Swal.fire("Lỗi", "Không tìm thấy CV này", "error");
           navigate("/my-cv");
           return;
         }
@@ -52,7 +53,7 @@ export default function EditCVPage() {
         setPreviewHtml(mergeHtml(html, data));
       } catch (err) {
         console.error("Lỗi tải CV:", err);
-        toast.error("Tải CV thất bại");
+        Swal.fire("Lỗi", "Tải CV thất bại", "error");
         navigate("/my-cv");
       } finally {
         setLoading(false);
@@ -71,7 +72,7 @@ export default function EditCVPage() {
 
   const handleSave = async () => {
     if (!formData.fullname?.trim()) {
-      toast.warn("Vui lòng nhập họ tên");
+      Swal.fire("Cảnh báo", "Vui lòng nhập họ tên", "warning");
       return;
     }
 
@@ -84,7 +85,7 @@ export default function EditCVPage() {
         data: formData,
       });
 
-      toast.success("Cập nhật CV thành công!");
+      Swal.fire("Thành công", "Cập nhật CV thành công!", "success");
 
       // Render lại từ server
       const renderRes = await renderCV(cvId);
@@ -93,7 +94,7 @@ export default function EditCVPage() {
       setPreviewHtml(mergeHtml(html, formData));
     } catch (err) {
       console.error("Lỗi lưu CV:", err);
-      toast.error("Lưu CV thất bại");
+      Swal.fire("Lỗi", "Lưu CV thất bại", "error");
     } finally {
       setSaving(false);
     }
