@@ -1,49 +1,60 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./AppliedJobs.css";
+import { applicationAPI } from "../../../services/auth.services";
 
 export default function AppliedJobs() {
-  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Tất cả");
 
-  // Dữ liệu mẫu (mock data)
-  const mockAppliedJobs = [
-    {
-      id: 1,
-      title: "Kế Toán Trưởng 1991, 1992 (Thu Nhập Upto 26 Triệu) Đi Làm Ngay",
-      companyName: "Công Ty TNHH All Logistics Việt Nam",
-      location: "Hà Nội",
-      salary: "25 - 30 triệu",
-      status: "Đã ứng tuyển",
-    },
-    {
-      id: 2,
-      title: "Kế Toán Trưởng - Đi Làm Ngay - Thu Nhập Từ 30 - 40 Triệu/ Tháng",
-      companyName: "Công Ty TNHH Phong Vân",
-      location: "Hà Nội",
-      salary: "30 - 40 triệu",
-      status: "NTD đã xem hồ sơ",
-    },
-    {
-      id: 3,
-      title: "Chuyên Viên Tài Chính",
-      companyName: "Techcombank",
-      location: "Hà Nội",
-      salary: "20 - 25 triệu",
-      status: "Hồ sơ phù hợp",
-    },
-  ];
+  // Map trạng thái sang tiếng Việt
+  const statusMap = {
+    PENDING: "Đang chờ xử lý",
+    INTERVIEW: "Phỏng vấn",
+    APPROVED: "Được chấp nhận",
+    REJECTED: "Từ chối",
+  };
+
+  // Format ngày
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      setJobs(mockAppliedJobs);
-      setLoading(false);
-    }, 1000);
+    const fetchAppliedJobs = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.warn("Không tìm thấy token, vui lòng đăng nhập.");
+          setApplications([]);
+          setLoading(false);
+          return;
+        }
+
+        const response = await applicationAPI.getMyApplications(token);
+        setApplications(response.data || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách ứng tuyển:", error);
+        setApplications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppliedJobs();
   }, []);
 
-  const filteredJobs =
-    filter === "Tất cả" ? jobs : jobs.filter((job) => job.status === filter);
+  const filteredApplications =
+    filter === "Tất cả"
+      ? applications
+      : applications.filter((app) => app.status === filter);
 
   if (loading) {
     return <div className="applied-jobs-loading">Đang tải dữ liệu...</div>;
@@ -63,13 +74,14 @@ export default function AppliedJobs() {
             className="filter-select"
           >
             <option>Tất cả</option>
-            <option>Đã ứng tuyển</option>
-            <option>NTD đã xem hồ sơ</option>
-            
+            <option value="PENDING">Đang chờ xử lý</option>
+            <option value="INTERVIEW">Phỏng vấn</option>
+            <option value="APPROVED">Được chấp nhận</option>
+            <option value="REJECTED">Từ chối</option>
           </select>
         </div>
 
-        {filteredJobs.length === 0 ? (
+        {filteredApplications.length === 0 ? (
           <div className="empty-applied-jobs">
             /images/empty-box.png
             <p>Bạn chưa ứng tuyển công việc nào!</p>
@@ -79,15 +91,17 @@ export default function AppliedJobs() {
           </div>
         ) : (
           <div className="applied-jobs-list">
-            {filteredJobs.map((job) => (
-              <div key={job.id} className="applied-job-card">
+            {filteredApplications.map((app) => (
+              <div key={app.applicationId} className="applied-job-card">
                 <div className="job-info">
-                  <h3>{job.title}</h3>
-                  <p className="company-name">{job.companyName}</p>
-                  <p className="job-location">{job.location}</p>
-                  <span className="job-status">{job.status}</span>
+                  <h3>{app.jobTitle}</h3>
+                  <p className="cv-title">CV: {app.cvTitle}</p>
+                  <p className="job-notes">Ghi chú: {app.notes}</p>
+                  <p className="job-date">Ngày ứng tuyển: {formatDate(app.appliedAt)}</p>
+                  <span className={`job-status status-${app.status.toLowerCase()}`}>
+                    {statusMap[app.status] || app.status}
+                  </span>
                 </div>
-                <div className="job-salary">{job.salary}</div>
               </div>
             ))}
           </div>
@@ -103,8 +117,6 @@ export default function AppliedJobs() {
             <button className="btn-update-cv">Cập nhật CV ngay</button>
           </Link>
         </div>
-
-       
       </div>
     </div>
   );
