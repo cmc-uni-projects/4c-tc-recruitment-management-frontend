@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMyCVs, renderCV, updateCV } from "../../services/auth.services";
@@ -17,7 +18,6 @@ export default function EditCVPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Hàm merge HTML + Data
   const mergeHtml = (html, data) => {
     if (!html) return "";
     let temp = html;
@@ -42,7 +42,6 @@ export default function EditCVPage() {
 
         setCv(found);
 
-        // Gọi renderCV để lấy HTML + data
         const renderRes = await renderCV(cvId);
         const html = renderRes?.data?.htmlLayout || "";
         const data = renderRes?.data?.data || {};
@@ -86,7 +85,6 @@ export default function EditCVPage() {
 
       toast.success("Cập nhật CV thành công!");
 
-      // Render lại từ server
       const renderRes = await renderCV(cvId);
       const html = renderRes?.data?.htmlLayout || "";
       setBaseHtml(html);
@@ -98,8 +96,7 @@ export default function EditCVPage() {
       setSaving(false);
     }
   };
-  
-  // 👉👉 THÊM CHỨC NĂNG EXPORT PDF TẠI ĐÂY
+
   const handleExportPDF = () => {
     const element = document.querySelector(".cv-preview");
 
@@ -137,22 +134,34 @@ export default function EditCVPage() {
         <div className="edit-cv-content">
           {/* Form bên trái */}
           <div className="form-section">
-            <h2>Thông tin cá nhân</h2>
+            <h2>Nhập thông tin của bạn</h2>
 
-            {["fullname", "position", "email", "phone", "summary", "experience", "education", "skills"].map((field) => (
-              <div className="form-group" key={field}>
-                <label>{field}</label>
-                {["summary", "experience", "education", "skills"].includes(field) ? (
+            {[
+              { name: "fullname", label: "Họ và tên *", placeholder: "Nhập họ và tên" },
+              { name: "position", label: "Vị trí ứng tuyển", placeholder: "Nhập vị trí mong muốn" },
+              { name: "email", label: "Email", placeholder: "Nhập email" },
+              { name: "phone", label: "Số điện thoại", placeholder: "Nhập số điện thoại" },
+              { name: "address", label: "Địa chỉ", placeholder: "Nhập địa chỉ" },
+              { name: "summary", label: "Tóm tắt bản thân", placeholder: "Giới thiệu ngắn gọn về bạn" },
+              { name: "experience", label: "Kinh nghiệm làm việc", placeholder: "Mô tả kinh nghiệm làm việc" },
+              { name: "education", label: "Học vấn", placeholder: "Mô tả quá trình học tập" },
+              { name: "skills", label: "Kỹ năng (cách nhau bằng dấu phẩy)", placeholder: "VD: Java, React, SQL" }
+            ].map((field) => (
+              <div className="form-group" key={field.name}>
+                <label>{field.label}</label>
+                {["summary", "experience", "education", "skills"].includes(field.name) ? (
                   <textarea
-                    name={field}
+                    name={field.name}
                     rows="4"
-                    value={formData[field] || ""}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
                     onChange={handleChange}
                   />
                 ) : (
                   <input
-                    name={field}
-                    value={formData[field] || ""}
+                    name={field.name}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
                     onChange={handleChange}
                   />
                 )}
@@ -169,7 +178,6 @@ export default function EditCVPage() {
             >
               Xuất PDF
             </button>
-
           </div>
 
           {/* Preview bên phải */}
