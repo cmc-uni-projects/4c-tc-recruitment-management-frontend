@@ -131,6 +131,32 @@ Swal.fire(
           <div className="form-section">
             <h2>Nhập thông tin của bạn</h2>
 
+            
+{/* Upload Avatar */}
+  <div className="avatar-upload">
+    <label htmlFor="avatar">Ảnh đại diện</label>
+    <input
+      type="file"
+      id="avatar"
+      accept="image/*"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const imageUrl = URL.createObjectURL(file);
+          const newData = { ...formData, avatarUrl: imageUrl };
+          setFormData(newData);
+          updatePreview(selectedTemplate?.htmlLayout, newData);
+        }
+      }}
+    />
+    {formData.avatarUrl && (
+      <div className="avatar-preview">
+        <img src={formData.avatarUrl} alt="Avatar Preview" />
+      </div>
+    )}
+  </div>
+
+
             <div className="form-grid">
               <input
                 type="text"
