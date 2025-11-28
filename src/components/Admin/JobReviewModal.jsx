@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { jobAPI } from "../../services/auth.services";
 import "./JobReviewModal.css";
+import Swal from "sweetalert2";
 export default function JobReviewModal({ job, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
 
@@ -10,30 +11,41 @@ export default function JobReviewModal({ job, onClose, onSuccess }) {
     setLoading(true);
     try {
       await jobAPI.approveJob(job.jobId);
-      alert("Đã duyệt thành công!");
+      Swal.fire("Thành công!", "Đã duyệt tin tuyển dụng.", "success");
       onSuccess(); // Cập nhật danh sách
       onClose();
     } catch {
-      alert("Lỗi khi duyệt!");
+      Swal.fire("Lỗi", "Không thể duyệt tin!", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = async () => {
-    if (!window.confirm("Hủy (xóa) tin này?")) return;
-    setLoading(true);
-    try {
-      await jobAPI.deleteJob(job.jobId);
-      alert("Đã hủy tin!");
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error("Lỗi khi hủy job:", error);
-      alert("Lỗi khi hủy!");
-    } finally {
-      setLoading(false);
-    }
+  
+const handleCancel = async () => {
+    Swal.fire({
+      title: "Xác nhận hủy tin?",
+      text: "Tin này sẽ bị xóa khỏi hệ thống.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hủy tin",
+      cancelButtonText: "Đóng",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setLoading(true);
+        try {
+          await jobAPI.deleteJob(job.jobId);
+          Swal.fire("Đã hủy!", "Tin tuyển dụng đã bị xóa.", "success");
+          onSuccess();
+          onClose();
+        } catch (error) {
+          console.error("Lỗi khi hủy job:", error);
+          Swal.fire("Lỗi", "Không thể hủy tin!", "error");
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
   };
 
   return (

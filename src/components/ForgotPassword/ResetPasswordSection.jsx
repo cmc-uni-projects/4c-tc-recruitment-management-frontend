@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { validateResetToken, resetPassword } from "../../services/auth.services";
 import "./ForgotPassword.css";
+import Swal from "sweetalert2";
 
 const validationSchema = Yup.object({
   newPassword: Yup.string()
@@ -61,10 +62,11 @@ export default function ResetPasswordSection() {
       setError("");
       try {
         await resetPassword(token, values.newPassword);
-        setMessage("Đặt lại mật khẩu thành công! Đang chuyển về đăng nhập...");
+        Swal.fire("Thành công", "Đặt lại mật khẩu thành công! Đang chuyển về đăng nhập...", "success");
         setTimeout(() => navigate("/reset-success"), 2000);
       } catch (err) {
         setError(err.response?.data || "Đã có lỗi xảy ra.");
+        Swal.fire("Lỗi", err.response?.data || "Đã có lỗi xảy ra.", "error");
       }
     },
   });

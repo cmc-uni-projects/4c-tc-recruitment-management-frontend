@@ -4,8 +4,9 @@ import { jobAPI, companyAPI } from "../../services/auth.services";
 import "./LatestJobsSection.css";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 import axios from "axios";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
+
 
 export default function LatestJobsSection() {
   const [latestJobs, setLatestJobs] = useState([]);
@@ -23,6 +24,7 @@ export default function LatestJobsSection() {
         setLatestJobs(response.data);
       } catch (error) {
         console.error("Lỗi khi tải tin tuyển dụng mới nhất:", error);
+        Swal.fire("Lỗi", "Không thể tải tin tuyển dụng mới nhất", "error");
       } finally {
         setLoading(false);
       }
@@ -87,7 +89,7 @@ useEffect(() => {
   const handleSaveJob = async (jobId, e) => {
     e.stopPropagation();
     if (!token || !userId) {
-      toast.error("Bạn chưa đăng nhập!");
+      Swal.fire("Cảnh báo", "Bạn chưa đăng nhập!", "warning");
       return;
     }
 
@@ -100,7 +102,7 @@ useEffect(() => {
           },
         });
         setSavedJobs(savedJobs.filter((id) => id !== jobId));
-        toast.info("Đã bỏ lưu công việc!");
+        Swal.fire("Thông báo", "Đã bỏ lưu công việc!", "info");
       } else {
         await axios.post(`http://localhost:8080/api/saved-jobs`, null, {
           params: { userId, jobId },
@@ -109,11 +111,11 @@ useEffect(() => {
           },
         });
         setSavedJobs([...savedJobs, jobId]);
-        toast.success("Đã lưu công việc!");
+        Swal.fire("Thành công", "Đã lưu công việc!", "success");
       }
     } catch (error) {
       console.error("Lỗi khi lưu/bỏ lưu công việc:", error);
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
+      Swal.fire("Lỗi", "Có lỗi xảy ra, vui lòng thử lại!", "error");
     }
   };
 
