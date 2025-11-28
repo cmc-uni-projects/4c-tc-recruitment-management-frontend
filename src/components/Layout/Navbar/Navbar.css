@@ -122,20 +122,23 @@
 }
 
 /* Dropdown đẹp như TopCV */
+
+
 .user-dropdown {
-  
-position: absolute;
+  position: absolute;
   top: 60px;
   right: 10px;
   width: 320px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
   padding: 16px;
   z-index: 100;
-
+  font-family: 'Inter', 'Roboto', sans-serif;
+  color: #333;
 }
 
+/* Header */
 .dropdown-header {
   display: flex;
   align-items: center;
@@ -143,77 +146,95 @@ position: absolute;
 }
 
 .dropdown-avatar {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  border: 2px solid #f0f0f0;
   margin-right: 12px;
 }
 
-.dropdown-info p {
-  margin: 0;
-  font-size: 14px;
+.dropdown-info .dropdown-name {
+  font-size: 18px; /* Tăng từ 16px lên 18px */
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .verified-text {
+  font-size: 13px; /* Tăng nhẹ */
+}
+.verified {
   color: #27ae60;
-  font-size: 12px;
+}
+.unverified {
+  color: #e74c3c;
 }
 
+.dropdown-email {
+  font-size: 13px; /* Tăng nhẹ */
+  color: #666;
+}
+
+/* Section */
 .dropdown-section {
-  margin-top: 12px;
+  margin-top: 18px;
 }
 
 .section-title {
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 15px; /* Tăng từ 14px lên 15px */
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .dropdown-section ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.dropdown-section li {
-  margin-bottom: 6px;
-}
-
-.dropdown-section li a {
-  text-decoration: none;
-  color: #333;
-}
-
-
-.dropdown-item {
+.dropdown-link {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #e74c3c;
-  transition: all 0.2s;
+  gap: 8px;
+  padding: 10px 12px; /* Tăng padding cho thoáng */
+  font-size: 15px; /* Tăng từ 14px lên 15px */
+  color: #333;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
 }
 
-.dropdown-item:hover {
-  background: #fff5f5;
+.dropdown-link:hover {
+  background: #f5f7fa;
+  color: #00B14F;
+  font-weight: 500;
 }
+
+
+
+
 
 /* Icon cửa mở ra đẹp lung linh */
 
 .logout-btn {
   
- width: 100%;
-  padding: 12px;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+ 
+width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  background-color: #f8f8f8;
+  color: #e74c3c;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
   margin-top: 16px;
-  font-size: 16px; /* Tăng kích thước chữ */
-  font-weight: 600; /* Làm chữ đậm hơn */
-  color: #333; /* Màu chữ rõ hơn */
+  transition: background 0.3s;
+
 
 }
 
@@ -232,4 +253,8 @@ position: absolute;
   display: flex;
   align-items: center;
   gap: 60px;
+}
+
+.logout-btn:hover {
+  background-color: #ffecec;
 }
