@@ -128,9 +128,15 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
         </Alert>
 
         <div className="action-buttons">
-          <Button variant="outlined" color="secondary" onClick={onClose}>
-            Hủy
-          </Button>
+         
+<Button
+  variant="outlined"
+  onClick={onClose}
+  className="cancel-btn"
+>
+  Hủy
+</Button>
+
           <Button variant="contained" sx={{ backgroundColor: "#00b14f" }} onClick={handleSubmit}>
             Nộp hồ sơ ứng tuyển
           </Button>
