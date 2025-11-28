@@ -74,14 +74,47 @@ export const jobAPI = {
 
 // Company API
 export const companyAPI = {
+  // Public
   getFeatured: () => api.get("/companies/featured"),
   getAllActive: () => api.get("/companies/public"),
   getById: (id) => api.get(`/companies/public/${id}`),
+
+  // Admin / HR
   getAll: () => api.get("/companies"),
   create: (data) => api.post("/companies", data),
   update: (id, data) => api.put(`/companies/${id}`, data),
   delete: (id) => api.delete(`/companies/${id}`),
   getByIdAdmin: (id) => api.get(`/companies/${id}`), // ADMIN/HR view – full payload
+
+  // NEW: Verify actions
+  approve: (id) => api.patch(`/companies/${id}/approve`),
+  reject:  (id) => api.patch(`/companies/${id}/reject`),
+
+  // NEW: Featured toggle (chỉ cho ACTIVE + APPROVE)
+  setFeatured: (id, featured) => api.patch(`/companies/${id}/featured?featured=${featured}`),
+  
+// ===== NEW: HR upload GPKD cho company đã có ID =====
+  // Backend: @PreAuthorize("hasRole('HR')"), consumes multipart/form-data
+  uploadBRForCompany: (companyId, file) => {
+    const token = localStorage.getItem("token");
+    const fd = new FormData();
+    fd.append("file", file);
+    return api.post(`/companies/${companyId}/business-registration`, fd, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // KHÔNG set Content-Type thủ công cho FormData (browser tự thêm boundary)
+      },
+    });
+  },
+
+  // ===== NEW: HR “Yêu cầu duyệt” cho company =====
+  requestVerification: (companyId) => {
+    const token = localStorage.getItem("token");
+    return api.post(`/companies/${companyId}/request-verification`, null, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
 };
 
 export const employerAPI = {
@@ -224,4 +257,15 @@ export const applicationAPI = {
       params: { status },
       headers: { Authorization: `Bearer ${token}` },
     }),
+};
+
+export const fileAPI = {
+  upload: (file) => {
+    const token = localStorage.getItem("token");
+    const fd = new FormData();
+    fd.append("file", file);
+    return api.post("/files/upload", fd, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
 };
