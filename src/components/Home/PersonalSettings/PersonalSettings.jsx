@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./PersonalSettings.css";
+import Swal from "sweetalert2";
 
 export default function PersonalSettings() {
   const [fullName, setFullName] = useState("");
@@ -27,6 +28,7 @@ export default function PersonalSettings() {
         setEmail(response.data.email || "");
       } catch (err) {
         console.error("Lỗi lấy thông tin người dùng:", err);
+        Swal.fire("Lỗi", "Không thể tải thông tin người dùng", "error");
       } finally {
         setLoading(false);
       }
@@ -47,10 +49,16 @@ export default function PersonalSettings() {
           },
         }
       );
-      alert("✅ Cập nhật thông tin thành công!");
+      Swal.fire("Thành công", "Cập nhật thông tin thành công!", "success");
     } catch (err) {
       console.error("Lỗi cập nhật thông tin:", err.response?.data || err.message);
-      alert(err.response?.data || "❌ Có lỗi xảy ra khi cập nhật thông tin.");
+      
+Swal.fire(
+        "Lỗi",
+        err.response?.data || "Có lỗi xảy ra khi cập nhật thông tin.",
+        "error"
+      );
+
     }
   };
 

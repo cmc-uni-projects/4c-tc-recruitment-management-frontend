@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
 import { getAllTemplates, createCV } from "../../services/auth.services";
+import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "./CVBuilderPage.css";
 
 export default function CVBuilderPage() {
@@ -46,7 +46,7 @@ export default function CVBuilderPage() {
           }
         }
       } catch (err) {
-        toast.error("Không tải được mẫu CV");
+        Swal.fire("Lỗi", "Không tải được mẫu CV", "error");
       }
     };
     fetchTemplates();
@@ -76,12 +76,20 @@ export default function CVBuilderPage() {
   const handleSelectTemplate = (template) => {
     setSelectedTemplate(template);
     updatePreview(template.htmlLayout, formData);
-    toast.info(`Đã chọn: ${template.name}`);
+    Swal.fire("Đã chọn mẫu", template.name, "info");
   };
 
   const handleSaveCV = async () => {
-    if (!selectedTemplate) return toast.warn("Vui lòng chọn mẫu CV");
-    if (!formData.fullname) return toast.warn("Vui lòng nhập họ tên");
+    
+if (!selectedTemplate) {
+      Swal.fire("Cảnh báo", "Vui lòng chọn mẫu CV", "warning");
+      return;
+    }
+    if (!formData.fullname) {
+      Swal.fire("Cảnh báo", "Vui lòng nhập họ tên", "warning");
+      return;
+    }
+
 
     setSaving(true);
     try {
@@ -92,14 +100,18 @@ export default function CVBuilderPage() {
         data: formData,
       };
       await createCV(cvData);
-      toast.success("Lưu CV thành công! Đi đến danh sách CV của bạn");
+      Swal.fire("Thành công", "Lưu CV thành công! Đi đến danh sách CV của bạn", "success");
       setTimeout(() => {
         window.location.href = "/my-cv";
       }, 1200);
     } catch (err) {
-      toast.error(
-        "Lưu CV thất bại: " + (err.response?.data?.message || err.message)
+      
+Swal.fire(
+        "Lỗi",
+        "Lưu CV thất bại: " + (err.response?.data?.message || err.message),
+        "error"
       );
+
     } finally {
       setSaving(false);
     }

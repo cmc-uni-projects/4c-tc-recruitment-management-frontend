@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
 import { uploadCV } from "../../services/auth.services";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
 import "./UploadCVPage.css";
 
 export default function UploadCVPage() {
@@ -35,7 +34,7 @@ export default function UploadCVPage() {
 
     // Kiểm tra dung lượng (< 5MB)
     if (selectedFile.size > 5 * 1024 * 1024) {
-      toast.error("File không được vượt quá 5MB!");
+      Swal.fire("Lỗi", "File không được vượt quá 5MB!", "error");
       return;
     }
 
@@ -46,12 +45,12 @@ export default function UploadCVPage() {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
     if (!allowedTypes.includes(selectedFile.type)) {
-      toast.error("Chỉ chấp nhận file .pdf, .doc hoặc .docx!");
+      Swal.fire("Lỗi", "Chỉ chấp nhận file .pdf, .doc hoặc .docx!", "error");
       return;
     }
 
     setFile(selectedFile);
-    toast.success(`Đã chọn: ${selectedFile.name}`);
+    Swal.fire("Thành công", `Đã chọn: ${selectedFile.name}`, "success");
   };
 
   const handleFileChange = (e) => {
@@ -68,14 +67,18 @@ export default function UploadCVPage() {
 
     try {
       await uploadCV(formData);
-      toast.success("Upload CV thành công! Nhà tuyển dụng sẽ sớm thấy bạn");
+      Swal.fire("Thành công", "Upload CV thành công! Nhà tuyển dụng sẽ sớm thấy bạn", "success");
       setTimeout(() => navigate("/my-cv"), 2000);
     } catch (err) {
-      toast.error(
-        "Upload thất bại: " + (err.response?.data?.message || err.message)
+      
+Swal.fire(
+        "Lỗi",
+        "Upload thất bại: " + (err.response?.data?.message || err.message),
+        "error"
       );
     }
   };
+
 
   return (
     <>

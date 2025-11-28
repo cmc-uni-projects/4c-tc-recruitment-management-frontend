@@ -11,6 +11,7 @@ import {
 } from "../../services/auth.services";
 import Navbar from "../../components/Layout/Navbar";
 import "./CreateCVPage.css";
+import Swal from "sweetalert2";
 
 export default function CreateCVPage() {
   const [templates, setTemplates] = useState([]);
@@ -26,7 +27,7 @@ export default function CreateCVPage() {
       const res = await getAllTemplates();
       setTemplates(res.data || []);
     } catch (err) {
-      alert("Không tải được mẫu CV");
+      Swal.fire("Lỗi", "Không tải được mẫu CV", "error");
     } finally {
       setLoading(false);
     }

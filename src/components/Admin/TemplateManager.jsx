@@ -3,6 +3,7 @@ import { templateAPI } from "../../services/auth.services";
 import "./TemplateManager.css";
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
+import Swal from "sweetalert2";
 
 export default function TemplateManager() {
   const [templates, setTemplates] = useState([]);
@@ -27,7 +28,7 @@ export default function TemplateManager() {
       setTemplates(res.data);
     } catch (err) {
       console.error("Lỗi khi tải danh sách template:", err);
-      alert("Không thể tải dữ liệu. Vui lòng thử lại.");
+      Swal.fire("Lỗi", "Không thể tải dữ liệu. Vui lòng thử lại.", "error");
     } finally {
       setLoading(false);
     }
@@ -61,11 +62,11 @@ export default function TemplateManager() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) {
-      alert("Tên template không được để trống!");
+      Swal.fire("Lỗi", "Tên template không được để trống!", "error");
       return;
     }
     if (!form.htmlLayout.trim()) {
-      alert("HTML layout không được để trống!");
+      Swal.fire("Lỗi", "HTML layout không được để trống!", "error");
       return;
     }
 
@@ -74,37 +75,50 @@ export default function TemplateManager() {
       if (currentEditingId) {
         // Cập nhật
         await templateAPI.update(currentEditingId, form);
+        Swal.fire("Thành công", "Cập nhật template thành công!", "success");
       } else {
         // Tạo mới
         await templateAPI.create(form);
+        Swal.fire("Thành công", "Thêm template mới thành công!", "success");
       }
       closeModal();
       fetchTemplates();
     } catch (err) {
       console.error("Lỗi khi lưu template:", err);
-      alert(err.response?.data?.message || "Lưu thất bại. Vui lòng thử lại.");
+      Swal.fire("Lỗi",err.response?.data?.message || "Lưu thất bại . Vui lòng thử lại.","error")
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Bạn có chắc chắn muốn xóa template này? Hành động này không thể hoàn tác!"
-      )
-    ) {
-      return;
-    }
+  
+const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Bạn có chắc chắn muốn xóa template này?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await templateAPI.delete(id);
+          fetchTemplates();
+          Swal.fire("Đã xóa!", "Template đã được xóa thành công.", "success");
+        } catch (err) {
+          console.error("Lỗi xóa template:", err);
+          Swal.fire(
+            "Lỗi",
+            "Xóa thất bại. Có thể template đang được sử dụng.",
+            "error"
+          );
+        }
+      }
+    });
 
-    try {
-      await templateAPI.delete(id);
-      fetchTemplates();
-      alert("Xóa template thành công!");
-    } catch (err) {
-      console.error("Lỗi xóa template:", err);
-      alert("Xóa thất bại. Có thể template đang được sử dụng.");
-    }
   };
 
   const openPreview = (html) => {

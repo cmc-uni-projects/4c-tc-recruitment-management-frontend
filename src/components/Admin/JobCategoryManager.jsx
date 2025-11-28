@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { jobCategoryAPI } from "../../services/auth.services";
 import "./JobCategoryManager.css";
+import Swal from "sweetalert2";
 
 export default function JobCategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -21,7 +22,7 @@ export default function JobCategoryManager() {
       setCategories(res.data);
     } catch (err) {
       console.error("Lỗi khi tải danh sách ngành nghề:", err);
-      alert("Không thể tải dữ liệu. Vui lòng thử lại.");
+      Swal.fire("Lỗi", "Không thể tải dữ liệu. Vui lòng thử lại.", "error");
     } finally {
       setLoading(false);
     }
@@ -57,35 +58,51 @@ export default function JobCategoryManager() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) {
-      alert("Tên ngành nghề không được để trống!");
+      Swal.fire("Lỗi", "Tên ngành nghề không được để trống!", "error");
       return;
     }
 
     try {
       if (editingId) {
         await jobCategoryAPI.update(editingId, form);
+        Swal.fire("Thành công", "Cập nhật ngành nghề thành công!", "success");
       } else {
         await jobCategoryAPI.create(form);
+        Swal.fire("Thành công", "Thêm ngành nghề mới thành công!", "success");
       }
       closeModal();
       fetchCategories();
     } catch (err) {
       console.error("Lỗi khi lưu:", err);
-      alert("Lưu thất bại. Vui lòng kiểm tra lại.");
+      Swal.fire("Lỗi", "Lưu thất bại. Vui lòng kiểm tra lại.", "error");
     }
   };
 
-  // Handle delete
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa ngành nghề này?")) return;
-    try {
-      await jobCategoryAPI.delete(id);
-      fetchCategories();
-    } catch (err) {
-      console.error("Lỗi xóa:", err);
-      alert("Xóa thất bại. Có thể ngành nghề đang được sử dụng.");
-    }
+  
+const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Bạn có chắc muốn xóa ngành nghề này?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await jobCategoryAPI.delete(id);
+          fetchCategories();
+          Swal.fire("Đã xóa!", "Ngành nghề đã được xóa thành công.", "success");
+        } catch (err) {
+          console.error("Lỗi xóa:", err);
+          Swal.fire("Lỗi","Xoá thất bại.Có thể nghành đang được sử dụng.","error");
+        }
+      }
+    });
   };
+
 
   return (
     <div className="job-category-manager">
