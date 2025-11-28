@@ -4,6 +4,7 @@ import JobReviewModal from "../../components/Admin/JobReviewModal";
 import BusinessRegistrationReviewModal from "../../components/Admin/BusinessRegistrationReviewModal";
 import "./NotificationsPage.css";
 import Navbar from "../../components/Layout/Navbar";
+import Swal from "sweetalert2";
 
 export default function NotificationsPage() {
   const [pendingJobs, setPendingJobs] = useState([]);
@@ -25,7 +26,7 @@ export default function NotificationsPage() {
       setPendingJobs(pending);
     } catch (error) {
       console.error("Lỗi tải danh sách chờ duyệt:", error);
-      alert("Lỗi tải danh sách chờ duyệt");
+      Swal.fire("Lỗi", "Không thể tải danh sách chờ duyệt", "error");
     } finally {
       setLoading(false);
     }
@@ -42,14 +43,18 @@ export default function NotificationsPage() {
       console.error("[Employer Pending] error:", error);
       const code = error?.response?.status;
       const msg = error?.response?.data?.message;
-      alert(
+      
+Swal.fire(
+        "Lỗi",
         code === 403
           ? "Bạn cần quyền ADMIN để xem hồ sơ doanh nghiệp chờ duyệt."
           : msg ??
               `Lỗi tải danh sách hồ sơ doanh nghiệp chờ duyệt (HTTP ${
                 code ?? "?"
-              })`
+              })`,
+        "error"
       );
+
       setPendingEmployers([]);
     } finally {
       setLoadingEmployers(false);

@@ -6,6 +6,7 @@ import "./JobDetail.css";
 import axios from "axios";
 import ApplyForm from "../Applications/ApplyForm";
 import { Modal, Box } from "@mui/material";
+import Swal from "sweetalert2";
 
 export default function JobDetail() {
   const { jobId } = useParams();
@@ -81,7 +82,7 @@ export default function JobDetail() {
   const handleSaveJob = async () => {
     try {
       if (!token || !userId) {
-        alert("Bạn chưa đăng nhập!");
+        Swal.fire("Cảnh báo", "Bạn chưa đăng nhập!", "warning");
         return;
       }
 
@@ -90,19 +91,19 @@ export default function JobDetail() {
           params: { userId, jobId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Đã lưu công việc!");
+        Swal.fire("Thành công", "Đã lưu công việc!", "success");
       } else {
         await axios.delete(`http://localhost:8080/api/saved-jobs/${jobId}`, {
           params: { userId },
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Đã bỏ lưu công việc!");
+        Swal.fire("Thông báo", "Đã bỏ lưu công việc!", "info");
       }
 
       setIsSaved(!isSaved);
     } catch (error) {
       console.error("Lỗi khi lưu/bỏ lưu công việc:", error);
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
+      Swal.fire("Lỗi", "Có lỗi xảy ra, vui lòng thử lại!", "error");
     }
   };
 

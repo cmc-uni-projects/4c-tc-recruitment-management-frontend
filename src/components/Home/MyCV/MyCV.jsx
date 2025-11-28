@@ -7,7 +7,8 @@ import { getMyCVs } from "../../../services/auth.services";
 import EmptyCreatedCV from "../../../assets/empty-cv-created.png";
 import EmptyUploadedCV from "../../../assets/empty-cv-upload.png";
 import { deleteCV } from "../../../services/auth.services";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+
 
 
 export default function MyCV() {
@@ -35,7 +36,12 @@ export default function MyCV() {
       setUploadedCVs(uploaded);
     } catch (err) {
       console.error("Lỗi API /api/cv/my:", err.response || err);
-      toast.error("Không tải được CV");
+     Swal.fire({
+        title: "Không tải được CV",
+        text: "Vui lòng kiểm tra kết nối hoặc thử lại.",
+        icon: "error",
+        confirmButtonColor: "#00B14F",
+      });
     } finally {
       setLoading(false);
     }
@@ -69,24 +75,48 @@ export default function MyCV() {
       transition: { type: "spring", stiffness: 100 },
     },
   };
-  const handleDelete = async (cvId) => {
-    if (!window.confirm("Xóa CV này?")) return;
-    try {
-      await deleteCV(cvId);
-      toast.success("Đã xóa CV");
-      await fetchMyCVs();
-    } catch (err) {
-      toast.error("Xóa thất bại");
-    }
+   const handleDelete = async (cvId) => {
+    Swal.fire({
+      title: "Bạn có chắc muốn xóa?",
+      html: `
+        <p style="font-size:16px; color:#444">
+          CV này sẽ bị <b style="color:#d33">xóa vĩnh viễn</b> và không thể khôi phục.
+        </p>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xóa ngay",
+      cancelButtonText: "Hủy",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#7a7a7a",
+      reverseButtons: true,
+      focusCancel: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteCV(cvId);
+          await fetchMyCVs();
+
+          // Alert thành công đẹp
+          Swal.fire({
+            title: "Đã xóa!",
+            text: "CV của bạn đã được xóa thành công.",
+            icon: "success",
+            confirmButtonColor: "#00B14F",
+            timer: 1300,
+            showConfirmButton: false,
+          });
+        } catch (err) {
+          Swal.fire({
+            title: "Xóa thất bại",
+            text: "Đã có lỗi xảy ra, vui lòng thử lại.",
+            icon: "error",
+            confirmButtonColor: "#00B14F",
+          });
+        }
+      }
+    });
   };
-  if (loading) {
-    return (
-      <div className="mycv-loading">
-        <div className="spinner"></div>
-        <p>Đang tải CV của bạn...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="mycv-page">

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { employerAPI, companyAPI } from "../../services/auth.services";
 import "./BusinessRegistrationReviewModal.css"; // tạo CSS nếu cần
+import Swal from "sweetalert2";
 
 /**
  * Props:
@@ -46,39 +47,70 @@ export default function BusinessRegistrationReviewModal({ employerId, onClose, o
     if (employerId) loadDetail();
   }, [employerId]);
 
-  const handleApprove = async () => {
-    if (!window.confirm("Xác nhận DUYỆT hồ sơ doanh nghiệp này?")) return;
-    try {
-      setActionLoading(true);
-      await employerAPI.approveVerification(employerId);
-      alert("Đã duyệt hồ sơ thành công!");
-      onSuccess?.();
-      onClose?.();
-    } catch (err) {
-      console.error("Lỗi duyệt hồ sơ:", err);
-      alert("Lỗi khi duyệt!");
-    } finally {
-      setActionLoading(false);
-    }
+  
+const handleApprove = async () => {
+    Swal.fire({
+      title: "Xác nhận duyệt hồ sơ?",
+      text: "Hồ sơ doanh nghiệp này sẽ được xác minh.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Duyệt",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setActionLoading(true);
+          await employerAPI.approveVerification(employerId);
+          Swal.fire("Thành công!", "Đã duyệt hồ sơ doanh nghiệp.", "success");
+          onSuccess?.();
+          onClose?.();
+        } catch (err) {
+          console.error("Lỗi duyệt hồ sơ:", err);
+          Swal.fire("Lỗi", "Không thể duyệt hồ sơ!", "error");
+        } finally {
+          setActionLoading(false);
+        }
+      }
+    });
   };
 
-  const handleReject = async () => {
-    const reason = window.prompt("Nhập lý do từ chối (optional):", "");
-    if (reason === null) return; // user cancelled
-    if (!window.confirm("Xác nhận TỪ CHỐI hồ sơ doanh nghiệp này?")) return;
+  
+const handleReject = async () => {
+    const { value: reason } = await Swal.fire({
+      title: "Nhập lý do từ chối",
+      input: "text",
+      inputPlaceholder: "Nhập lý do (tùy chọn)",
+      showCancelButton: true,
+      confirmButtonText: "Tiếp tục",
+      cancelButtonText: "Hủy",
+    });
 
-    try {
-      setActionLoading(true);
-      await employerAPI.rejectVerification(employerId, reason || "");
-      alert("Đã từ chối hồ sơ!");
-      onSuccess?.();
-      onClose?.();
-    } catch (err) {
-      console.error("Lỗi từ chối hồ sơ:", err);
-      alert("Lỗi khi từ chối!");
-    } finally {
-      setActionLoading(false);
-    }
+    if (reason === undefined) return; // Người dùng bấm Hủy
+
+    Swal.fire({
+      title: "Xác nhận từ chối hồ sơ?",
+      text: "Hồ sơ sẽ bị từ chối và yêu cầu cập nhật lại.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Từ chối",
+      cancelButtonText: "Đóng",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setActionLoading(true);
+          await employerAPI.rejectVerification(employerId, reason || "");
+          Swal.fire("Đã từ chối!", "Hồ sơ doanh nghiệp đã bị từ chối.", "success");
+          onSuccess?.();
+          onClose?.();
+        } catch (err) {
+          console.error("Lỗi từ chối hồ sơ:", err);
+          Swal.fire("Lỗi", "Không thể từ chối hồ sơ!", "error");
+        } finally {
+          setActionLoading(false);
+        }
+      }
+    });
+
   };
 
   // URL file GPKD (lưu trong Company)

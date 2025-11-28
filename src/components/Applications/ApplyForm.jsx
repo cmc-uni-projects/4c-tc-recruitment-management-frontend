@@ -12,7 +12,7 @@ import {
   Alert
 } from "@mui/material";
 import "./ApplyForm.css";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const ApplyForm = ({ jobId, jobTitle, onClose }) => {
   const [cvs, setCvs] = useState([]);
@@ -31,7 +31,7 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedCv && selectedOption === "other") {
-      toast.error("Vui lòng chọn CV");
+      Swal.fire("Cảnh báo", "Vui lòng chọn CV", "warning");
       return;
     }
 
@@ -39,11 +39,11 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
 
     try {
       await applicationAPI.create(data, token);
-      toast.success("Ứng tuyển thành công!");
+      Swal.fire("Thành công", "Ứng tuyển thành công!", "success");
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error("Có lỗi xảy ra khi ứng tuyển");
+      Swal.fire("Lỗi", "Có lỗi xảy ra khi ứng tuyển", "error");
     }
   };
 

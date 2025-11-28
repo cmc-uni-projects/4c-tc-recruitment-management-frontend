@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import { employerAPI } from "../../services/auth.services";
 import "./BusinessRegistration.css";
 
@@ -24,7 +24,7 @@ const BusinessRegistration = () => {
     }
 
     if (!employerId) {
-      toast.error("Không tìm thấy thông tin nhà tuyển dụng.");
+      Swal.fire("Lỗi", "Không tìm thấy thông tin nhà tuyển dụng.", "error");
       navigate("/hr/profile/company");
     }
   }, [employerData, employerId, navigate]);
@@ -35,12 +35,12 @@ const BusinessRegistration = () => {
 
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
     if (!allowedTypes.includes(selectedFile.type)) {
-      toast.error("Chỉ chấp nhận file: .jpg, .jpeg, .png, .pdf");
+      Swal.fire("Lỗi", "Chỉ chấp nhận file: .jpg, .jpeg, .png, .pdf", "error");
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      toast.error("Dung lượng file không được vượt quá 5MB");
+      Swal.fire("Lỗi", "Dung lượng file không được vượt quá 5MB", "error");
       return;
     }
 
@@ -56,7 +56,7 @@ const BusinessRegistration = () => {
 
   const handleSubmitVerification = async () => {
     if (!file) {
-      toast.error("Vui lòng chọn file giấy tờ");
+      Swal.fire("Cảnh báo", "Vui lòng chọn file giấy tờ", "warning");
       return;
     }
 
@@ -89,7 +89,7 @@ const BusinessRegistration = () => {
 
     } catch (err) {
       const msg = err.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại.";
-      toast.error(msg);
+      Swal.fire("Lỗi", msg, "error");
     } finally {
       setLoading(false);
     }
