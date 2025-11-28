@@ -103,7 +103,7 @@ export default function AppliedJobs() {
                     {statusMap[app.status]}
                   </span>
                 </div>
-                <div className="job-actions">
+                <div className="job-actions1">
                   <Link to={`/jobs/${app.jobId}`} className="btn-view-job">
                     Xem chi tiết
                   </Link>
