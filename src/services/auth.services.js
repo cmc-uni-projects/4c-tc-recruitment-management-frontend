@@ -208,7 +208,7 @@ export const applicationAPI = {
   // HR xem danh sách ứng viên theo JobId
   getByJobId: (jobId, page = 0, size = 10, status, token) =>
     api.get(`/api/applications/job/${jobId}`, {
-      params: { page, size, status },
+      params: { page, size, ...(status ? { status } : {}) },
       headers: { Authorization: `Bearer ${token}` },
     }),
 

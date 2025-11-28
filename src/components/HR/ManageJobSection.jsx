@@ -45,13 +45,7 @@ function ManageJobSection() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await applicationAPI.getByJobId(
-        job.jobId,
-        0,
-        10,
-        null,
-        token
-      );
+      const res = await applicationAPI.getByJobId(job.jobId, 0, 10, null, token);
       console.log("Ứng viên:", res.data); // Kiểm tra dữ liệu trả về
 
       // Nếu API trả về dạng phân trang
@@ -551,15 +545,17 @@ const filteredLocations = locations.filter(loc =>
                     <th>Email</th>
                     <th>Ngày ứng tuyển</th>
                     <th>Trạng thái</th>
+                    <th>Ghi chú</th>
                   </tr>
                 </thead>
                 <tbody>
                   {applications.map((app) => (
                     <tr key={app.id}>
                       <td>{app.candidateName}</td>
-                      <td>{app.email}</td>
+                      <td>{app.email || "Không có email"}</td>
                       <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
                       <td>{app.status}</td>
+                      <td>{app.notes || "-"}</td>
                     </tr>
                   ))}
                 </tbody>
