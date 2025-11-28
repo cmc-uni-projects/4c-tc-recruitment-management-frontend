@@ -22,7 +22,7 @@ const vietnamProvinces = [
 
 /** ===== Utils validation ===== */
 const isValidUrl = (url) => {
-  if (!url) return true; // cho phép rỗng
+  if (!url) return true;
   try {
     const u = new URL(url);
     return u.protocol === "http:" || u.protocol === "https:";
@@ -31,31 +31,21 @@ const isValidUrl = (url) => {
   }
 };
 const clampYear = (y) => {
-  if (!y) return y;
+  if (!y && y !== 0) return y;
   const year = Number(y);
   const current = new Date().getFullYear();
   if (Number.isNaN(year)) return null;
   if (year < 1800 || year > current) return null;
   return year;
 };
-const normalizeTax = (v) => (v || "").replace(/[^0-9]/g, ""); // bỏ mọi ký tự không phải số
+const normalizeTax = (v) => (v || "").replace(/[^0-9]/g, "");
 
 /** ===== Searchable Combobox cho city (không dùng lib) ===== */
-function CitySelect({
-  value,
-  onChange,
-  options,          // string[]
-  placeholder = "Tìm kiếm tỉnh/thành...",
-  label = "Thành phố (City)",
-  required = true,
-  error             // chuỗi lỗi nếu có
-}) {
+function CitySelect({ value, onChange, options, placeholder = "Tìm kiếm tỉnh/thành...", label = "Thành phố (City)", required = true, error }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(-1);
-
   const containerRef = useRef(null);
-
   const filtered = options.filter((c) =>
     c.toLowerCase().includes(query.trim().toLowerCase())
   );
@@ -78,7 +68,6 @@ function CitySelect({
     setHighlightIndex(-1);
   };
 
-  const onInputFocus = () => setOpen(true);
   const onKeyDown = (e) => {
     if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
       setOpen(true);
@@ -103,15 +92,14 @@ function CitySelect({
 
   return (
     <div className="form-group full-width" ref={containerRef}>
-      <label> {label} </label>
-
+      <label>{label}</label>
       <input
         type="text"
         className={`combobox-input ${error ? "input-error" : ""}`}
         placeholder={placeholder}
         value={open ? query : (value || "")}
         onChange={(e) => setQuery(e.target.value)}
-        onFocus={onInputFocus}
+        onFocus={() => setOpen(true)}
         onClick={() => setOpen(true)}
         onKeyDown={onKeyDown}
         required={required && !value}
@@ -119,7 +107,6 @@ function CitySelect({
         aria-describedby={error ? "city-error" : undefined}
       />
       {error && <div id="city-error" className="error-text">{error}</div>}
-
       {open && (
         <div className="combobox-list">
           {filtered.length === 0 ? (
@@ -128,15 +115,9 @@ function CitySelect({
             filtered.map((item, idx) => (
               <div
                 key={item}
-                className={
-                  "combobox-item" +
-                  (idx === highlightIndex ? " combobox-item--active" : "")
-                }
+                className={"combobox-item" + (idx === highlightIndex ? " combobox-item--active" : "")}
                 onMouseEnter={() => setHighlightIndex(idx)}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  selectValue(item);
-                }}
+                onMouseDown={(e) => { e.preventDefault(); selectValue(item); }}
               >
                 {item}
               </div>
@@ -152,12 +133,11 @@ export default function AdminCompanyManager() {
   const [companies, setCompanies] = useState([]);
   const [filteredCompanies, setFilteredCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  /** ===== FORM STATE (có city) ===== */
+  /** ===== FORM STATE ===== */
   const [form, setForm] = useState({
     name: "",
     taxCode: "",
@@ -170,26 +150,25 @@ export default function AdminCompanyManager() {
     city: "",
     size: "MEDIUM",
     foundedYear: "",
-    status: "ACTIVE",
+    status: "ACTIVE",   // ACTIVE | INACTIVE
     featured: false,
+    verify: undefined,  // chỉ dùng khi edit để ràng buộc Featured
   });
 
-  /** ===== ERRORS STATE ===== */
-  const [errors, setErrors] = useState({}); // { field: message }
+  /** ===== ERRORS ===== */
+  const [errors, setErrors] = useState({});
 
-  /** ===== CITY OPTIONS (merge tĩnh + động) ===== */
+  /** ===== CITY OPTIONS ===== */
   const [cities, setCities] = useState([]);
 
-  /** ===== Fetch companies (sorted newest) ===== */
+  /** ===== Fetch companies (tôn trọng orderNumber từ backend) ===== */
   const fetchCompanies = async () => {
     try {
       setLoading(true);
       const res = await companyAPI.getAll();
-      const sorted = (res?.data ?? []).sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setCompanies(sorted);
-      setFilteredCompanies(sorted);
+      const data = res?.data ?? [];
+      setCompanies(data);
+      setFilteredCompanies(data);
     } catch {
       Swal.fire({ icon: "error", title: "Lỗi", text: "Không thể tải dữ liệu." });
     } finally {
@@ -202,7 +181,7 @@ export default function AdminCompanyManager() {
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        const res = await jobAPI.getApprovedJobs(); // giả định mảng job
+        const res = await jobAPI.getApprovedJobs();
         const dynamicCities = (res?.data ?? [])
           .map((job) => (job.city || job.location || "").trim())
           .filter(Boolean);
@@ -222,22 +201,39 @@ export default function AdminCompanyManager() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [featuredFilter, setFeaturedFilter] = useState("ALL");
+  const [verifyFilter, setVerifyFilter] = useState("ALL");
+
   const statusLabel = (s) => (s === "ACTIVE" ? "Hoạt động" : "Ngừng hoạt động");
+  const verifyLabel = (v) => {
+    switch (v) {
+      case "APPROVE": return "Đã duyệt";
+      case "PENDING": return "Chờ duyệt";
+      case "REJECT": return "Từ chối";
+      default: return v || "-";
+    }
+  };
 
   const applyFilters = () => {
-    const result = companies.filter((c) => {
+    const result = (companies || []).filter((c) => {
       const matchName = (c.name || "").toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "ALL" || c.status === statusFilter;
       const matchFeatured =
         featuredFilter === "ALL" ||
         (featuredFilter === "YES" && c.featured) ||
         (featuredFilter === "NO" && !c.featured);
-      return matchName && matchStatus && matchFeatured;
+      const matchVerify = verifyFilter === "ALL" || c.verify === verifyFilter;
+      return matchName && matchStatus && matchFeatured && matchVerify;
     });
     setFilteredCompanies(result);
   };
 
-  /** ===== Validation per field ===== */
+  // Tự động áp dụng mỗi khi filter thay đổi (bỏ nút tìm kiếm)
+  useEffect(() => {
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companies, search, statusFilter, featuredFilter, verifyFilter]);
+
+  /** ===== Validation ===== */
   const validateField = (field, value) => {
     switch (field) {
       case "name": {
@@ -251,16 +247,13 @@ export default function AdminCompanyManager() {
         const raw = (value || "").trim();
         if (!raw) return "Mã số thuế là bắt buộc";
         const digits = normalizeTax(raw);
-        if (digits.length < 10 || digits.length > 13) {
-          return "Mã số thuế phải từ 10 đến 13 chữ số";
-        }
+        if (digits.length < 10 || digits.length > 13) return "Mã số thuế phải từ 10 đến 13 chữ số";
         if (!/^\d+$/.test(digits)) return "Mã số thuế chỉ gồm chữ số";
         return null;
       }
       case "city": {
         const v = (value || "").trim();
         if (!v) return "Vui lòng chọn tỉnh/thành (city)";
-        // nếu cần: kiểm tra có trong danh sách cities
         if (!cities.includes(v)) return "City không hợp lệ";
         return null;
       }
@@ -286,7 +279,7 @@ export default function AdminCompanyManager() {
         return null;
       }
       case "foundedYear": {
-        if (value === "" || value === null) return null; // cho phép trống
+        if (value === "" || value === null) return null;
         const year = clampYear(value);
         if (year === null) return "Năm thành lập không hợp lệ (1800 - hiện tại)";
         return null;
@@ -308,10 +301,8 @@ export default function AdminCompanyManager() {
         if (!allowed.includes(value)) return "Trạng thái không hợp lệ";
         return null;
       }
-      case "featured": {
-        // boolean -> luôn hợp lệ
-        return null;
-      }
+      case "featured":
+      case "verify":
       default:
         return null;
     }
@@ -326,7 +317,6 @@ export default function AdminCompanyManager() {
     return nextErrors;
   };
 
-  /** ===== Field change (set form + per-field validation) ===== */
   const setField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => {
@@ -350,12 +340,13 @@ export default function AdminCompanyManager() {
         address: company.address || "",
         city: company.city || "",
         size: company.size || "MEDIUM",
-        foundedYear: company.foundedYear || "",
+        foundedYear: company.foundedYear ?? "",
         status: company.status || "ACTIVE",
         featured: !!company.featured,
+        verify: company.verify, // dùng để ràng buộc featured
       };
       setForm(initial);
-      setErrors(validateForm(initial)); // validate ngay khi mở
+      setErrors(validateForm(initial));
       setEditingId(company.companyId);
     } else {
       const initial = {
@@ -372,6 +363,7 @@ export default function AdminCompanyManager() {
         foundedYear: "",
         status: "ACTIVE",
         featured: false,
+        verify: "APPROVE", // Admin tạo -> mặc định approve theo service
       };
       setForm(initial);
       setErrors({});
@@ -381,30 +373,51 @@ export default function AdminCompanyManager() {
   };
   const closeModal = () => { setIsModalOpen(false); setEditingId(null); setErrors({}); };
 
+  /** ===== Ràng buộc Featured theo status + verify (ACTIVE + APPROVE) ===== */
+  useEffect(() => {
+    // Nếu chuyển INACTIVE thì tự tắt featured (đồng bộ rule backend/public)
+    if (form.status === "INACTIVE" && form.featured) {
+      setField("featured", false);
+      Swal.fire({ icon: "info", text: "Công ty INACTIVE sẽ không được đánh dấu nổi bật/public." });
+    }
+    // Nếu verify không phải APPROVE thì featured cũng không được phép
+    if (form.verify && form.verify !== "APPROVE" && form.featured) {
+      setField("featured", false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.status, form.verify]);
+
   /** ===== Submit ===== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     const nextErrors = validateForm(form);
     setErrors(nextErrors);
-
     if (Object.keys(nextErrors).length > 0) {
-      Swal.fire({ icon: "warning", title: "Thiếu/nhập sai thông tin", text: "Vui lòng kiểm tra các trường được đánh dấu." });
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu/nhập sai thông tin",
+        text: "Vui lòng kiểm tra các trường được đánh dấu.",
+      });
       return;
     }
-
     try {
       setSubmitting(true);
+      const payload = { ...form, taxCode: normalizeTax(form.taxCode) };
       if (editingId) {
-        await companyAPI.update(editingId, form);
+        await companyAPI.update(editingId, payload);
         Swal.fire({ icon: "success", title: "Cập nhật thành công", timer: 2000, showConfirmButton: false });
       } else {
-        await companyAPI.create(form);
+        await companyAPI.create(payload); // Admin tạo -> verify=APPROVE (public)
         Swal.fire({ icon: "success", title: "Thêm mới thành công", timer: 2000, showConfirmButton: false });
       }
       closeModal();
       fetchCompanies();
     } catch (err) {
-      Swal.fire({ icon: "error", title: "Lỗi", text: "Lưu thất bại. Vui lòng kiểm tra lại." });
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: err?.response?.data?.message ?? "Lưu thất bại. Vui lòng kiểm tra lại.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -427,9 +440,60 @@ export default function AdminCompanyManager() {
         await companyAPI.delete(id);
         Swal.fire({ icon: "success", title: "Đã xóa thành công", timer: 2000, showConfirmButton: false });
         fetchCompanies();
-      } catch {
-        Swal.fire({ icon: "error", title: "Lỗi", text: "Xóa thất bại. Có thể công ty đang được sử dụng." });
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: err?.response?.data?.message ?? "Xóa thất bại. Kiểm tra ràng buộc dữ liệu hoặc thử lại sau.",
+        });
       }
+    }
+  };
+
+  /** ===== Approve / Reject ===== */
+  const handleApprove = async (id) => {
+    try {
+      await companyAPI.approve(id);
+      Swal.fire({ icon: "success", title: "Đã duyệt công ty", timer: 1500, showConfirmButton: false });
+      fetchCompanies();
+    } catch {
+      Swal.fire({ icon: "error", title: "Lỗi", text: "Duyệt thất bại." });
+    }
+  };
+  const handleReject = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Từ chối công ty?",
+      text: "Công ty sẽ không public và bị ẩn khỏi danh sách nổi bật.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Từ chối",
+      cancelButtonText: "Hủy",
+    });
+    if (!confirm.isConfirmed) return;
+    try {
+      await companyAPI.reject(id);
+      Swal.fire({ icon: "success", title: "Đã từ chối công ty", timer: 1500, showConfirmButton: false });
+      fetchCompanies();
+    } catch {
+      Swal.fire({ icon: "error", title: "Lỗi", text: "Từ chối thất bại." });
+    }
+  };
+
+  /** ===== Toggle Featured row action ===== */
+  const toggleFeatured = async (company) => {
+    const allowed = company.status === "ACTIVE" && company.verify === "APPROVE";
+    if (!allowed) {
+      Swal.fire({
+        icon: "info",
+        text: "Chỉ công ty ACTIVE và đã APPROVE mới được đánh dấu nổi bật.",
+      });
+      return;
+    }
+    try {
+      await companyAPI.setFeatured(company.companyId, !company.featured);
+      fetchCompanies();
+    } catch {
+      Swal.fire({ icon: "error", title: "Lỗi", text: "Đổi nổi bật thất bại." });
     }
   };
 
@@ -438,12 +502,10 @@ export default function AdminCompanyManager() {
     <div className="company-manager">
       <div className="header">
         <h2>Quản lý công ty</h2>
-        <button className="add-btn" onClick={() => openModal()}>
-          + Thêm công ty
-        </button>
+        <button className="add-btn" onClick={() => openModal()}>+ Thêm công ty</button>
       </div>
 
-      {/* Filter bar */}
+      {/* Filter bar (KHÔNG có nút Tìm kiếm) */}
       <div className="filter-bar">
         <input
           type="text"
@@ -451,18 +513,37 @@ export default function AdminCompanyManager() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"
+          aria-label="Tìm kiếm theo tên công ty"
         />
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Lọc theo trạng thái"
+        >
           <option value="ALL">Tất cả trạng thái</option>
           <option value="ACTIVE">Hoạt động</option>
           <option value="INACTIVE">Ngừng hoạt động</option>
         </select>
-        <select value={featuredFilter} onChange={(e) => setFeaturedFilter(e.target.value)}>
-          <option value="ALL">Tất cả</option>
+        <select
+          value={featuredFilter}
+          onChange={(e) => setFeaturedFilter(e.target.value)}
+          aria-label="Lọc theo nổi bật"
+        >
+          <option value="ALL">Tất cả nổi bật</option>
           <option value="YES">Nổi bật</option>
           <option value="NO">Không nổi bật</option>
         </select>
-        <button className="btn-search" onClick={applyFilters}>Tìm kiếm</button>
+        {/* NEW: Verify filter */}
+        <select
+          value={verifyFilter}
+          onChange={(e) => setVerifyFilter(e.target.value)}
+          aria-label="Lọc theo kiểm duyệt"
+        >
+          <option value="ALL">Tất cả duyệt</option>
+          <option value="PENDING">Chờ duyệt</option>
+          <option value="APPROVE">Đã duyệt</option>
+          <option value="REJECT">Từ chối</option>
+        </select>
       </div>
 
       {loading ? (
@@ -477,29 +558,72 @@ export default function AdminCompanyManager() {
               <th>Ngành nghề</th>
               <th>Thành phố</th>
               <th>Trạng thái</th>
+              <th>Kiểm duyệt</th>
               <th>Nổi bật</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
             {filteredCompanies.length === 0 ? (
-              <tr><td colSpan="8" className="no-data">Không tìm thấy công ty nào</td></tr>
+              <tr><td colSpan="9" className="no-data">Không tìm thấy công ty nào</td></tr>
             ) : (
-              filteredCompanies.map((c, idx) => (
-                <tr key={c.companyId}>
-                  <td>{c.orderNumber ?? idx + 1}</td>
-                  <td>{c.name}</td>
-                  <td>{c.taxCode || "-"}</td>
-                  <td>{c.industry || "-"}</td>
-                  <td>{c.city || "-"}</td>
-                  <td>{statusLabel(c.status)}</td>
-                  <td>{c.featured ? "Có" : "Không"}</td>
-                  <td className="actions">
-                    <button className="edit-btn" onClick={() => openModal(c)}>Sửa</button>
-                    <button className="delete-btn" onClick={() => handleDelete(c.companyId)}>Xóa</button>
-                  </td>
-                </tr>
-              ))
+              filteredCompanies.map((c, idx) => {
+                const isPending = c.verify === "PENDING";
+                const isApproved = c.verify === "APPROVE";
+                const canFeatured = c.status === "ACTIVE" && isApproved;
+
+                return (
+                  <tr key={c.companyId}>
+                    <td>{c.orderNumber ?? idx + 1}</td>
+                    <td>{c.name}</td>
+                    <td>{c.taxCode || "-"}</td>
+                    <td>{c.industry || "-"}</td>
+                    <td>{c.city || "-"}</td>
+                    <td>{statusLabel(c.status)}</td>
+                    <td>
+                      <span className={`verify-badge verify-${(c.verify || '').toLowerCase()}`}>
+                        {verifyLabel(c.verify)}
+                      </span>
+                      {/* Hiển thị link GPKD khi PENDING để Admin kiểm tra */}
+                      {isPending && c.businessRegistrationUrl && (
+                        <div style={{ marginTop: 6 }}>
+                          <a
+                            href={c.businessRegistrationUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={c.businessRegistrationFileName || "Xem GPKD"}
+                          >
+                            {c.businessRegistrationFileName || "Xem GPKD"}
+                          </a>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className={`chip ${c.featured ? "chip-on" : "chip-off"} ${!canFeatured ? "chip-disabled" : ""}`}
+                        onClick={() => toggleFeatured(c)}
+                        disabled={!canFeatured}
+                        title="Chỉ công ty ACTIVE + APPROVE mới bật được nổi bật"
+                      >
+                        {c.featured ? "Nổi bật" : "Cơ bản"}
+                      </button>
+                    </td>
+                    <td className="actions">
+                      {isPending ? (
+                        <>
+                          <button className="approve-btn" onClick={() => handleApprove(c.companyId)}>Duyệt</button>
+                          <button className="reject-btn" onClick={() => handleReject(c.companyId)}>Từ chối</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="edit-btn" onClick={() => openModal(c)}>Sửa</button>
+                          <button className="delete-btn" onClick={() => handleDelete(c.companyId)}>Xóa</button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -510,7 +634,6 @@ export default function AdminCompanyManager() {
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>{editingId ? "Chỉnh sửa công ty" : "Thêm công ty mới"}</h3>
-
             <form onSubmit={handleSubmit} className="modal-form">
               {/* Tên công ty */}
               <div className="form-group full-width">
@@ -683,18 +806,16 @@ export default function AdminCompanyManager() {
                     type="checkbox"
                     checked={form.featured}
                     onChange={(e) => setField("featured", e.target.checked)}
+                    disabled={!(form.status === "ACTIVE" && form.verify === "APPROVE")}
+                    title="Chỉ cho phép đánh dấu nổi bật khi công ty đang ACTIVE và đã APPROVE"
                   />
-                  Công ty nổi bật
+                  {" "}Công ty nổi bật
                 </label>
               </div>
 
               <div className="modal-actions full-width">
                 <button type="button" className="cancel-btn" onClick={closeModal}>Hủy</button>
-                <button
-                  type="submit"
-                  className="submit-btn"
-                  disabled={submitting}
-                >
+                <button type="submit" className="submit-btn" disabled={submitting}>
                   {editingId ? "Cập nhật" : "Thêm mới"}
                 </button>
               </div>
