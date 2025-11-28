@@ -9,11 +9,11 @@ const ProfileLayout = () => {
       <aside className="profile-mini-sidebar">
         <h3>Cài đặt tài khoản</h3>
         <nav>
-          <NavLink to="/hr/profile" end className={({ isActive }) => isActive ? "active" : ""}>
-            Thông tin cá nhân
-          </NavLink>
           <NavLink to="/hr/profile/company" className={({ isActive }) => isActive ? "active" : ""}>
             Thông tin công ty
+          </NavLink>
+          <NavLink to="/hr/profile" end className={({ isActive }) => isActive ? "active" : ""}>
+            Thông tin cá nhân
           </NavLink>
           <NavLink to="/hr/profile/business-registration" className={({ isActive }) => isActive ? "active" : ""}>
             Giấy đăng ký/Giấy Phép kinh doanh
