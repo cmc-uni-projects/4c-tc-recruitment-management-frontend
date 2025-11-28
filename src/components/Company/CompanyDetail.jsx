@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { companyAPI } from "../../services/auth.services";
 import "./CompanySection.css";
+import Swal from "sweetalert2";
 
 const CompanyDetail = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const CompanyDetail = () => {
       })
       .catch(err => {
         console.error("Lỗi khi tải công ty:", err);
+        Swal.fire("Lỗi", "Không thể tải thông tin công ty", "error");
         setLoading(false);
       });
   }, [id]);

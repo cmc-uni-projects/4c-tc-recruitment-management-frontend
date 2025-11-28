@@ -1,7 +1,7 @@
 // src/pages/hr/PersonalInfo.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 import "./PersonalInfo.css";
 import axios from "axios";
 
@@ -31,7 +31,7 @@ const PersonalInfo = () => {
           localStorage.getItem("userId") || userObj.userId || userObj.id || userObj._id;
 
         if (!userId) {
-          toast.error("Không tìm thấy userId. Vui lòng đăng nhập lại.");
+          Swal.fire("Lỗi", "Không tìm thấy userId. Vui lòng đăng nhập lại.", "error");
           navigate("/login");
           return;
         }
@@ -78,7 +78,7 @@ const PersonalInfo = () => {
         }
       } catch (err) {
         const msg = err?.response?.data?.message || err?.message || "Không lấy được thông tin người dùng.";
-        toast.error(msg);
+        Swal.fire("Lỗi", msg, "error");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -99,11 +99,11 @@ const PersonalInfo = () => {
 
     // Validation chỉ cho 3 ô bắt buộc
     if (!formData.positionTitle.trim())
-      return toast.error("Vui lòng nhập chức danh");
+      return Swal.fire("Cảnh báo", "Vui lòng nhập chức danh", "warning");
     if (!formData.department.trim())
-      return toast.error("Vui lòng nhập phòng ban");
+      return Swal.fire("Cảnh báo", "Vui lòng nhập phòng ban", "warning");
     if (!formData.workEmail.trim())
-      return toast.error("Vui lòng nhập email công việc");
+      return Swal.fire("Cảnh báo", "Vui lòng nhập email công việc", "warning");
 
     // Lưu tạm đúng 3 trường cho bước 2
     const personalTemp = {
@@ -114,7 +114,7 @@ const PersonalInfo = () => {
 
     localStorage.setItem("employer_personal_temp", JSON.stringify(personalTemp));
 
-    toast.success("Đã lưu thông tin cá nhân tạm thời!");
+    Swal.fire("Thành công", "Đã lưu thông tin cá nhân tạm thời!", "success");
     navigate("/hr/profile/company"); // Sang bước 2
   };
 

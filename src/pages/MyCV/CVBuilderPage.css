@@ -151,3 +151,26 @@
   background: #95a5a6;
   cursor: not-allowed;
 }
+
+.avatar-upload {
+  margin-bottom: 20px;
+}
+
+.avatar-upload label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.avatar-upload input[type="file"] {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.avatar-preview img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}

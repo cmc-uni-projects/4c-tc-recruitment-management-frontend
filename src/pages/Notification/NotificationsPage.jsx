@@ -3,6 +3,7 @@ import { jobAPI, employerAPI } from "../../services/auth.services";
 import BusinessRegistrationReviewModal from "../../components/Admin/BusinessRegistrationReviewModal";
 import "./NotificationsPage.css";
 import Navbar from "../../components/Layout/Navbar";
+import Swal from "sweetalert2";
 
 export default function NotificationsPage() {
 
@@ -58,14 +59,18 @@ export default function NotificationsPage() {
       console.error("[Employer Pending] error:", error);
       const code = error?.response?.status;
       const msg = error?.response?.data?.message;
-      alert(
+      
+Swal.fire(
+        "Lỗi",
         code === 403
           ? "Bạn cần quyền ADMIN để xem hồ sơ doanh nghiệp chờ duyệt."
           : msg ??
               `Lỗi tải danh sách hồ sơ doanh nghiệp chờ duyệt (HTTP ${
                 code ?? "?"
-              })`
+              })`,
+        "error"
       );
+
       setPendingEmployers([]);
     } finally {
       setLoadingEmployers(false);

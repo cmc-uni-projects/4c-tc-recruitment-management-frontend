@@ -119,15 +119,18 @@
 }
 
 /* Nút Hủy */
+
 .apply-form .cancel-btn {
-  background: #f5f5f5;
-  color: #333;
-  border: 1px solid #ccc;
+  background: #e74c3c;
+  color: #fff; /* Màu chữ đỏ */
+  border: 1px solid #e74c3c; /* Viền đỏ */
+  font-weight: 600;
 }
 
 .apply-form .cancel-btn:hover {
-  background: #e0e0e0;
+  background: #ff6565; /* Nền nhạt khi hover */
 }
+
 
 /* Nút Nộp hồ sơ */
 .apply-form .submit-btn {

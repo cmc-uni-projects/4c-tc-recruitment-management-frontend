@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { companyAPI } from "../../services/auth.services";
 import "./CompanyList.css";
+import Swal from "sweetalert2";
 
 const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -19,6 +20,7 @@ const CompanyList = () => {
         setCompanies(activeCompanies);
       } catch (err) {
         console.error("Lỗi tải dữ liệu:", err);
+        Swal.fire("Lỗi", "Không thể tải danh sách công ty", "error");
       } finally {
         setLoading(false);
       }

@@ -98,55 +98,52 @@ export default function Navbar() {
             <span className="user-name">{user.name}</span>
 
             {showDropdown && (
-              <div className="user-dropdown">
-                {/* Header thông tin user */}
-                <div className="dropdown-header">
-                  <img src={user.avatar} alt="Avatar" className="dropdown-avatar" />
-                  <div className="dropdown-info">
-                    <p className="dropdown-name">{user.name}</p>
-                   
-<p className="verified-text">
-  {verified ? "Tài khoản đã xác thực" : "Tài khoản chưa xác thực"} </p>
+             
+<div className="user-dropdown">
+  {/* Header thông tin user */}
+  <div className="dropdown-header">
+    <img src={user.avatar} alt="Avatar" className="dropdown-avatar" />
+    <div className="dropdown-info">
+      <p className="dropdown-name">{user.name}</p>
+      <p className={`verified-text ${verified ? "verified" : "unverified"}`}>
+        {verified ? "Tài khoản đã xác thực" : "Tài khoản chưa xác thực"}
+      </p>
+      <p className="dropdown-email">ID {userIdDisplay} | {user.email}</p>
+    </div>
+  </div>
+  <hr />
 
-                    <p className="dropdown-email">ID {userIdDisplay} | {user.email}</p>
-                  </div>
-                </div>
-                <hr />
+  {/* Các mục menu */}
+  <div className="dropdown-section">
+    <p className="section-title">Quản lý tìm việc</p>
+    <ul>
+      <li><Link to="/saved-jobs" className="dropdown-link"><i className="icon-bookmark"></i> Việc làm đã lưu</Link></li>
+      <li><Link to="/applied-jobs" className="dropdown-link"><i className="icon-apply"></i> Việc làm đã ứng tuyển</Link></li>
+      <li><Link to="/recommended-jobs" className="dropdown-link"><i className="icon-star"></i> Gợi ý việc làm phù hợp với bạn</Link></li>
+    </ul>
+  </div>
 
-                {/* Các mục menu */}
-                <div className="dropdown-section">
-                  <p className="section-title">Quản lý tìm việc</p>
-                  <ul>
-                    <li><Link to="/saved-jobs">Việc làm đã lưu</Link></li>
-                    <li><Link to="/applied-jobs">Việc làm đã ứng tuyển</Link></li>
-                    <li><Link to="/recommended-jobs">Gợi ý việc làm phù hợp với bạn</Link></li>
-                  </ul>
-                </div>
+  <div className="dropdown-section">
+    <p className="section-title">Quản lý CV</p>
+    <ul>
+      <li><Link to="/my-cv" className="dropdown-link"><i className="icon-cv"></i> CV của tôi</Link></li>
+    </ul>
+  </div>
 
-                <div className="dropdown-section">
-                  <p className="section-title">Quản lý CV</p>
-                  <ul>
-                    <li><Link to="/my-cv">CV của tôi</Link></li>
-                
-                  </ul>
-                </div>
+  <div className="dropdown-section">
+    <p className="section-title">Cài đặt tài khoản</p>
+    <ul>
+      <li><Link to="/personal-settings" className="dropdown-link"><i className="icon-settings"></i> Cài đặt thông tin cá nhân</Link></li>
+    </ul>
+  </div>
 
-                <div className="dropdown-section">
-                  <p className="section-title">Cài đặt tài khoản</p>
-                   <ul>
-                    <li><Link to="/personal-settings">Cài đặt thông tin cá nhân</Link></li>
-                
-                  </ul>
-                </div>
+  {/* Nút đăng xuất */}
+  <button className="logout-btn" onClick={handleLogout}>
+    <img src={logoutIcon} alt="Đăng xuất" className="logout-icon" />
+    <span>Đăng xuất</span>
+  </button>
+</div>
 
-               
-
-                {/* Nút đăng xuất */}
-                <button className="logout-btn" onClick={handleLogout}>
-                  <img src={logoutIcon} alt="Đăng xuất" className="logout-icon" />
-                 <span>Đăng xuất</span>
-                </button>
-              </div>
             )}
           </div>
         ) : (
