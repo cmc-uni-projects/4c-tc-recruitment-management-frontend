@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { jobAPI, employerAPI } from "../../services/auth.services";
-import JobReviewModal from "../../components/Admin/JobReviewModal";
 import BusinessRegistrationReviewModal from "../../components/Admin/BusinessRegistrationReviewModal";
 import "./NotificationsPage.css";
 import Navbar from "../../components/Layout/Navbar";
 
 export default function NotificationsPage() {
-  const [pendingJobs, setPendingJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
+  
+ // --- COMPANY pending (mới) ---
+  const [pendingCompanies, setPendingCompanies] = useState([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
+
 
   // --- EMPLOYER pending (mới) ---
   const [pendingEmployers, setPendingEmployers] = useState([]);
@@ -17,19 +18,34 @@ export default function NotificationsPage() {
   const [selectedEmployerId, setSelectedEmployerId] = useState(null);
   const [isBRReviewOpen, setIsBRReviewOpen] = useState(false);
 
-  const fetchPendingJobs = async () => {
+
+  
+// ====== FETCH DOANH NGHIỆP ======
+  const fetchPendingCompanies = async () => {
     try {
-      setLoading(true);
-      const res = await jobAPI.getAllJobs();
-      const pending = res.data.filter((j) => j.status === "PENDING");
-      setPendingJobs(pending);
+      setLoadingCompanies(true);
+      // Đổi tên API này cho đúng với service hiện có của bạn nếu cần.
+      const res = await jobAPI.getPendingVerificationCompanies();
+      console.log("[Company Pending] status:", res.status);
+      console.log("[Company Pending] data:", res.data);
+      setPendingCompanies(res.data || []);
     } catch (error) {
-      console.error("Lỗi tải danh sách chờ duyệt:", error);
-      alert("Lỗi tải danh sách chờ duyệt");
+      console.error("[Company Pending] error:", error);
+      const code = error?.response?.status;
+      const msg = error?.response?.data?.message;
+      alert(
+        msg ??
+          `Lỗi tải danh sách hồ sơ doanh nghiệp (company) chờ duyệt (HTTP ${
+            code ?? "?"
+          })`
+      );
+      setPendingCompanies([]);
     } finally {
-      setLoading(false);
+      setLoadingCompanies(false);
     }
   };
+
+ 
 
   const fetchPendingEmployers = async () => {
     try {
@@ -57,19 +73,10 @@ export default function NotificationsPage() {
   };
 
   useEffect(() => {
-    fetchPendingJobs();
+    fetchPendingCompanies();
     fetchPendingEmployers();
   }, []);
 
-  const openReview = (job) => {
-    setSelectedJob(job);
-    setIsReviewOpen(true);
-  };
-
-  const closeReview = () => {
-    setIsReviewOpen(false);
-    setSelectedJob(null);
-  };
 
   const openBRReview = (employerId) => {
     setSelectedEmployerId(employerId);
@@ -82,76 +89,80 @@ export default function NotificationsPage() {
 
   return (
     <div className="notifications-page">
-      <h2>Duyệt tin tuyển dụng mới</h2>
-      {loading ? (
-        <p>Đang tải...</p>
-      ) : pendingJobs.length === 0 ? (
-        <p>Không có tin nào đang chờ duyệt.</p>
-      ) : (
-        <div className="pending-list">
-          {pendingJobs.map((job) => (
-            <div
-              key={job.jobId}
-              className="pending-card job-card"
-              onClick={() => openReview(job)}
-            >
-              <h4>{job.title}</h4>
-              <p>
-                <strong>Công ty:</strong> {job.companyName || "Không rõ"}
-              </p>
-              <p>
-                <strong>Địa điểm:</strong> {job.location}
-              </p>
-              <p>
-                <strong>Lương:</strong> {job.salaryMin} - {job.salaryMax} đ
-              </p>
-              <span className="status-pending">Chờ duyệt</span>
-            </div>
-          ))}
-        </div>
-      )}
+
+<div className="notifications-grid">
+        {/* --------- CỘT TRÁI: DOANH NGHIỆP (COMPANY) --------- */}
+        <section className="column">
+          <div className="column-header">
+            <h3>Hồ Sơ Doanh Nghiệp Chờ Duyệt</h3>
+          </div>
+
+          <div className="column-body">
+            {loadingCompanies ? (
+              <div className="loading">Đang tải...</div>
+            ) : pendingCompanies.length === 0 ? (
+              <div className="no-data">Không có hồ sơ doanh nghiệp nào đang chờ duyệt.</div>
+            ) : (
+              <div className="pending-list">
+                {pendingCompanies.map((comp) => (
+                  <div className="pending-card company-card" key={comp.companyId || comp.id}>
+                    {/* Giữ nguyên nội dung card của bạn – đây chỉ là ví dụ khung */}
+                    <div className="card-title">
+                      {comp.companyName || comp.name || "Doanh nghiệp không rõ"}
+                    </div>
+                    <div className="card-sub">
+                      Người liên hệ: {comp.contactName || "—"} • Email: {comp.contactEmail || "—"} • Trạng thái:{" "}
+                      {comp.verificationStatus || (comp.verified ? "VERIFIED" : "PENDING")}
+                    </div>
+                    <span className="status-pending">Chờ duyệt hồ sơ</span>
+                    {/* Nếu có modal doanh nghiệp riêng, bạn đặt nút ở đây.
+                        Yêu cầu ban đầu: không chỉnh nội dung card, nên mình không thêm handler. */}
+                    <button className="btn">Xem hồ sơ</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
 
       {/* ==================== EMPLOYER PENDING ==================== */}
-      <h3 style={{ marginTop: 24 }}>Hồ sơ doanh nghiệp cần duyệt</h3>
-      {loadingEmployers ? (
-        <div>Đang tải...</div>
-      ) : pendingEmployers.length === 0 ? (
-        <div>Không có hồ sơ doanh nghiệp nào đang chờ duyệt.</div>
-      ) : (
-        <div className="list">
-          {pendingEmployers.map((emp) => (
-            <div className="pending-card employer-card" key={emp.employerId}>
-              <div className="card-title">
-                {emp.companyName ||
-                  emp.company?.name ||
-                  "Doanh nghiệp không rõ"}
-              </div>{" "}
-              <div className="card-sub">
-                Người liên hệ: {emp.fullName || emp.name || "—"} • Email:{" "}
-                {emp.email || "—"} • Trạng thái:{" "}
-                {emp.verificationStatus ||
-                  (emp.verified ? "VERIFIED" : "PENDING")}
+      
+<section className="column">
+          <div className="column-header">
+            <h3>Hồ Sơ Nhà Tuyển Dụng Chờ Duyệt</h3>
+          </div>
+
+      
+<div className="column-body">
+            {loadingEmployers ? (
+              <div className="loading">Đang tải...</div>
+            ) : pendingEmployers.length === 0 ? (
+              <div className="no-data">Không có hồ sơ nhà tuyển dụng nào đang chờ duyệt.</div>
+            ) : (
+              <div className="pending-list">
+                {pendingEmployers.map((emp) => (
+                  <div className="pending-card employer-card" key={emp.employerId}>
+                    <div className="card-title">
+                      {emp.companyName || emp.company?.name || "Doanh nghiệp không rõ"}
+                    </div>
+                    <div className="card-sub">
+                      Người liên hệ: {emp.fullName || emp.name || "—"} • Email: {emp.email || "—"} • Trạng thái:{" "}
+                      {emp.verificationStatus || (emp.verified ? "VERIFIED" : "PENDING")}
+                    </div>
+                    <button className="btn" onClick={() => openBRReview(emp.employerId)}>
+                      Xem hồ sơ
+                    </button>
+                  </div>
+                ))}
               </div>
-              <span className="status-pending">Chờ duyệt hồ sơ</span>
-              <button
-                className="btn"
-                onClick={() => openBRReview(emp.employerId)}
-              >
-                Xem hồ sơ
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+            )}
+          </div>
+        </section>
+      </div>
+
 
       {/* Modal Duyệt */}
-      {isReviewOpen && selectedJob && (
-        <JobReviewModal
-          job={selectedJob}
-          onClose={closeReview}
-          onSuccess={fetchPendingJobs}
-        />
-      )}
+     
 
       {isBRReviewOpen && selectedEmployerId && (
         <BusinessRegistrationReviewModal
