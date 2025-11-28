@@ -120,7 +120,7 @@ transform: none;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  color: #00b14f;
+  color: #ff0000;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
