@@ -90,17 +90,23 @@ export default function AppliedJobs() {
             </Link>
           </div>
         ) : (
-          <div className="applied-jobs-list">
+       
+        <div className="applied-jobs-list">
             {filteredApplications.map((app) => (
-              <div key={app.applicationId} className="applied-job-card">
+              <div className="applied-job-card" key={app.id}>
                 <div className="job-info">
                   <h3>{app.jobTitle}</h3>
-                  <p className="cv-title">CV: {app.cvTitle}</p>
-                  <p className="job-notes">Ghi chú: {app.notes}</p>
+                  <p className="company-name">CV: {app.cvTitle}</p>
+                  <p className="job-location">Ghi chú: {app.notes || "Không có"}</p>
                   <p className="job-date">Ngày ứng tuyển: {formatDate(app.appliedAt)}</p>
                   <span className={`job-status status-${app.status.toLowerCase()}`}>
-                    {statusMap[app.status] || app.status}
+                    {statusMap[app.status]}
                   </span>
+                </div>
+                <div className="job-actions">
+                  <Link to={`/jobs/${app.jobId}`} className="btn-view-job">
+                    Xem chi tiết
+                  </Link>
                 </div>
               </div>
             ))}
@@ -111,7 +117,8 @@ export default function AppliedJobs() {
       {/* Cột phải */}
       <div className="applied-jobs-right">
         <div className="profile-management">
-          <h3>Quản lý hồ sơ</h3>
+          /images/profile-banner.png
+          <h4>Quản lý hồ sơ</h4>
           <p>Cập nhật CV để tăng cơ hội được Nhà Tuyển Dụng xem xét</p>
           <Link to="/my-cv">
             <button className="btn-update-cv">Cập nhật CV ngay</button>
@@ -121,3 +128,4 @@ export default function AppliedJobs() {
     </div>
   );
 }
+
