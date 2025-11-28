@@ -195,7 +195,7 @@ const HRSection = ({ children }) => {
               ) : (
                 <div
                   className="verified-status not-verified"
-                  onClick={() => navigate("/hr/profile")}
+                  onClick={() => navigate("/hr/profile/company")}
                   style={{ cursor: "pointer" }}
                 >
                   Xác Thực Ngay
