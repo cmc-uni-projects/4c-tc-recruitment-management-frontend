@@ -21,7 +21,7 @@ const getSelectedCompanyId = () => {
   try {
     const obj = JSON.parse(raw);
     if (obj && obj.companyId) raw = obj.companyId;
-  } catch (_) {
+  } catch {
     // raw là chuỗi UUID rồi, giữ nguyên
   }
 

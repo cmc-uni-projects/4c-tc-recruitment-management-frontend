@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { jobAPI, employerAPI } from "../../services/auth.services";
-import BusinessRegistrationReviewModal from "../../components/Admin/BusinessRegistrationReviewModal";
+import EmployerReviewModal from "../../components/Admin/EmployerReviewModal";
 import "./NotificationsPage.css";
 import Navbar from "../../components/Layout/Navbar";
 import Swal from "sweetalert2";
@@ -170,7 +170,7 @@ Swal.fire(
      
 
       {isBRReviewOpen && selectedEmployerId && (
-        <BusinessRegistrationReviewModal
+        <EmployerReviewModal
           employerId={selectedEmployerId}
           onClose={closeBRReview}
           onSuccess={fetchPendingEmployers}

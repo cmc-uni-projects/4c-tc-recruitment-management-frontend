@@ -2,7 +2,7 @@
 // src/components/admin/BusinessRegistrationReviewModal.jsx
 import React, { useEffect, useState } from "react";
 import { employerAPI, companyAPI } from "../../services/auth.services";
-import "./BusinessRegistrationReviewModal.css"; // tạo CSS nếu cần
+import "./EmployerReviewModal.css"; // tạo CSS nếu cần
 import Swal from "sweetalert2";
 
 /**
@@ -14,7 +14,7 @@ import Swal from "sweetalert2";
  * Modal này hiển thị chi tiết Employer + Company + GPKD đã upload,
  * và có nút "Duyệt" / "Từ chối" (có lý do).
  */
-export default function BusinessRegistrationReviewModal({ employerId, onClose, onSuccess }) {
+export default function EmployerReviewModal({ employerId, onClose, onSuccess }) {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [employer, setEmployer] = useState(null);
@@ -113,15 +113,13 @@ const handleReject = async () => {
 
   };
 
-  // URL file GPKD (lưu trong Company)
-  const businessFileUrl = company?.businessRegistrationUrl || "";
-  const isPdf = businessFileUrl?.toLowerCase().endsWith(".pdf");
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h4>Duyệt hồ sơ doanh nghiệp</h4>
+          <h4>Duyệt hồ sơ nhà tuyển dụng</h4>
           <button className="btn-close" onClick={onClose}>×</button>
         </div>
 
@@ -168,23 +166,6 @@ const handleReject = async () => {
               </div>
             </section>
 
-            {/* Business registration file */}
-            <section className="block">
-              <h5>Giấy phép kinh doanh (GPKD) đã upload</h5>
-              {businessFileUrl ? (
-                isPdf ? (
-                  <div className="file-box">
-                    <a href={businessFileUrl} target="_blank" rel="noreferrer">Mở / Tải xuống file PDF</a>
-                  </div>
-                ) : (
-                  <div className="image-box">
-                    <img src={businessFileUrl} alt="GPKD đã upload" />
-                  </div>
-                )
-              ) : (
-                <div className="file-box muted">Chưa tìm thấy URL GPKD trong Company.</div>
-              )}
-            </section>
           </div>
         )}
 
