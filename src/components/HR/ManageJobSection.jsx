@@ -6,6 +6,7 @@ import {
   companyAPI,
   applicationAPI,
   employerAPI,
+  renderCV,
 } from "../../services/auth.services";
 
 function ManageJobSection() {
@@ -36,19 +37,62 @@ function ManageJobSection() {
     companyId: "",
     categoryId: "",
   });
-  const [errors, setErrors] = useState({});
+  
 
+// Modal CV
+  const [isCVModalOpen, setIsCVModalOpen] = useState(false);
+  const [selectedCV, setSelectedCV] = useState(null);
+  const [loadingCV, setLoadingCV] = useState(false);
+
+  const token = localStorage.getItem("token");
+
+  // ✅ Xem CV ứng viên
+  const handleViewCV = async (app) => {
+    setLoadingCV(true);
+    try {
+      const res = await renderCV(app.cvId); // API lấy CV theo cvId
+      setSelectedCV({
+        candidateName: app.candidateName,
+        cvUrl: res.data.cvUrl || null,
+        cvHtml: res.data.html || null,
+        cvData: res.data.data || null,
+      });
+      setIsCVModalOpen(true);
+    } catch (error) {
+      console.error("Lỗi lấy CV:", error);
+      setSelectedCV({ candidateName: app.candidateName, cvUrl: null });
+      setIsCVModalOpen(true);
+    } finally {
+      setLoadingCV(false);
+    }
+  };
+
+  const closeCVModal = () => {
+    setIsCVModalOpen(false);
+    setSelectedCV(null);
+  };
+
+  // ✅ Cập nhật trạng thái ứng viên
+  const handleStatusChange = async (applicationId, newStatus) => {
+    try {
+      await applicationAPI.updateStatus(applicationId, newStatus, token);
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId ? { ...app, status: newStatus } : app
+        )
+      );
+    } catch (error) {
+      console.error("Lỗi cập nhật trạng thái:", error);
+    }
+  };
+
+  // ✅ Mở modal chi tiết job
   const openViewModal = async (job) => {
     setViewJob(job);
     setIsViewModalOpen(true);
     setLoadingApplications(true);
-
     try {
-      const token = localStorage.getItem("token");
       const res = await applicationAPI.getByJobId(job.jobId, 0, 10, null, token);
-      console.log("Ứng viên:", res.data); // Kiểm tra dữ liệu trả về
-
-      // Nếu API trả về dạng phân trang
       const apps = res.data.content ? res.data.content : res.data;
       setApplications(Array.isArray(apps) ? apps : []);
     } catch (err) {
@@ -58,6 +102,13 @@ function ManageJobSection() {
       setLoadingApplications(false);
     }
   };
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setViewJob(null);
+    setApplications([]);
+  };
+
   
 const vietnamProvinces = [
   "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
@@ -193,11 +244,7 @@ const filteredLocations = locations.filter(loc =>
 
 
 
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-    setViewJob(null);
-    setApplications([]);
-  };
+  
 
   // ✅ Load danh sách Job
   const fetchJobs = async () => {
@@ -546,6 +593,7 @@ const filteredLocations = locations.filter(loc =>
                     <th>Ngày ứng tuyển</th>
                     <th>Trạng thái</th>
                     <th>Ghi chú</th>
+                    <th>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -554,8 +602,24 @@ const filteredLocations = locations.filter(loc =>
                       <td>{app.candidateName}</td>
                       <td>{app.email || "Không có email"}</td>
                       <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
-                      <td>{app.status}</td>
+                      
+<td>
+          <select
+            value={app.status}
+            onChange={(e) => handleStatusChange(app.id, e.target.value)}
+          >
+            <option value="PENDING">PENDING</option>
+            <option value="APPROVED">APPROVED</option>
+            <option value="REJECTED">REJECTED</option>
+          </select>
+        </td>
+
                       <td>{app.notes || "-"}</td>
+                      
+<td>
+  <button onClick={() => handleViewCV(app)}>Xem CV</button>
+</td>
+
                     </tr>
                   ))}
                 </tbody>
@@ -570,6 +634,28 @@ const filteredLocations = locations.filter(loc =>
           </div>
         </div>
       )}
+
+      
+
+ {isCVModalOpen && selectedCV && (
+        <div className="modal-overlay" onClick={closeCVModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
+            {loadingCV ? (
+              <p>Đang tải CV...</p>
+            ) : selectedCV.cvUrl ? (
+              <iframe src={selectedCV.cvUrl} width="100%" height="500px" title="CV"></iframe>
+            ) : selectedCV.cvHtml ? (
+              <div dangerouslySetInnerHTML={{ __html: selectedCV.cvHtml }} />
+            ) : (
+              <p>Không có CV được tải lên.</p>
+            )}
+            <button onClick={closeCVModal}>Đóng</button>
+          </div>
+        </div>
+      )}
+
+
 
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
