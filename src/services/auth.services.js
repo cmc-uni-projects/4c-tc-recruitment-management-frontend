@@ -136,21 +136,6 @@ export const employerAPI = {
   // 3. HR/ADMIN: Lấy thông tin Employer theo ID
   getEmployerById: (employerId) => api.get(`/employers/${employerId}`),
 
-  // 4. HR: Upload Giấy phép kinh doanh (GPKD) - FormData
-  uploadBusinessRegistration: (employerId, file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    return api.post(
-      `/employers/${employerId}/business-registration`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-  },
-
   // 5. HR: Gửi yêu cầu duyệt hồ sơ (sau khi đã upload GPKD)
   requestVerification: (employerId) =>
     api.post(`/employers/${employerId}/request-verification`),
