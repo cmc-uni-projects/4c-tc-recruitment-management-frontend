@@ -389,7 +389,7 @@ setForm((prev) => ({
       Swal.fire({ icon: "info", title: "Vui lòng chọn công ty" }); return;
     }
     localStorage.setItem("selectedCompany", JSON.stringify(selectedCompany));
-    localStorage.setItem("selectedCompanyId", selectedCompany.companyId);
+    localStorage.setItem("selected_company_id", selectedCompany.companyId); 
     navigate("/hr/profile"); // trang nhập thông tin cá nhân Employer
   };
 

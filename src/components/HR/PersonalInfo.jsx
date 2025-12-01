@@ -1,9 +1,42 @@
+
 // src/pages/hr/PersonalInfo.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./PersonalInfo.css";
 import axios from "axios";
+import { employerAPI } from "../../services/auth.services.js"; // 🔸 THÊM import
+
+
+// Utility: lấy companyId từ localStorage với fallback + chuẩn hoá UUID
+const getSelectedCompanyId = () => {
+  let raw = localStorage.getItem("selected_company_id");
+  if (!raw) raw = localStorage.getItem("selectedCompanyId");
+  if (!raw) raw = localStorage.getItem("companyId");
+  if (!raw) raw = localStorage.getItem("selectedCompany"); // có thể là JSON object
+
+  if (!raw) return null;
+
+  // Nếu lỡ lưu object JSON { companyId: "..." }
+  try {
+    const obj = JSON.parse(raw);
+    if (obj && obj.companyId) raw = obj.companyId;
+  } catch (_) {
+    // raw là chuỗi UUID rồi, giữ nguyên
+  }
+
+  const candidate = String(raw).trim();
+
+  // Nếu lỡ lưu dạng path "/companies/<uuid>/..."
+  const match = candidate.match(/\/companies\/([0-9a-fA-F-]{36})/);
+  const uuid = match ? match[1] : candidate;
+
+
+  const uuidRegex =
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+
+  return uuidRegex.test(uuid) ? uuid : null;
+}
 
 const PersonalInfo = () => {
   const navigate = useNavigate();
@@ -25,10 +58,12 @@ const PersonalInfo = () => {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-        // userId có thể lưu riêng hoặc nằm trong object 'user'
         const userObj = JSON.parse(localStorage.getItem("user") || "{}");
         const userId =
-          localStorage.getItem("userId") || userObj.userId || userObj.id || userObj._id;
+          localStorage.getItem("userId") ||
+          userObj.userId ||
+          userObj.id ||
+          userObj._id;
 
         if (!userId) {
           Swal.fire("Lỗi", "Không tìm thấy userId. Vui lòng đăng nhập lại.", "error");
@@ -37,11 +72,9 @@ const PersonalInfo = () => {
         }
 
         const res = await axios.get(`http://localhost:8080/users/${userId}`, {
-          // Nếu server không yêu cầu token, có thể bỏ headers này.
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
-        // Payload của bạn trả thẳng object user
         const u = res?.data || {};
         const fullName = u.fullName ?? "";
         const email = u.email ?? "";
@@ -55,9 +88,11 @@ const PersonalInfo = () => {
           phone,
         }));
 
-        // THÊM: Đọc employer từ localStorage nếu có
+        // Đọc employer từ localStorage nếu có
         const savedEmployer = JSON.parse(localStorage.getItem("employer") || "null");
         if (savedEmployer) {
+          // Nếu đã có employer, dọn temp để tránh ghi đè
+          localStorage.removeItem("employer_personal_temp");
           setFormData((prev) => ({
             ...prev,
             positionTitle: savedEmployer.positionTitle || "",
@@ -65,7 +100,7 @@ const PersonalInfo = () => {
             workEmail: savedEmployer.workEmail || "",
           }));
         } else {
-          // Nếu không có employer thì mới đọc temp (trường hợp đang làm dở)
+          // Nếu không có employer thì đọc temp (trường hợp đang làm dở)
           const temp = JSON.parse(localStorage.getItem("employer_personal_temp") || "{}");
           if (temp.positionTitle || temp.department || temp.workEmail) {
             setFormData((prev) => ({
@@ -77,13 +112,16 @@ const PersonalInfo = () => {
           }
         }
       } catch (err) {
-        const msg = err?.response?.data?.message || err?.message || "Không lấy được thông tin người dùng.";
+        const msg =
+          err?.response?.data?.message ||
+          err?.message ||
+          "Không lấy được thông tin người dùng.";
         Swal.fire("Lỗi", msg, "error");
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-    
+
     return () => {
       mounted = false;
     };
@@ -94,35 +132,103 @@ const PersonalInfo = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNext = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation chỉ cho 3 ô bắt buộc
+    // Validation cho 3 ô bắt buộc
     if (!formData.positionTitle.trim())
       return Swal.fire("Cảnh báo", "Vui lòng nhập chức danh", "warning");
     if (!formData.department.trim())
       return Swal.fire("Cảnh báo", "Vui lòng nhập phòng ban", "warning");
     if (!formData.workEmail.trim())
       return Swal.fire("Cảnh báo", "Vui lòng nhập email công việc", "warning");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.workEmail))
+      return Swal.fire("Cảnh báo", "Email công việc không hợp lệ.", "warning");
 
-    // Lưu tạm đúng 3 trường cho bước 2
-    const personalTemp = {
-      positionTitle: formData.positionTitle,
-      department: formData.department,
-      workEmail: formData.workEmail,
-    };
+    // Lấy companyId từ Bước 1 (đã chọn công ty)
+    const companyId = getSelectedCompanyId();
+    if (!companyId) {
+      return Swal.fire(
+        "Cảnh báo",
+        "Vui lòng chọn công ty ở Bước 1 trước khi gửi yêu cầu xác thực.",
+        "warning"
+      );
+    }
 
-    localStorage.setItem("employer_personal_temp", JSON.stringify(personalTemp));
+    // Lưu temp (phòng trường hợp call API lỗi)
+    localStorage.setItem(
+      "employer_personal_temp",
+      JSON.stringify({
+        positionTitle: formData.positionTitle,
+        department: formData.department,
+        workEmail: formData.workEmail,
+      })
+    );
 
-    Swal.fire("Thành công", "Đã lưu thông tin cá nhân tạm thời!", "success");
-    navigate("/hr/profile/company"); // Sang bước 2
+    try {
+      setLoading(true);
+      // 1) Tạo Employer
+      const payload = {
+        positionTitle: formData.positionTitle,
+        department: formData.department,
+        workEmail: formData.workEmail,
+        companyId, // bắt buộc
+      };
+      const createRes = await employerAPI.createEmployer(payload);
+      const created = createRes?.data;
+      const employerId = created?.employerId;
+      if (!employerId) {
+        throw new Error("Không nhận được employerId sau khi tạo.");
+      }
+
+      // 2) Gửi yêu cầu xác thực ngay
+      await employerAPI.requestVerification(employerId);
+
+      // Lưu employer vào localStorage (tuỳ chọn)
+      localStorage.setItem("employer", JSON.stringify(created));
+      localStorage.removeItem("employer_personal_temp");
+
+      Swal.fire("Thành công", "Đã tạo hồ sơ và gửi yêu cầu xác thực!", "success");
+      navigate("/hr"); // hoặc trang khác tuỳ bạn (ví dụ: /hr/profile/summary)
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Lỗi khi gửi yêu cầu xác thực.";
+      // Fallback: nếu đã có employer, gọi requestVerification cho hồ sơ hiện có
+      if (typeof msg === "string" && msg.includes("Bạn đã có hồ sơ Employer")) {
+        try {
+          const me = await employerAPI.getMyEmployer();
+          const exId = me?.data?.employerId;
+          if (exId) {
+            await employerAPI.requestVerification(exId);
+            Swal.fire(
+              "Thành công",
+              "Đã gửi yêu cầu xác thực cho hồ sơ hiện có!",
+              "success"
+            );
+            return navigate("/hr");
+          }
+        } catch (e2) {
+          const msg2 =
+            e2?.response?.data?.message ||
+            e2?.message ||
+            "Không thể gửi yêu cầu xác thực cho hồ sơ hiện có.";
+          Swal.fire("Lỗi", msg2, "error");
+        }
+      } else {
+        Swal.fire("Lỗi", msg, "error");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
     return (
       <div className="personal-info-container">
         <h2>Cập nhật thông tin cá nhân</h2>
-        <p className="step-hint">Bước 1/4 - Thông tin người đại diện</p>
+        <p className="step-hint">Bước 2 - Thông tin người đại diện</p>
         <div className="skeleton">Đang tải thông tin...</div>
       </div>
     );
@@ -131,9 +237,9 @@ const PersonalInfo = () => {
   return (
     <div className="personal-info-container">
       <h2>Cập nhật thông tin cá nhân</h2>
-      <p className="step-hint">Bước 1/4 - Thông tin người đại diện</p>
+      <p className="step-hint">Bước 2 - Thông tin người đại diện</p>
 
-      <form onSubmit={handleNext} className="personal-info-form">
+      <form onSubmit={handleSubmit} className="personal-info-form">
         {/* Email cá nhân (readonly) */}
         <div className="form-grid">
           <div className="email-display">
@@ -211,7 +317,7 @@ const PersonalInfo = () => {
             Hủy
           </button>
           <button type="submit" className="btn-save">
-            Tiếp theo
+            Gửi yêu cầu xác thực
           </button>
         </div>
       </form>
