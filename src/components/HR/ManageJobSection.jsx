@@ -606,11 +606,12 @@ const filteredLocations = locations.filter(loc =>
 <td>
           <select
             value={app.status}
-            onChange={(e) => handleStatusChange(app.id, e.target.value)}
+            onChange={(e) => handleStatusChange(app.applicationId, e.target.value)}
           >
-            <option value="PENDING">PENDING</option>
-            <option value="APPROVED">APPROVED</option>
-            <option value="REJECTED">REJECTED</option>
+            <option value="PENDING">Đang xử lý</option>
+            <option value="REVIEWED">NTD đã xem</option>
+            <option value="HIRED">Được chấp nhận</option>
+            <option value="REJECTED">Từ chối</option>
           </select>
         </td>
 

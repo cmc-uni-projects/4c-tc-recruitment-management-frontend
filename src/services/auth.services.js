@@ -254,9 +254,9 @@ export const applicationAPI = {
   // HR cập nhật trạng thái ứng tuyển
   updateStatus: (applicationId, status, token) =>
     api.put(`/api/applications/${applicationId}/status`, null, {
-      params: { status },
+      params: { status: status.toUpperCase() }, // ✅ Chuyển thành chữ hoa
       headers: { Authorization: `Bearer ${token}` },
-    }),
+  }),
 };
 
 export const fileAPI = {
