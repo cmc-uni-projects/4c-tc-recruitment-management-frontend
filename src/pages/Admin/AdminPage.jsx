@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState, useMemo } from "react";
 import AdminSection from "../../components/Admin/AdminSection";
 import { jobAPI, companyAPI, cvAPI } from "../../services/auth.services";
+import { message } from "antd";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,10 +15,34 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
-import { Card, Row, Col, Spin, Select, Statistic, Skeleton } from "antd";
-import { SolutionOutlined, BankOutlined, FileTextOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Select, Statistic, Skeleton } from "antd";
+import {
+  SolutionOutlined,
+  BankOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
+import "./AdminPage.css"; // CSS mới
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement
+);
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false, // QUAN TRỌNG: Cho phép full chiều cao
+  plugins: {
+    legend: { position: "bottom", labels: { padding: 20 } },
+  },
+  animation: { duration: 800 },
+};
 
 function AdminPage() {
   const [jobStats, setJobStats] = useState([]);
@@ -30,9 +54,9 @@ function AdminPage() {
   useEffect(() => {
     Promise.all([jobAPI.getAllJobs(), companyAPI.getAll(), cvAPI.getMyCVs()])
       .then(([jobsRes, companiesRes, cvsRes]) => {
-        setJobStats(jobsRes.data);
-        setCompanyStats(companiesRes.data);
-        setCvStats(cvsRes.data);
+        setJobStats(jobsRes.data || []);
+        setCompanyStats(companiesRes.data || []);
+        setCvStats(cvsRes.data || []);
       })
       .catch(() => message.error("Không thể tải dữ liệu!"))
       .finally(() => setLoading(false));
@@ -43,135 +67,212 @@ function AdminPage() {
   const totalCVs = cvStats.length;
 
   const jobStatusCount = useMemo(() => {
-    return jobStats.reduce((acc, job) => {
-      const key = job.status || (job.approved ? "APPROVED" : "PENDING");
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
+    const count = { APPROVED: 0, PENDING: 0, REJECTED: 0 };
+    jobStats.forEach((job) => {
+      const status = job.status || (job.approved ? "APPROVED" : "PENDING");
+      count[status] = (count[status] || 0) + 1;
+    });
+    return count;
   }, [jobStats]);
 
   const companyStatusCount = useMemo(() => {
-    return companyStats.reduce((acc, company) => {
-      const key = company.status || (company.approved ? "APPROVED" : "PENDING");
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
+    const count = { APPROVED: 0, PENDING: 0 };
+    companyStats.forEach((c) => {
+      count[c.approved === false ? "PENDING" : "APPROVED"]++;
+    });
+    return count;
   }, [companyStats]);
 
   const cvByMonth = useMemo(() => {
-    return cvStats.reduce((acc, cv) => {
+    const months = Array(12).fill(0);
+    const labels = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    cvStats.forEach((cv) => {
       const date = new Date(cv.createdAt);
-      if (date.getFullYear() === selectedYear) {
-        const month = date.toLocaleString("default", { month: "short" });
-        acc[month] = (acc[month] || 0) + 1;
-      }
-      return acc;
-    }, {});
+      if (date.getFullYear() === selectedYear) months[date.getMonth()]++;
+    });
+    return { labels, data: months };
   }, [cvStats, selectedYear]);
 
-  const years = [...new Set(cvStats.map(cv => new Date(cv.createdAt).getFullYear()))];
+  const years = [
+    ...new Set(cvStats.map((cv) => new Date(cv.createdAt).getFullYear())),
+  ].sort((a, b) => b - a);
 
   if (loading) {
     return (
       <AdminSection>
-        <Skeleton active paragraph={{ rows: 6 }} />
+        <div className="loading-wrapper">
+          <Skeleton active paragraph={{ rows: 10 }} />
+        </div>
       </AdminSection>
     );
   }
 
   return (
     <AdminSection>
-      <h1 style={{ marginBottom: "20px" }}>📊 Báo cáo thống kê</h1>
+      <div className="admin-dashboard">
+        <div className="dashboard-title">
+          <h1>Thống kê hệ thống</h1>
+          <p>Theo dõi toàn diện hoạt động tuyển dụng</p>
+        </div>
 
-      {/* Cards tổng quan */}
-      <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
-        <Col span={8}>
-          <Card hoverable>
-            <Statistic title="Tổng số Job" value={totalJobs} prefix={<SolutionOutlined />} valueStyle={{ color: "#1890ff" }} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card hoverable>
-            <Statistic title="Tổng số Công ty" value={totalCompanies} prefix={<BankOutlined />} valueStyle={{ color: "#52c41a" }} />
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card hoverable>
-            <Statistic title="Tổng số CV" value={totalCVs} prefix={<FileTextOutlined />} valueStyle={{ color: "#faad14" }} />
-          </Card>
-        </Col>
-      </Row>
+        {/* Stats Cards */}
+        <Row gutter={[24, 24]} className="stats-grid">
+          <Col xs={24} sm={12} lg={8}>
+            <div className="stat-card">
+              <SolutionOutlined className="stat-icon job" />
+              <Statistic
+                title="Tổng Job"
+                value={totalJobs}
+                valueStyle={{ color: "#007aff" }}
+              />
+            </div>
+          </Col>
+          <Col xs={24} sm={12} lg={8}>
+            <div className="stat-card">
+              <BankOutlined className="stat-icon company" />
+              <Statistic
+                title="Công ty"
+                value={totalCompanies}
+                valueStyle={{ color: "#34c759" }}
+              />
+            </div>
+          </Col>
+          <Col xs={24} sm={12} lg={8}>
+            <div className="stat-card">
+              <FileTextOutlined className="stat-icon cv" />
+              <Statistic
+                title="CV ứng tuyển"
+                value={totalCVs}
+                valueStyle={{ color: "#ff9f0a" }}
+              />
+            </div>
+          </Col>
+        </Row>
 
-      {/* Bộ lọc năm */}
-      <Row style={{ marginBottom: "20px" }}>
-        <Col span={24}>
-          <Select value={selectedYear} onChange={setSelectedYear} style={{ width: 200 }}>
-            {years.map(year => (
-              <Select.Option key={year} value={year}>
-                Năm {year}
-              </Select.Option>
-            ))}
-          </Select>
-        </Col>
-      </Row>
+        {/* Year Filter */}
+        {years.length > 0 && (
+          <div className="year-filter">
+            <Select
+              value={selectedYear}
+              onChange={setSelectedYear}
+              size="large"
+              className="select-year"
+            >
+              {years.map((year) => (
+                <Select.Option key={year} value={year}>
+                  Năm {year}
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        )}
 
-      {/* Biểu đồ */}
-      <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <Card title="Thống kê Job theo trạng thái" bordered={false} hoverable>
-            <Bar
-              data={{
-                labels: Object.keys(jobStatusCount),
-                datasets: [
-                  {
-                    label: "Số lượng Job",
-                    data: Object.values(jobStatusCount),
-                    backgroundColor: ["#1890ff", "#52c41a", "#faad14"],
-                  },
-                ],
-              }}
-              options={{ responsive: true, plugins: { legend: { position: "bottom" } } }}
-            />
-          </Card>
-        </Col>
+        {/* Charts */}
+        <Row gutter={[24, 24]}>
+          {/* Job Status */}
+          <Col xs={24} lg={12}>
+            <Card title="Trạng thái Job" className="chart-card">
+              <div className="chart-container">
+                <Bar
+                  data={{
+                    labels: ["Đã duyệt", "Chờ duyệt", "Bị từ chối"],
+                    datasets: [
+                      {
+                        label: "Số lượng",
+                        data: [
+                          jobStatusCount.APPROVED,
+                          jobStatusCount.PENDING,
+                          jobStatusCount.REJECTED || 0,
+                        ],
+                        backgroundColor: ["#007aff", "#ff9f0a", "#ff3b30"],
+                        borderRadius: 12,
+                        borderSkipped: false,
+                      },
+                    ],
+                  }}
+                  options={chartOptions}
+                />
+              </div>
+            </Card>
+          </Col>
 
-        <Col span={12}>
-          <Card title="Tỷ lệ công ty duyệt vs chưa duyệt" bordered={false} hoverable>
-            <Pie
-              data={{
-                labels: Object.keys(companyStatusCount),
-                datasets: [
-                  {
-                    data: Object.values(companyStatusCount),
-                    backgroundColor: ["#36A2EB", "#FF6384", "#FFCE56"],
-                  },
-                ],
-              }}
-              options={{ responsive: true, plugins: { legend: { position: "bottom" } } }}
-            />
-          </Card>
-        </Col>
+          {/* Company Approval */}
+          <Col xs={24} lg={12}>
+            <Card title="Tỷ lệ duyệt công ty" className="chart-card">
+              <div className="chart-container">
+                <Pie
+                  data={{
+                    labels: ["Đã duyệt", "Chờ duyệt"],
+                    datasets: [
+                      {
+                        data: [
+                          companyStatusCount.APPROVED,
+                          companyStatusCount.PENDING,
+                        ],
+                        backgroundColor: ["#007aff", "#ff2d55"],
+                        borderColor: "#fff",
+                        borderWidth: 4,
+                      },
+                    ],
+                  }}
+                  options={chartOptions}
+                />
+              </div>
+            </Card>
+          </Col>
 
-        <Col span={24}>
-          <Card title={`Số lượng CV theo tháng (${selectedYear})`} bordered={false} hoverable>
-            <Line
-              data={{
-                labels: Object.keys(cvByMonth),
-                datasets: [
-                  {
-                    label: "CV được tạo",
-                    data: Object.values(cvByMonth),
-                    borderColor: "#4BC0C0",
-                    backgroundColor: "rgba(75,192,192,0.2)",
-                    fill: true,
-                  },
-                ],
-              }}
-              options={{ responsive: true, plugins: { legend: { position: "bottom" } } }}
-            />
-          </Card>
-        </Col>
-      </Row>
+          {/* CV Trend */}
+          <Col span={24}>
+            <Card
+              title={`Xu hướng nộp CV năm ${selectedYear}`}
+              className="chart-card full-width"
+            >
+              <div className="chart-container line-chart">
+                <Line
+                  data={{
+                    labels: cvByMonth.labels,
+                    datasets: [
+                      {
+                        label: "Số CV",
+                        data: cvByMonth.data,
+                        borderColor: "#5856d6",
+                        backgroundColor: "rgba(88, 86, 214, 0.1)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: "#5856d6",
+                      },
+                    ],
+                  }}
+                  options={{
+                    ...chartOptions,
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        grid: { color: "rgba(0,0,0,0.05)" },
+                      },
+                      x: { grid: { display: false } },
+                    },
+                  }}
+                />
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </AdminSection>
   );
 }
