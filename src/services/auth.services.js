@@ -93,19 +93,12 @@ export const companyAPI = {
   // NEW: Featured toggle (chỉ cho ACTIVE + APPROVE)
   setFeatured: (id, featured) => api.patch(`/companies/${id}/featured?featured=${featured}`),
   
-// ===== NEW: HR upload GPKD cho company đã có ID =====
-  // Backend: @PreAuthorize("hasRole('HR')"), consumes multipart/form-data
-  uploadBRForCompany: (companyId, file) => {
-    const token = localStorage.getItem("token");
-    const fd = new FormData();
-    fd.append("file", file);
-    return api.post(`/companies/${companyId}/business-registration`, fd, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // KHÔNG set Content-Type thủ công cho FormData (browser tự thêm boundary)
-      },
-    });
-  },
+// HR: yêu cầu duyệt công ty
+  requestVerification: (companyId) => api.post(`/companies/${companyId}/request-verification`),
+
+  // ✅ NEW: HR cập nhật công ty theo luồng riêng (nếu cần enforce GPKD khi chưa có)
+  updateForHR: (id, data) => api.put(`/companies/hr/${id}`, data),
+  
 
   // ===== NEW: HR “Yêu cầu duyệt” cho company =====
   requestVerification: (companyId) => {
@@ -114,7 +107,6 @@ export const companyAPI = {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
-
 };
 
 export const employerAPI = {

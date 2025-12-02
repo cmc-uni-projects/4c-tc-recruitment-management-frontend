@@ -15,6 +15,8 @@ import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { employerAPI } from "../../services/auth.services";
+import NotificationsPageHR from "../../pages/Notification/NotificationsPageHR.jsx"; // <-- mới
+
 
 const HRSection = ({ children }) => {
   const [showLogout, setShowLogout] = useState(false);
@@ -24,8 +26,12 @@ const HRSection = ({ children }) => {
   const [showPendingPopup, setShowPendingPopup] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-
   const userId = localStorage.getItem("userId");
+  const [showNotifications, setShowNotifications] = useState(false); // mở page dưới header
+  const [unreadCount, setUnreadCount] = useState(0);
+const LS_NOTI_KEY = "hr_notifications";
+
+
 
   // MỚI: State cho popup xác thực
   const [showVerifyBlocker, setShowVerifyBlocker] = useState(false);
@@ -35,6 +41,37 @@ const HRSection = ({ children }) => {
     localStorage.clear();
     navigate("/");
   };
+
+  
+// Thay thế hàm fetchUnreadCount:
+const fetchUnreadCount = async () => {
+  try {
+    const raw = localStorage.getItem(LS_NOTI_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    const unread = arr.filter(n => !n.read).length;
+    setUnreadCount(unread);
+  } catch {
+    setUnreadCount(0);
+  }
+};
+
+
+  
+// Polling giữ nguyên
+useEffect(() => {
+  fetchUnreadCount();
+  const interval = setInterval(fetchUnreadCount, 10000);
+  return () => clearInterval(interval);
+}, []);
+
+
+  // 4) click chuông => mở page thông báo và giữ URL /hr
+  const handleBellClick = (e) => {
+    e.preventDefault();
+    setShowNotifications(true);
+    navigate("/hr", { replace: true });
+  };
+
 
   useEffect(() => {
     if (!token || !userId) {
@@ -56,33 +93,46 @@ const HRSection = ({ children }) => {
         setUser(userRes.data);
 
         // 2. Lấy thông tin Employer để kiểm tra verified
-        try {
-          const employerRes = await employerAPI.getMyEmployer();
-          const employerData = employerRes.data;
+        
+try {
+        const employerRes = await employerAPI.getMyEmployer();
+        const employerData = employerRes.data;
 
-          setEmployer(employerData);
-
-          // THÊM 2 DÒNG NÀY - QUAN TRỌNG NHẤT
-          localStorage.setItem("employer", JSON.stringify(employerData));
-          localStorage.setItem(
-            "selectedCompany",
-            JSON.stringify(employerData.company)
-          );
-        } catch (err) {
-          if (err.response?.status === 404) {
-            setEmployer(null); // Chưa tạo hồ sơ Employer
-          }
-        }
+        setEmployer(employerData);
+        localStorage.setItem("employer", JSON.stringify(employerData));
+        localStorage.setItem("selectedCompany", JSON.stringify(employerData.company));
       } catch (err) {
-        console.error("Lỗi tải dữ liệu HR:", err);
-      } finally {
-        setLoading(false);
+        const code = err?.response?.status;
+
+        if (code === 404) {
+          setEmployer(null);
+        } else if (code === 403) {
+          const selectedCompanyRaw = localStorage.getItem("selectedCompany");
+          if (!selectedCompanyRaw) {
+            const employerRaw = localStorage.getItem("employer");
+            if (employerRaw) {
+              try {
+                const empObj = JSON.parse(employerRaw);
+                if (empObj?.company) {
+                  localStorage.setItem("selectedCompany", JSON.stringify(empObj.company));
+                }
+              } catch {}
+            }
+          }
+        } else {
+          console.warn("[HRSection] getMyEmployer error:", err);
+        }
       }
-    };
+    } catch (err) {
+      console.warn("[HRSection] Tải dữ liệu HR gặp lỗi, UI vẫn tiếp tục.", err?.response?.status);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [token, userId]);
-
+  fetchData();
+},
+[token, userId]);
   // Hàm kiểm tra xác thực - dùng cho sidebar
   const requireVerification = (e) => {
     if (employer?.verified) return true;
@@ -131,7 +181,28 @@ const HRSection = ({ children }) => {
 
         <div className="header-right">
           <div className="header-icons">
-            <img src={Bell} alt="Thông báo" className="icon-img" />
+
+            <div className="icon-wrap" onClick={handleBellClick} style={{ position: "relative", cursor: "pointer" }}>
+              <img src={Bell} alt="Thông báo" className="icon-img" />
+              {unreadCount > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -4,
+                    right: -4,
+                    background: "#ff3b30",
+                    color: "#fff",
+                    borderRadius: 999,
+                    fontSize: 12,
+                    padding: "2px 6px",
+                    border: "2px solid #0b0b0c"
+                  }}
+                >
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+
             <img src={Setting} alt="Cài đặt" className="icon-img" />
           </div>
 
@@ -291,77 +362,83 @@ const HRSection = ({ children }) => {
 
         {/* Main Content */}
         <main className="hr-content">
-          {children ? (
-            <div className="hr-page-body">{children}</div>
+
+          {showNotifications ? (
+            <NotificationsPageHR />
           ) : (
-            <>
-              {/* Greeting Card */}
-              <div className="card greeting-card">
-  <h2>
-    Xin chào
-    {loading ? (
-      "..."
-    ) : user?.fullName ? (
-      <>
-        {" "}{user.fullName}
-        <span style={{ fontWeight: 400, opacity: 0.9 }}>!</span>
-      </>
-    ) : (
-      "!"
-    )}
-  </h2>
-  <p>
-    Hãy thực hiện các bước xác thực bảo mật để đảm bảo an toàn tài
-    khoản của bạn và nhận ngay{" "}
-    <span className="highlight">+8 Top Points</span>
-  </p>
-  <div className="action-buttons">
-    <button>Xác thực số điện thoại</button>
-    <button>Cập nhật thông tin công ty</button>
-    <button>Đăng tin tuyển dụng</button>
-  </div>
-</div>
+            children ? (
+              <div className="hr-page-body">{children}</div>
+            ) : (
 
-              {/* Explore TopCV */}
-              <div className="card explore-card">
-                <h3>Khám phá TopCV dành cho nhà tuyển dụng</h3>
-                <div className="explore-options">
-                  <div className="explore-item">
-                    <img src={exploreJob} alt="Đăng tin" />
-                    <p>Đăng tin tuyển dụng</p>
-                    <button>Thử ngay</button>
-                  </div>
-                  <div className="explore-item">
-                    <img src={exploreCV} alt="Tìm CV" />
-                    <p>Tìm kiếm CV</p>
-                    <button>Thử ngay</button>
-                  </div>
-                  <div className="explore-item">
-                    <img src={exploreService} alt="Mua dịch vụ" />
-                    <p>Mua dịch vụ</p>
-                    <button>Thử ngay</button>
+              <>
+                {/* Greeting Card */}
+                <div className="card greeting-card">
+                  <h2>
+                    Xin chào
+                    {loading ? (
+                      "..."
+                    ) : user?.fullName ? (
+                      <>
+                        {" "}{user.fullName}
+                        <span style={{ fontWeight: 400, opacity: 0.9 }}>!</span>
+                      </>
+                    ) : (
+                      "!"
+                    )}
+                  </h2>
+                  <p>
+                    Hãy thực hiện các bước xác thực bảo mật để đảm bảo an toàn tài
+                    khoản của bạn và nhận ngay{" "}
+                    <span className="highlight">+8 Top Points</span>
+                  </p>
+                  <div className="action-buttons">
+                    <button>Xác thực số điện thoại</button>
+                    <button>Cập nhật thông tin công ty</button>
+                    <button>Đăng tin tuyển dụng</button>
                   </div>
                 </div>
-              </div>
 
-              {/* CV Suggestion */}
-              <div className="card cv-card">
-                <h3>CV đề xuất</h3>
-                <div className="cv-content">
-                  <img src={cvIcon} alt="CV Icon" />
-                  <div className="cv-info">
-                    <p>
-                      Kích hoạt CV đề xuất bởi TopCV AI để được:
-                      <br />✔ Gợi ý ứng viên tiềm năng
-                      <br />✔ Lọc danh sách ứng viên phù hợp
-                      <br />✔ Tự động đề xuất ứng viên theo mô tả
-                    </p>
-                    <button className="buy-btn">Mua ngay</button>
+                {/* Explore TopCV */}
+                <div className="card explore-card">
+                  <h3>Khám phá TopCV dành cho nhà tuyển dụng</h3>
+                  <div className="explore-options">
+                    <div className="explore-item">
+                      <img src={exploreJob} alt="Đăng tin" />
+                      <p>Đăng tin tuyển dụng</p>
+                      <button>Thử ngay</button>
+                    </div>
+                    <div className="explore-item">
+                      <img src={exploreCV} alt="Tìm CV" />
+                      <p>Tìm kiếm CV</p>
+                      <button>Thử ngay</button>
+                    </div>
+                    <div className="explore-item">
+                      <img src={exploreService} alt="Mua dịch vụ" />
+                      <p>Mua dịch vụ</p>
+                      <button>Thử ngay</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
+
+                {/* CV Suggestion */}
+                <div className="card cv-card">
+                  <h3>CV đề xuất</h3>
+                  <div className="cv-content">
+                    <img src={cvIcon} alt="CV Icon" />
+                    <div className="cv-info">
+                      <p>
+                        Kích hoạt CV đề xuất bởi TopCV AI để được:
+                        <br />✔ Gợi ý ứng viên tiềm năng
+                        <br />✔ Lọc danh sách ứng viên phù hợp
+                        <br />✔ Tự động đề xuất ứng viên theo mô tả
+                      </p>
+                      <button className="buy-btn">Mua ngay</button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )
+            )}
         </main>
       </div>
 
@@ -409,7 +486,7 @@ const HRSection = ({ children }) => {
                     className="btn-primary"
                     onClick={() => {
                       setShowVerifyBlocker(false);
-                      navigate("/hr/profile");
+                      navigate("/hr/profile/company");
                     }}
                   >
                     Tạo hồ sơ ngay
