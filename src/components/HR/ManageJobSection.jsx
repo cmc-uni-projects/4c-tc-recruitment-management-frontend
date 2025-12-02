@@ -8,6 +8,7 @@ import {
   employerAPI,
   renderCV,
 } from "../../services/auth.services";
+import { replaceTemplate } from "../../untils/replaceTemplate";
 
 function ManageJobSection() {
   const [dropdownLoading, setDropdownLoading] = useState(false);
@@ -37,9 +38,9 @@ function ManageJobSection() {
     companyId: "",
     categoryId: "",
   });
-  
 
-// Modal CV
+
+  // Modal CV
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
   const [selectedCV, setSelectedCV] = useState(null);
   const [loadingCV, setLoadingCV] = useState(false);
@@ -51,13 +52,17 @@ function ManageJobSection() {
     setLoadingCV(true);
     try {
       const res = await renderCV(app.cvId); // API lấy CV theo cvId
+      const { data } = res;
+      const { htmlLayout, cvUrl } = data;
+      const cvHtml = replaceTemplate(htmlLayout, data.data);
       setSelectedCV({
         candidateName: app.candidateName,
-        cvUrl: res.data.cvUrl || null,
-        cvHtml: res.data.html || null,
-        cvData: res.data.data || null,
+        cvUrl: cvUrl || null,
+        cvHtml: cvHtml || null,
+        cvData: data.data || null,
       });
       setIsCVModalOpen(true);
+
     } catch (error) {
       console.error("Lỗi lấy CV:", error);
       setSelectedCV({ candidateName: app.candidateName, cvUrl: null });
@@ -67,6 +72,7 @@ function ManageJobSection() {
     }
   };
 
+
   const closeCVModal = () => {
     setIsCVModalOpen(false);
     setSelectedCV(null);
@@ -75,12 +81,10 @@ function ManageJobSection() {
   // ✅ Cập nhật trạng thái ứng viên
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
+      console.log("Cập nhật trạng thái ứng tuyển:", applications);
       await applicationAPI.updateStatus(applicationId, newStatus, token);
-      setApplications((prev) =>
-        prev.map((app) =>
-          app.id === applicationId ? { ...app, status: newStatus } : app
-        )
-      );
+      const updatedApplications = applications.map((app) => applicationId == app.applicationId ? { ...app, status: newStatus } : app);
+      setApplications(updatedApplications);
     } catch (error) {
       console.error("Lỗi cập nhật trạng thái:", error);
     }
@@ -109,142 +113,142 @@ function ManageJobSection() {
     setApplications([]);
   };
 
-  
-const vietnamProvinces = [
-  "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
-  "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bắc Ninh",
-  "Bến Tre", "Bình Dương", "Bình Định", "Bình Phước", "Bình Thuận",
-  "Cà Mau", "Cao Bằng", "Đắk Lắk", "Đắk Nông", "Điện Biên",
-  "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam",
-  "Hà Tĩnh", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa",
-  "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn",
-  "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
-  "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
-  "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
-  "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
-  "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
-];
+
+  const vietnamProvinces = [
+    "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
+    "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bắc Ninh",
+    "Bến Tre", "Bình Dương", "Bình Định", "Bình Phước", "Bình Thuận",
+    "Cà Mau", "Cao Bằng", "Đắk Lắk", "Đắk Nông", "Điện Biên",
+    "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam",
+    "Hà Tĩnh", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa",
+    "Kiên Giang", "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn",
+    "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
+    "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
+    "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
+    "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
+    "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+  ];
 
 
-function CitySelect({
-  value,
-  onChange,
-  options,          // string[]
-  placeholder = "Tìm kiếm tỉnh/thành...",
-  label = "Địa điểm",
-  required = true,
-  error
-}) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useState(0);
+  function CitySelect({
+    value,
+    onChange,
+    options,          // string[]
+    placeholder = "Tìm kiếm tỉnh/thành...",
+    label = "Địa điểm",
+    required = true,
+    error
+  }) {
+    const [query, setQuery] = useState("");
+    const [open, setOpen] = useState(false);
+    const [highlightIndex, setHighlightIndex] = useState(0);
 
-  const filtered = options.filter(item =>
-    item.toLowerCase().includes(query.toLowerCase())
-  );
+    const filtered = options.filter(item =>
+      item.toLowerCase().includes(query.toLowerCase())
+    );
 
-  const selectValue = (val) => {
-    onChange(val);
-    setQuery(val);
-    setOpen(false);
-  };
-
-  const onInputFocus = () => {
-    setOpen(true);
-    setHighlightIndex(0);
-  };
-
-  const onKeyDown = (e) => {
-    if (!open) return;
-    if (e.key === "ArrowDown") {
-      setHighlightIndex((prev) => (prev + 1) % filtered.length);
-    } else if (e.key === "ArrowUp") {
-      setHighlightIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (filtered[highlightIndex]) selectValue(filtered[highlightIndex]);
-    } else if (e.key === "Escape") {
+    const selectValue = (val) => {
+      onChange(val);
+      setQuery(val);
       setOpen(false);
-    }
-  };
+    };
 
-  return (
-    <div className="form-group full-width">
-      <label>{label}</label>
-      <input
-        type="text"
-        className={`combobox-input ${error ? "input-error" : ""}`}
-        placeholder={placeholder}
-        value={open ? query : (value || "")}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={onInputFocus}
-        onClick={() => setOpen(true)}
-        onKeyDown={onKeyDown}
-        required={required && !value}
-        aria-invalid={!!error}
-        aria-describedby={error ? "city-error" : undefined}
-      />
-      {open && (
-        <div className="combobox-list">
-          {filtered.length === 0 ? (
-            <div className="combobox-item combobox-empty">Không có kết quả</div>
-          ) : (
-            filtered.map((item, idx) => (
-              <div
-                key={item}
-                className={
-                  "combobox-item" +
-                  (idx === highlightIndex ? " combobox-item--active" : "")
-                }
-                onMouseEnter={() => setHighlightIndex(idx)}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  selectValue(item);
-                }}
-              >
-                {item}
-              </div>
-            ))
-          )}
-        </div>
-      )}
-      {error && <p id="city-error" className="error-text">{error}</p>}
-    </div>
+    const onInputFocus = () => {
+      setOpen(true);
+      setHighlightIndex(0);
+    };
+
+    const onKeyDown = (e) => {
+      if (!open) return;
+      if (e.key === "ArrowDown") {
+        setHighlightIndex((prev) => (prev + 1) % filtered.length);
+      } else if (e.key === "ArrowUp") {
+        setHighlightIndex((prev) => (prev - 1 + filtered.length) % filtered.length);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filtered[highlightIndex]) selectValue(filtered[highlightIndex]);
+      } else if (e.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    return (
+      <div className="form-group full-width">
+        <label>{label}</label>
+        <input
+          type="text"
+          className={`combobox-input ${error ? "input-error" : ""}`}
+          placeholder={placeholder}
+          value={open ? query : (value || "")}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={onInputFocus}
+          onClick={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+          required={required && !value}
+          aria-invalid={!!error}
+          aria-describedby={error ? "city-error" : undefined}
+        />
+        {open && (
+          <div className="combobox-list">
+            {filtered.length === 0 ? (
+              <div className="combobox-item combobox-empty">Không có kết quả</div>
+            ) : (
+              filtered.map((item, idx) => (
+                <div
+                  key={item}
+                  className={
+                    "combobox-item" +
+                    (idx === highlightIndex ? " combobox-item--active" : "")
+                  }
+                  onMouseEnter={() => setHighlightIndex(idx)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectValue(item);
+                  }}
+                >
+                  {item}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+        {error && <p id="city-error" className="error-text">{error}</p>}
+      </div>
+    );
+  }
+
+  // Thêm vào đầu component
+  const [locations, setLocations] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
+
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const res = await jobAPI.getApprovedJobs();
+        const jobs = res.data;
+        const dynamicLocations = jobs.map(job => job.location).filter(Boolean);
+        const uniqueLocations = [...new Set([...vietnamProvinces, ...dynamicLocations])];
+        setLocations(uniqueLocations);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách địa điểm:", error);
+        setLocations(vietnamProvinces); // fallback nếu API lỗi
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  // Lọc danh sách theo searchTerm
+  const filteredLocations = locations.filter(loc =>
+    loc.toLowerCase().includes(searchTerm.toLowerCase())
   );
-}
-
-// Thêm vào đầu component
-const [locations, setLocations] = useState([]);
-const [searchTerm, setSearchTerm] = useState("");
-
-// Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
-
-
-useEffect(() => {
-  const fetchLocations = async () => {
-    try {
-      const res = await jobAPI.getApprovedJobs();
-      const jobs = res.data;
-      const dynamicLocations = jobs.map(job => job.location).filter(Boolean);
-      const uniqueLocations = [...new Set([...vietnamProvinces, ...dynamicLocations])];
-      setLocations(uniqueLocations);
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách địa điểm:", error);
-      setLocations(vietnamProvinces); // fallback nếu API lỗi
-    }
-  };
-  fetchLocations();
-}, []);
-
-// Lọc danh sách theo searchTerm
-const filteredLocations = locations.filter(loc =>
-  loc.toLowerCase().includes(searchTerm.toLowerCase())
-);
 
 
 
 
-  
+
 
   // ✅ Load danh sách Job
   const fetchJobs = async () => {
@@ -508,7 +512,7 @@ const filteredLocations = locations.filter(loc =>
                       {job.salaryMax?.toLocaleString()} đ
                     </td>
                     <td>{job.experienceRequired || 0} năm</td>
-                   
+
                     <td className="actions">
                       <button
                         className="job-view-btn"
@@ -598,28 +602,29 @@ const filteredLocations = locations.filter(loc =>
                 </thead>
                 <tbody>
                   {applications.map((app) => (
-                    <tr key={app.id}>
+                    <tr key={app.id || app.cvId}>
                       <td>{app.candidateName}</td>
                       <td>{app.email || "Không có email"}</td>
                       <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
+
+                      <td>
+                        <select
+                          value={app.status}
+                          onChange={(e) => handleStatusChange(app.applicationId, e.target.value)}
+                        >
+                          <option value="PENDING">Đang xử lý</option>
+                          <option value="REVIEWED">NTD đã xem</option>
+                          <option value="HIRED">Được chấp nhận</option>
+                          <option value="REJECTED">Từ chối</option>
+                        </select>
+                      </td>
                       
-<td>
-          <select
-            value={app.status}
-            onChange={(e) => handleStatusChange(app.applicationId, e.target.value)}
-          >
-            <option value="PENDING">Đang xử lý</option>
-            <option value="REVIEWED">NTD đã xem</option>
-            <option value="HIRED">Được chấp nhận</option>
-            <option value="REJECTED">Từ chối</option>
-          </select>
-        </td>
 
                       <td>{app.notes || "-"}</td>
-                      
-<td>
-  <button onClick={() => handleViewCV(app)}>Xem CV</button>
-</td>
+
+                      <td>
+                        <button onClick={() => handleViewCV(app)}>Xem CV</button>
+                      </td>
 
                     </tr>
                   ))}
@@ -636,12 +641,13 @@ const filteredLocations = locations.filter(loc =>
         </div>
       )}
 
-      
 
- {isCVModalOpen && selectedCV && (
+
+      {isCVModalOpen && selectedCV && (
         <div className="modal-overlay" onClick={closeCVModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
+            {/* <div dangerouslySetInnerHTML={{ __html: selectedCV.cvHtml }} /> */}
             {loadingCV ? (
               <p>Đang tải CV...</p>
             ) : selectedCV.cvUrl ? (
@@ -697,19 +703,19 @@ const filteredLocations = locations.filter(loc =>
                 />
               </div>
 
-              
 
 
 
-<CitySelect
-  value={form.location}
-  onChange={(val) => setForm({ ...form, location: val })}
-  options={locations}
-  placeholder="Tìm kiếm tỉnh/thành..."
-  label="Địa điểm"
-  required
-  error={errors.location}
-/>
+
+              <CitySelect
+                value={form.location}
+                onChange={(val) => setForm({ ...form, location: val })}
+                options={locations}
+                placeholder="Tìm kiếm tỉnh/thành..."
+                label="Địa điểm"
+                required
+                error={errors.location}
+              />
 
 
 

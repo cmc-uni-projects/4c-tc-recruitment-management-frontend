@@ -184,7 +184,14 @@ export const cvAPI = {
     }),
 
   // Xem trước CV (render HTML + data)
-  renderCV: (cvId) => api.get(`/api/cv/render/${cvId}`),
+renderCV: (cvId) => {
+  const token = localStorage.getItem("accessToken"); // hoặc lấy từ Redux/context
+  return api.get(`/api/cv/render/${cvId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+},
 
   // Xóa CV
   delete: (cvId) => api.delete(`/api/cv/${cvId}`),
