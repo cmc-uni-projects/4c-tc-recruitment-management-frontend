@@ -297,18 +297,30 @@ const HRSection = ({ children }) => {
             <>
               {/* Greeting Card */}
               <div className="card greeting-card">
-                <h2>Xin chào, Phạm Khánh Linh</h2>
-                <p>
-                  Hãy thực hiện các bước xác thực bảo mật để đảm bảo an toàn tài
-                  khoản của bạn và nhận ngay{" "}
-                  <span className="highlight">+8 Top Points</span>
-                </p>
-                <div className="action-buttons">
-                  <button>Xác thực số điện thoại</button>
-                  <button>Cập nhật thông tin công ty</button>
-                  <button>Đăng tin tuyển dụng</button>
-                </div>
-              </div>
+  <h2>
+    Xin chào
+    {loading ? (
+      "..."
+    ) : user?.fullName ? (
+      <>
+        {" "}{user.fullName}
+        <span style={{ fontWeight: 400, opacity: 0.9 }}>!</span>
+      </>
+    ) : (
+      "!"
+    )}
+  </h2>
+  <p>
+    Hãy thực hiện các bước xác thực bảo mật để đảm bảo an toàn tài
+    khoản của bạn và nhận ngay{" "}
+    <span className="highlight">+8 Top Points</span>
+  </p>
+  <div className="action-buttons">
+    <button>Xác thực số điện thoại</button>
+    <button>Cập nhật thông tin công ty</button>
+    <button>Đăng tin tuyển dụng</button>
+  </div>
+</div>
 
               {/* Explore TopCV */}
               <div className="card explore-card">
