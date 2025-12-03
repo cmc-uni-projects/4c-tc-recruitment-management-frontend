@@ -113,7 +113,9 @@ const HRSection = ({ children }) => {
                       JSON.stringify(empObj.company)
                     );
                   }
-                } catch {}
+                } catch (error) {
+                  console.warn("Lỗi parse employer từ localStorage:", error);
+                }
               }
             }
           } else {
@@ -132,34 +134,31 @@ const HRSection = ({ children }) => {
 
     fetchData();
   }, [token, userId]);
-  // Hàm kiểm tra xác thực - dùng cho sidebar
   const requireVerification = (e) => {
-    if (employer?.verified) return true;
+  if (employer?.verified) return true;
 
-    if (!employer) {
-      e.preventDefault();
-      setBlockerStatus("NOT_CREATED");
-      setShowVerifyBlocker(true);
-      return false;
-    }
+  e.preventDefault(); // luôn chặn trước
 
-    if (employer.verificationStatus === "PENDING") {
-      e.preventDefault();
-      setBlockerStatus("PENDING");
-      setShowVerifyBlocker(true);
-      return false;
-    }
+  if (!employer) {
+    setBlockerStatus("NOT_CREATED");
+    setShowVerifyBlocker(true);
+    return false;
+  }
 
-    if (!employer.verified && employer.verificationStatus !== "APPROVED") {
-      e.preventDefault();
-      setBlockerStatus("NOT_VERIFIED");
-      setShowVerifyBlocker(true);
-      return false;
-    }
+  if (employer.verificationStatus === "PENDING") {
+    setBlockerStatus("PENDING");
+    setShowVerifyBlocker(true);
+    return false;
+  }
 
-    return true;
-  };
+  if (!employer.verified && employer.verificationStatus !== "APPROVED") {
+    setBlockerStatus("NOT_VERIFIED");
+    setShowVerifyBlocker(true);
+    return false;
+  }
 
+  return true;
+};
   return (
     <div className="hr-page">
       {/* Header */}
@@ -318,7 +317,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/companies"
                 className={({ isActive }) => (isActive ? "active" : "")}
-                onClick={(e) => requireVerification(e, "/hr/companies")}
+                onClick={requireVerification}
               >
                 Quản Lý Công Ty
               </NavLink>
@@ -327,7 +326,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/jobs"
                 className={({ isActive }) => (isActive ? "active" : "")}
-                onClick={(e) => requireVerification(e, "/hr/jobs")}
+                onClick={requireVerification}
               >
                 Quản Lý Tin Tuyển Dụng
               </NavLink>
@@ -335,17 +334,9 @@ const HRSection = ({ children }) => {
 
             <li>
               <NavLink
-                to="/hr/ai"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                🤖 TopCV AI (Đánh giá CV)
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
                 to="/hr/statistics"
                 className={({ isActive }) => (isActive ? "active" : "")}
-                onClick={(e) => requireVerification(e, "/hr/statistics")}
+                onClick={requireVerification}
               >
                 Thống Kê Tuyển dụng
               </NavLink>
@@ -354,7 +345,7 @@ const HRSection = ({ children }) => {
               <NavLink
                 to="/hr/activities"
                 className={({ isActive }) => (isActive ? "active" : "")}
-                onClick={(e) => requireVerification(e, "/hr/activities")}
+                onClick={requireVerification}
               >
                 Hoạt Động
               </NavLink>

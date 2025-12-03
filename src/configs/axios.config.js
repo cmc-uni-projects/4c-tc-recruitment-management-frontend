@@ -10,26 +10,50 @@ const api = axios.create({
   },
 });
 
-// 🧠 Interceptor: tự động thêm token nếu có
+// INTERCEPTOR DUY NHẤT – SIÊU SẠCH – SIÊU ỔN ĐỊNH
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    // ⚠️ Không thêm token cho các API public
-    const isPublicEndpoint =
-      config.url.includes("/users/login") ||
-      config.url.includes("/users/register") ||
-      config.url.includes("/users/request-reset") ||
-      config.url.includes("/users/verify") ||
-      config.url.includes("/users/validate") ||
-      config.url.includes("/job-categories/popular") ||
-      config.url.includes("/companies/public") ||
-      config.url.includes("/companies/featured") ||
-      config.url.includes("/jobs/approved") ||
-      config.url.includes("/jobs/search");
+    // Chỉ thêm token nếu:
+    // - Có token
+    // - Chưa có Authorization (tránh ghi đè khi gọi thủ công)
+    // - Không phải endpoint public
+    const publicEndpoints = [
+      "/users/login",
+      "/users/register",
+      "/users/request-reset",
+      "/users/verify",
+      "/users/validate",
+      "/job-categories/popular",
+      "/companies/public",
+      "/companies/featured",
+      "/jobs/approved",
+      "/jobs/search",
+      "/jobs/latest",
+    ];
 
-    if (!isPublicEndpoint && token) {
+    const isPublic = publicEndpoints.some((endpoint) =>
+      config.url?.includes(endpoint)
+    );
+
+    if (token && !isPublic && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // QUAN TRỌNG NHẤT: Không để axios tự set Content-Type khi gửi FormData
+    if (config.data instanceof FormData) {
+      // Xóa Content-Type để browser tự set boundary
+      delete config.headers["Content-Type"];
+      // Nếu có set thủ công Authorization rồi thì giữ nguyên
+      // Nếu chưa có thì thêm token (phòng trường hợp gọi từ employerAPI)
+      if (token && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    // Fix double slash
+    if (config.url?.startsWith("/")) {
+      config.url = config.url.replace(/^\/+/, "/");
     }
 
     return config;
@@ -58,12 +82,6 @@ api.defaults.paramsSerializer = (params) => {
     .join("&");
 };
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token && !config.headers.Authorization) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+
 
 export default api;

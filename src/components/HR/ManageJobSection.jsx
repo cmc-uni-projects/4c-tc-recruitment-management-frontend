@@ -39,6 +39,8 @@ function ManageJobSection() {
     categoryId: "",
   });
 
+  const [errors, setErrors] = useState({}); // ← THÊM DÒNG NÀY LÀ XONG!
+
 
   // Modal CV
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
@@ -244,11 +246,6 @@ function ManageJobSection() {
   const filteredLocations = locations.filter(loc =>
     loc.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-
-
-
-
 
   // ✅ Load danh sách Job
   const fetchJobs = async () => {

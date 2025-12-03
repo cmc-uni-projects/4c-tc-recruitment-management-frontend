@@ -110,21 +110,30 @@ export const companyAPI = {
 };
 
 export const employerAPI = {
-  // 1. HR: Tạo hồ sơ Employer (lần đầu)
-
-  createEmployer: (data) => {
-    const token = localStorage.getItem("token"); // hoặc 'accessToken' tùy bạn lưu
-    return api.post("/employers", data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  // CHỈ 1 tham số duy nhất: payload (có thể chứa cả data + file)
+  createEmployer: (payload) => {
+    const formData = new FormData();
+    
+    Object.keys(payload).forEach(key => {
+      if (payload[key] !== null && payload[key] !== undefined) {
+        formData.append(key, payload[key]);
+      }
     });
+
+    // BÂY GIỜ DÙNG api instance → token tự động thêm + FormData hoạt động ngon!
+    return api.post("/employers", formData);
   },
 
-  // 2. HR: Cập nhật hồ sơ Employer
-  updateEmployer: (employerId, data) =>
-    api.put(`/employers/${employerId}`, data),
-
+  // Tương tự cho update (nếu cần update + đổi file)
+  updateEmployer: (employerId, payload) => {
+  const formData = new FormData();
+  Object.keys(payload).forEach(key => {
+    if (payload[key] !== null && payload[key] !== undefined) {
+      formData.append(key, payload[key]);
+    }
+  });
+  return api.put(`/employers/${employerId}`, formData); // ← ĐÃ SỬA
+},
   // 3. HR/ADMIN: Lấy thông tin Employer theo ID
   getEmployerById: (employerId) => api.get(`/employers/${employerId}`),
 
@@ -143,14 +152,7 @@ export const employerAPI = {
 // 8. HR: lấy danh sách HR thuộc công ty của HR hiện tại
   getMyCompanyEmployers: () => api.get("/employers/by-company/me"),
 
-  getMyEmployer: () => {
-    const token = localStorage.getItem("token"); // hoặc 'accessToken' tùy bạn lưu
-    return api.get("/employers/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  },
+  getMyEmployer: () => api.get("/employers/me"), // ← ĐÃ SỬA
   getPendingVerificationEmployers: () =>
     api.get("/employers/pending-verification"),
 };

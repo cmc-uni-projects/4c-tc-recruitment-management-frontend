@@ -1,12 +1,10 @@
-
 // src/pages/hr/PersonalInfo.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "./PersonalInfo.css";
 import axios from "axios";
 import { employerAPI } from "../../services/auth.services.js"; // 🔸 THÊM import
-
 
 // Utility: lấy companyId từ localStorage với fallback + chuẩn hoá UUID
 const getSelectedCompanyId = () => {
@@ -31,16 +29,15 @@ const getSelectedCompanyId = () => {
   const match = candidate.match(/\/companies\/([0-9a-fA-F-]{36})/);
   const uuid = match ? match[1] : candidate;
 
-
   const uuidRegex =
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
 
   return uuidRegex.test(uuid) ? uuid : null;
-}
+};
 
 const PersonalInfo = () => {
   const navigate = useNavigate();
-
+  const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -50,6 +47,10 @@ const PersonalInfo = () => {
     department: "",
     workEmail: "",
   });
+
+  // THÊM MỚI: Upload file
+  const [laborContractFile, setLaborContractFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
 
   // Fetch user từ /users/:id và prefill 3 trường readonly
   useEffect(() => {
@@ -66,7 +67,11 @@ const PersonalInfo = () => {
           userObj._id;
 
         if (!userId) {
-          Swal.fire("Lỗi", "Không tìm thấy userId. Vui lòng đăng nhập lại.", "error");
+          Swal.fire(
+            "Lỗi",
+            "Không tìm thấy userId. Vui lòng đăng nhập lại.",
+            "error"
+          );
           navigate("/login");
           return;
         }
@@ -89,7 +94,9 @@ const PersonalInfo = () => {
         }));
 
         // Đọc employer từ localStorage nếu có
-        const savedEmployer = JSON.parse(localStorage.getItem("employer") || "null");
+        const savedEmployer = JSON.parse(
+          localStorage.getItem("employer") || "null"
+        );
         if (savedEmployer) {
           // Nếu đã có employer, dọn temp để tránh ghi đè
           localStorage.removeItem("employer_personal_temp");
@@ -99,8 +106,12 @@ const PersonalInfo = () => {
             department: savedEmployer.department || "",
             workEmail: savedEmployer.workEmail || "",
           }));
+        // Nếu đã có file hợp đồng → preview
+          if (savedEmployer.laborContractPath) {
+            const base = import.meta.env.VITE_API_URL || "http://localhost:8080";
+            setFilePreview(`${base}${savedEmployer.laborContractPath}`);
+          }
         } else {
-          // Nếu không có employer thì đọc temp (trường hợp đang làm dở)
           const temp = JSON.parse(localStorage.getItem("employer_personal_temp") || "{}");
           if (temp.positionTitle || temp.department || temp.workEmail) {
             setFormData((prev) => ({
@@ -132,93 +143,116 @@ const PersonalInfo = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // THÊM MỚI: Xử lý chọn file
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    if (!allowed.includes(file.type)) {
+      Swal.fire("Lỗi", "Chỉ chấp nhận file: JPG, PNG, PDF", "error");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      Swal.fire("Lỗi", "File không được vượt quá 10MB", "error");
+      return;
+    }
+
+    setLaborContractFile(file);
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => setFilePreview(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      setFilePreview("/pdf-preview.png");
+    }
+  };
+
+  // ĐOẠN QUAN TRỌNG NHẤT – ĐÃ SỬA HOÀN HẢO
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation cho 3 ô bắt buộc
-    if (!formData.positionTitle.trim())
-      return Swal.fire("Cảnh báo", "Vui lòng nhập chức danh", "warning");
-    if (!formData.department.trim())
-      return Swal.fire("Cảnh báo", "Vui lòng nhập phòng ban", "warning");
-    if (!formData.workEmail.trim())
-      return Swal.fire("Cảnh báo", "Vui lòng nhập email công việc", "warning");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.workEmail))
-      return Swal.fire("Cảnh báo", "Email công việc không hợp lệ.", "warning");
-
-    // Lấy companyId từ Bước 1 (đã chọn công ty)
-    const companyId = getSelectedCompanyId();
-    if (!companyId) {
-      return Swal.fire(
-        "Cảnh báo",
-        "Vui lòng chọn công ty ở Bước 1 trước khi gửi yêu cầu xác thực.",
-        "warning"
-      );
+    // Validate form
+    if (!formData.positionTitle.trim()) return Swal.fire("Lỗi", "Nhập chức danh", "warning");
+    if (!formData.department.trim()) return Swal.fire("Lỗi", "Nhập phòng ban", "warning");
+    if (!formData.workEmail.trim()) return Swal.fire("Lỗi", "Nhập email công việc", "warning");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.workEmail)) {
+      return Swal.fire("Lỗi", "Email công việc không hợp lệ", "warning");
     }
 
-    // Lưu temp (phòng trường hợp call API lỗi)
-    localStorage.setItem(
-      "employer_personal_temp",
-      JSON.stringify({
-        positionTitle: formData.positionTitle,
-        department: formData.department,
-        workEmail: formData.workEmail,
-      })
-    );
+    const companyId = getSelectedCompanyId();
+    if (!companyId) {
+      return Swal.fire("Lỗi", "Chưa chọn công ty! Vui lòng quay lại Bước 1.", "error");
+    }
+
+    if (!laborContractFile && !filePreview) {
+      return Swal.fire("Lỗi", "Vui lòng upload hợp đồng lao động", "warning");
+    }
+
+    // Lưu tạm để không mất dữ liệu nếu lỗi
+    localStorage.setItem("employer_personal_temp", JSON.stringify({
+      positionTitle: formData.positionTitle,
+      department: formData.department,
+      workEmail: formData.workEmail,
+    }));
 
     try {
       setLoading(true);
-      // 1) Tạo Employer
+
+      // Payload ĐẦY ĐỦ – companyId BẮT BUỘC
       const payload = {
-        positionTitle: formData.positionTitle,
-        department: formData.department,
-        workEmail: formData.workEmail,
-        companyId, // bắt buộc
-      };
-      const createRes = await employerAPI.createEmployer(payload);
-      const created = createRes?.data;
-      const employerId = created?.employerId;
-      if (!employerId) {
-        throw new Error("Không nhận được employerId sau khi tạo.");
-      }
+  positionTitle: formData.positionTitle.trim(),
+  department: formData.department.trim(),
+  workEmail: formData.workEmail.trim(),
+  companyId: companyId,
+  laborContractFile: laborContractFile, // ← THÊM DÒNG NÀY!!!
+};
 
-      // 2) Gửi yêu cầu xác thực ngay
-      await employerAPI.requestVerification(employerId);
+      // 1. Tạo Employer + upload file luôn trong 1 request
+const createRes = await employerAPI.createEmployer(payload); // ← Chỉ 1 tham số!
 
-      // Lưu employer vào localStorage (tuỳ chọn)
-      localStorage.setItem("employer", JSON.stringify(created));
+const createdEmployer = createRes.data;
+const employerId = createdEmployer.employerId || createdEmployer.id;
+
+if (!employerId) throw new Error("Không nhận được employerId");
+
+// 2. Gửi yêu cầu duyệt – vẫn gọi bình thường
+await employerAPI.requestVerification(employerId);
+
+      // Lưu vào localStorage để HRSection nhận diện ngay
+      localStorage.setItem("employer", JSON.stringify(createdEmployer));
       localStorage.removeItem("employer_personal_temp");
 
-      Swal.fire("Thành công", "Đã tạo hồ sơ và gửi yêu cầu xác thực!", "success");
-      navigate("/hr"); // hoặc trang khác tuỳ bạn (ví dụ: /hr/profile/summary)
+      Swal.fire({
+        icon: "success",
+        title: "Thành công!",
+        text: "Hồ sơ đã được gửi duyệt. Bạn sẽ nhận email khi được duyệt.",
+        timer: 3000,
+      });
+
+      navigate("/hr");
+
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Lỗi khi gửi yêu cầu xác thực.";
-      // Fallback: nếu đã có employer, gọi requestVerification cho hồ sơ hiện có
-      if (typeof msg === "string" && msg.includes("Bạn đã có hồ sơ Employer")) {
+      console.error("Lỗi tạo Employer:", err.response?.data);
+
+      const msg = err.response?.data?.message || "Lỗi không xác định";
+
+      // Fallback thông minh: nếu đã tồn tại Employer
+      if (msg.includes("đã có hồ sơ") || msg.includes("already exists")) {
         try {
           const me = await employerAPI.getMyEmployer();
-          const exId = me?.data?.employerId;
-          if (exId) {
-            await employerAPI.requestVerification(exId);
-            Swal.fire(
-              "Thành công",
-              "Đã gửi yêu cầu xác thực cho hồ sơ hiện có!",
-              "success"
-            );
-            return navigate("/hr");
+          const existingId = me.data?.employerId || me.data?.id;
+          if (existingId) {
+            await employerAPI.requestVerification(existingId);
+            localStorage.setItem("employer", JSON.stringify(me.data));
+            Swal.fire("Thành công", "Đã gửi lại yêu cầu xác thực!", "success");
+            navigate("/hr");
+            return;
           }
-        } catch (e2) {
-          const msg2 =
-            e2?.response?.data?.message ||
-            e2?.message ||
-            "Không thể gửi yêu cầu xác thực cho hồ sơ hiện có.";
-          Swal.fire("Lỗi", msg2, "error");
-        }
-      } else {
-        Swal.fire("Lỗi", msg, "error");
+        } catch { }
       }
+
+      Swal.fire("Thất bại", msg, "error");
     } finally {
       setLoading(false);
     }
@@ -312,8 +346,55 @@ const PersonalInfo = () => {
           />
         </div>
 
+        {/* THÊM MỚI: Phần upload hợp đồng lao động - ĐẸP NHƯ BUSINESS REGISTRATION */}
+        <div className="upload-section">
+          <label className="upload-label">
+            Hợp đồng lao động / Giấy bổ nhiệm <span className="required">*</span>
+          </label>
+
+          <div className="drop-zone">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,application/pdf"
+              onChange={handleFileChange}
+              id="labor-file-input"
+            />
+            <label htmlFor="labor-file-input" className="drop-label">
+              {laborContractFile || filePreview ? (
+                <div className="file-preview">
+                  <span className="file-name">
+                    {laborContractFile?.name || "Đã tải lên hợp đồng"}
+                  </span>
+                  {filePreview && <img src={filePreview} alt="Preview" className="preview-img" />}
+                </div>
+              ) : (
+                <>
+                  <div className="upload-icon">Upload</div>
+                  <p>Kéo và thả file vào đây hoặc nhấn để chọn</p>
+                  <p className="file-info">Tối đa 10MB • JPG, PNG, PDF</p>
+                  <button type="button" className="btn-choose-file">Chọn file</button>
+                </>
+              )}
+            </label>
+          </div>
+
+          <div className="warning-box">
+            <strong>Lưu ý quan trọng:</strong>
+            <ul>
+              <li>Hợp đồng phải có chữ ký + đóng dấu công ty</li>
+              <li>Thông tin chức danh, phòng ban phải trùng khớp với form</li>
+              <li>Chấp nhận scan hoặc ảnh chụp rõ nét</li>
+            </ul>
+          </div>
+        </div>
+
         <div className="form-actions">
-          <button type="button" className="btn-cancel" onClick={() => navigate(-1)}>
+          <button
+            type="button"
+            className="btn-cancel"
+            onClick={() => navigate(-1)}
+          >
             Hủy
           </button>
           <button type="submit" className="btn-save">
