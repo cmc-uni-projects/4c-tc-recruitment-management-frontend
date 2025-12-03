@@ -14,6 +14,7 @@ import shieldIcon from "../../assets/hr/shield.png";
 import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { employerAPI } from "../../services/auth.services";
 
 const HRSection = ({ children }) => {
@@ -85,32 +86,120 @@ const HRSection = ({ children }) => {
 
   // Hàm kiểm tra xác thực - dùng cho sidebar
   const requireVerification = (e) => {
-    if (employer?.verified) return true;
 
-    if (!employer) {
-      e.preventDefault();
-      setBlockerStatus("NOT_CREATED");
-      setShowVerifyBlocker(true);
-      return false;
-    }
+if (employer?.verified) return true;
 
-    if (employer.verificationStatus === "PENDING") {
-      e.preventDefault();
-      setBlockerStatus("PENDING");
-      setShowVerifyBlocker(true);
-      return false;
-    }
 
-    if (!employer.verified && employer.verificationStatus !== "APPROVED") {
-      e.preventDefault();
-      setBlockerStatus("NOT_VERIFIED");
-      setShowVerifyBlocker(true);
-      return false;
-    }
 
-    return true;
-  };
+e.preventDefault();
 
+
+
+// Chưa tạo hồ sơ
+
+if (!employer) {
+
+Swal.fire({
+
+icon: "warning",
+
+title: "Bạn chưa tạo hồ sơ doanh nghiệp",
+
+text: "Vui lòng tạo và xác thực công ty để sử dụng tính năng này.",
+
+showCancelButton: true,
+
+cancelButtonText: "Để sau",
+
+confirmButtonText: "Tạo hồ sơ ngay",
+
+}).then((result) => {
+
+if (result.isConfirmed) navigate("/hr/profile");
+
+});
+
+
+
+return false;
+
+}
+
+
+
+// Đang chờ duyệt
+
+if (employer.verificationStatus === "PENDING") {
+
+Swal.fire({
+
+icon: "info",
+
+title: "Hồ sơ đang chờ duyệt",
+
+html: `
+
+Chúng tôi đang xem xét hồ sơ doanh nghiệp của bạn.<br/>
+
+Thời gian xử lý: <b>1-3 ngày làm việc</b>.
+
+`,
+
+showCancelButton: true,
+
+cancelButtonText: "Để sau",
+
+confirmButtonText: "Xem chi tiết",
+
+}).then((result) => {
+
+if (result.isConfirmed) navigate("/hr/profile/business-registration");
+
+});
+
+
+
+return false;
+
+}
+
+
+
+// Từ chối / chưa hoàn tất
+
+if (!employer.verified && employer.verificationStatus !== "APPROVED") {
+
+Swal.fire({
+
+icon: "error",
+
+title: "Xác thực chưa hoàn tất",
+
+text: "Hồ sơ bị từ chối hoặc thiếu thông tin. Vui lòng bổ sung lại.",
+
+showCancelButton: true,
+
+cancelButtonText: "Để sau",
+
+confirmButtonText: "Tiếp tục xác thực",
+
+}).then((result) => {
+
+if (result.isConfirmed) navigate("/hr/profile/business-registration");
+
+});
+
+
+
+return false;
+
+}
+
+
+
+return true;
+
+};
   return (
     <div className="hr-page">
       {/* Header */}
