@@ -88,7 +88,8 @@ export const companyAPI = {
 
   // NEW: Verify actions
   approve: (id) => api.patch(`/companies/${id}/approve`),
-  reject:  (id) => api.patch(`/companies/${id}/reject`),
+  reject: (companyId, reason) => 
+    api.patch(`/companies/${companyId}/reject`, { reason }), // Gửi { reason: "..." }
 
   // NEW: Featured toggle (chỉ cho ACTIVE + APPROVE)
   setFeatured: (id, featured) => api.patch(`/companies/${id}/featured?featured=${featured}`),
@@ -98,15 +99,6 @@ export const companyAPI = {
 
   // ✅ NEW: HR cập nhật công ty theo luồng riêng (nếu cần enforce GPKD khi chưa có)
   updateForHR: (id, data) => api.put(`/companies/hr/${id}`, data),
-  
-
-  // ===== NEW: HR “Yêu cầu duyệt” cho company =====
-  requestVerification: (companyId) => {
-    const token = localStorage.getItem("token");
-    return api.post(`/companies/${companyId}/request-verification`, null, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  },
 };
 
 export const employerAPI = {
@@ -179,7 +171,7 @@ export const cvAPI = {
 
   // Xem trước CV (render HTML + data)
 renderCV: (cvId) => {
-  const token = localStorage.getItem("accessToken"); // hoặc lấy từ Redux/context
+  const token = localStorage.getItem("token"); // hoặc lấy từ Redux/context
   return api.get(`/api/cv/render/${cvId}`, {
     headers: {
       Authorization: `Bearer ${token}`,

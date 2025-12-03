@@ -520,3 +520,68 @@
   color: white;
   border: none;
 }
+/* Khi mở thông báo → full nội dung dưới header */
+.notifications-fullscreen {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+  animation: slideDown 0.4s ease-out;
+}
+
+.noti-header-bar {
+  position: sticky;
+  top: 0;
+
+  background: white;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.noti-header-bar h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.close-noti-btn {
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  color: #64748b;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.close-noti-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Khi đang mở thông báo → ẩn sidebar một chút (tùy chọn, đẹp hơn) */
+.hr-layout:has(.notifications-fullscreen) .hr-sidebar {
+  opacity: 0.3;
+  pointer-events: none;
+}

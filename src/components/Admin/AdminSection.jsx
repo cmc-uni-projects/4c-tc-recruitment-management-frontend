@@ -117,14 +117,7 @@ export default function AdminSection({ children }) {
                 Quản lý nhà tuyển dụng
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/admin/candidates"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Quản lý ứng viên
-              </NavLink>
-            </li>
+            
             <li>
               <NavLink
                 to="/admin/companies"
@@ -141,14 +134,7 @@ export default function AdminSection({ children }) {
                 Quản lý ngành nghề
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/admin/job-positions"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Quản lý các vị trí công việc
-              </NavLink>
-            </li>
+            
             <li>
               <NavLink
                 to="/admin/templates"
@@ -157,14 +143,7 @@ export default function AdminSection({ children }) {
                 Quản lý Template CV
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/admin/ai"
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                🤖 Toppy AI
-              </NavLink>
-            </li>
+            
             {/*<li>
               <NavLink
                 to="/admin/notifications"
