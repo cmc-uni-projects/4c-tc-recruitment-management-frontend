@@ -15,6 +15,7 @@ import { FiLogOut } from "react-icons/fi"; // Icon logout
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { employerAPI } from "../../services/auth.services";
+import NotificationsPageHR from "../../pages/Notification/NotificationsPageHR.jsx";
 
 const HRSection = ({ children }) => {
   const [showLogout, setShowLogout] = useState(false);
@@ -59,10 +60,11 @@ const HRSection = ({ children }) => {
 
   // 4) click chuông => mở page thông báo và giữ URL /hr
   const handleBellClick = (e) => {
-    e.preventDefault();
-    setShowNotifications(true);
-    navigate("/hr", { replace: true });
-  };
+  e.preventDefault();
+  setShowNotifications(prev => !prev); // Toggle mở/đóng
+};
+
+
 
   useEffect(() => {
     if (!token || !userId) {
@@ -365,7 +367,18 @@ const HRSection = ({ children }) => {
         {/* Main Content */}
         <main className="hr-content">
           {showNotifications ? (
-            <NotificationsPageHR />
+            <div className="notifications-fullscreen">
+      <div className="noti-header-bar">
+        <h2>Thông báo duyệt công ty</h2>
+        <button 
+          className="close-noti-btn"
+          onClick={() => setShowNotifications(false)}
+        >
+          ×
+        </button>
+      </div>
+      <NotificationsPageHR />
+    </div>
           ) : children ? (
             <div className="hr-page-body">{children}</div>
           ) : (
