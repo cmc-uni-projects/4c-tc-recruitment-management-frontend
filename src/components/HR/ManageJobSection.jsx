@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./ManageJobSection.css";
+import Swal from "sweetalert2";
 import {
   jobAPI,
   jobCategoryAPI,
@@ -393,30 +394,44 @@ const filteredLocations = locations.filter(loc =>
     const newErrors = validateForm();
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+    Swal.fire("Lỗi!","Vui lòng kiểm tra lại thông tin!","error");
 
     try {
       if (editingId) {
         await jobAPI.updateJob(editingId, form);
+        Swal.fire("Thành công!", "Cập nhật job thành công!","success");
       } else {
         await jobAPI.createJob(form);
+        Swal.fire("Thành công!","Đã thêm job mới!","success");
       }
       closeModal();
       fetchJobs();
     } catch (err) {
       console.error("Lỗi:", err.response?.data || err);
-      setErrors({ api: "Thao tác thất bại, vui lòng thử lại!" });
+      Swal.fire("Lỗi!", "Thao tác thất bại, vui lòng thử lại!" ,"error");
     }
   };
 
   // ✅ Xóa Job
   const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
-    try {
-      await jobAPI.deleteJob(id);
-      fetchJobs();
-    } catch (err) {
-      console.error("Lỗi khi xóa job:", err);
-    }
+    Swal.fire({
+      title: "Bạn có chắc muốn xóa công việc này?",
+      text: "Thao tác này không thể hoàn tác",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      try {
+        await jobAPI.deleteJob(id);
+        Swal.fire("Đã xóa!", "Công việc đã được xóa!", "success");
+        fetchJobs();
+      } catch (err) {
+        Swal.fire("Lỗi!", "Không thể xóa công việc!", "error");
+      }
+    });
   };
 
   return (
