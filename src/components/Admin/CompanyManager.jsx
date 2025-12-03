@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { companyAPI, jobAPI } from "../../services/auth.services";
 import Swal from "sweetalert2";
+import CompanyReviewModal from "../Admin/CompanyReviewModal"; // đúng đường dẫn
 import "./CompanyManager.css";
 
 /** ===== Danh sách tỉnh/thành (có thể tách ra constants/provinces.js) ===== */
@@ -19,7 +20,6 @@ const vietnamProvinces = [
   "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
   "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
 ];
-
 /** ===== Utils validation ===== */
 const isValidUrl = (url) => {
   if (!url) return true;
@@ -136,6 +136,7 @@ export default function AdminCompanyManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [reviewModalId, setReviewModalId] = useState(null);
 
   /** ===== FORM STATE ===== */
   const [form, setForm] = useState({
@@ -610,10 +611,12 @@ export default function AdminCompanyManager() {
                     </td>
                     <td className="actions">
                       {isPending ? (
-                        <>
-                          <button className="approve-btn" onClick={() => handleApprove(c.companyId)}>Duyệt</button>
-                          <button className="reject-btn" onClick={() => handleReject(c.companyId)}>Từ chối</button>
-                        </>
+                        <button
+                          className="review-btn"
+                          onClick={() => setReviewModalId(c.companyId)}
+                        >
+                          Xem chi tiết
+                        </button>
                       ) : (
                         <>
                           <button className="edit-btn" onClick={() => openModal(c)}>Sửa</button>
@@ -822,6 +825,16 @@ export default function AdminCompanyManager() {
             </form>
           </div>
         </div>
+      )}
+      {reviewModalId && (
+        <CompanyReviewModal
+          companyId={reviewModalId}
+          onClose={() => {
+            setReviewModalId(null);
+            fetchCompanies(); // reload bảng
+          }}
+          onSuccess={() => fetchCompanies()}
+        />
       )}
     </div>
   );
