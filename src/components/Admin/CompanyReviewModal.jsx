@@ -57,36 +57,44 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
 
   // TỪ CHỐI CÔNG TY – GỌI ĐÚNG API
   const handleReject = async () => {
-    const { value: reason } = await Swal.fire({
-      title: "Từ chối duyệt công ty",
-      input: "textarea",
-      inputLabel: "Lý do từ chối (bắt buộc)",
-      inputPlaceholder: "Nhập lý do rõ ràng để HR biết...",
-      showCancelButton: true,
-      confirmButtonText: "Từ chối",
-      cancelButtonText: "Hủy",
-      confirmButtonColor: "#d33",
-      inputValidator: (value) => {
-        if (!value?.trim()) return "Bạn phải nhập lý do từ chối!";
-      },
+  const { value: reason } = await Swal.fire({
+    title: "Từ chối duyệt công ty",
+    input: "textarea",
+    inputLabel: "Lý do từ chối (bắt buộc)",
+    inputPlaceholder: "VD: Giấy phép kinh doanh bị mờ, thiếu con dấu đỏ, thông tin không khớp với MST...",
+    showCancelButton: true,
+    confirmButtonText: "Từ chối",
+    cancelButtonText: "Hủy",
+    confirmButtonColor: "#d33",
+    inputValidator: (value) => {
+      if (!value?.trim()) return "Bạn phải nhập lý do từ chối!";
+    },
+  });
+
+  if (!reason) return;
+
+  try {
+    setActionLoading(true);
+    
+    // ĐÃ SỬA: GỬI KÈM LÝ DO
+    await companyAPI.reject(companyId, reason.trim());
+
+    Swal.fire({
+      icon: "success",
+      title: "Đã từ chối!",
+      text: "HR sẽ thấy chính xác lý do bạn vừa nhập.",
+      timer: 3000
     });
 
-    if (!reason) return;
-
-    try {
-      setActionLoading(true);
-      await companyAPI.reject(companyId); // ĐÚNG API: PATCH /companies/{id}/reject
-      Swal.fire("Đã từ chối", "Công ty đã bị từ chối với lý do bạn nhập.", "info");
-      onSuccess?.();
-      onClose?.();
-    } catch (err) {
-      const msg = err?.response?.data?.message || "Không thể từ chối công ty";
-      Swal.fire("Lỗi", msg, "error");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
+    onSuccess?.();
+    onClose?.();
+  } catch (err) {
+    const msg = err?.response?.data?.message || "Không thể từ chối công ty";
+    Swal.fire("Lỗi", msg, "error");
+  } finally {
+    setActionLoading(false);
+  }
+};
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
