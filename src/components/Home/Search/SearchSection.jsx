@@ -82,7 +82,7 @@ export default function SearchSection() {
       <div className="search-bar">
 
         {/* Category */}
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+        <select className="category-select" value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">Danh mục Nghề</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>

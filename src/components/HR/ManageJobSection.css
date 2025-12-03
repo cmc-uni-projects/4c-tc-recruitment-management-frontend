@@ -412,13 +412,10 @@
   margin-top: 10px;
 }
 
-
-.application-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
+.application-table th, .application-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
-
 
 
 .application-table th {
@@ -435,40 +432,6 @@
   border-radius: 4px;
   border: 1px solid #ccc;
   font-size: 14px;
-}
-
-
-/* Buttons */
-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-button.cancel-btn {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-button.cancel-btn:hover {
-  background-color: #bdbdbd;
-}
-
-button.view-btn {
-  background-color: #3498db;
-  color: #fff;
-}
-
-button.view-btn:hover {
-  background-color: #2980b9;
 }
 
 .combobox-input {
