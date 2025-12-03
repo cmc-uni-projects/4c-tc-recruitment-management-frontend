@@ -179,7 +179,7 @@ export const cvAPI = {
 
   // Xem trước CV (render HTML + data)
 renderCV: (cvId) => {
-  const token = localStorage.getItem("accessToken"); // hoặc lấy từ Redux/context
+  const token = localStorage.getItem("token"); // hoặc lấy từ Redux/context
   return api.get(`/api/cv/render/${cvId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
