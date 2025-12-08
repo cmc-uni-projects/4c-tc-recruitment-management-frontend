@@ -121,7 +121,7 @@
 
 /* Khung preview nhỏ gọn, vừa đẹp */
 .mycv-preview-box {
-  height: 600px; /* Tăng chiều cao cho "sang" hơn */
+  height: 700px; /* Tăng chiều cao cho "sang" hơn */
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
   overflow: hidden;
@@ -144,7 +144,7 @@
 .mycv-preview-inner {
   width: 100%; /* 2 lần kích thước thật */
   height: 100%;
-  transform: scale(0.5); /* = 1/2 → vừa đẹp, vừa to, vừa rõ */
+  
   transform-origin: center;
   pointer-events: none;
   background: white;
@@ -214,10 +214,10 @@
   transition: all 0.3s ease;
   z-index: 10;
 }
-.cv-card:hover .delete-btn {
+.cv-card:hover .delete-btn1 {
   opacity: 1;
 }
-.delete-btn:hover {
+.delete-btn1:hover {
   background: #dc2626;
   transform: scale(1.1);
 }
