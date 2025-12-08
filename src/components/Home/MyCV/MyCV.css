@@ -1,244 +1,245 @@
-/* MyCV.css - Phiên bản nâng cấp 2025 */
+/* MyCV.css – Phiên bản SIÊU ĐẸP 2025 – Dành riêng cho bạn */
+
 .mycv-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 40px 20px;
 }
 
-.mycv-header {
-  text-align: center;
-  margin-bottom: 48px;
-  color: #2c3e50;
-}
-
 .mycv-header h1 {
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 38px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+  text-align: center;
 }
 
 .mycv-header p {
-  font-size: 16px;
-  color: #7f8c8d;
+  text-align: center;
+  color: #64748b;
+  font-size: 17px;
 }
 
+/* Grid 2 cột */
 .mycv-grid {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
 }
 
-/* Responsive */
 @media (max-width: 992px) {
   .mycv-grid {
     grid-template-columns: 1fr;
   }
 }
 
+/* Card danh sách CV */
 .cv-section {
-  background: #ffffff;
-  border-radius: 16px;
+  background: #fff;
+  border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .cv-section:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
 }
 
 .cv-section-header {
-  padding: 24px 28px 20px;
-  border-bottom: 1px solid #f0f2f5;
+  padding: 28px 32px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .cv-section-header h2 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: #2c3e50;
-  margin: 0;
+  color: #1e293b;
 }
 
 .cv-count {
-  margin-left: 12px;
-  background: #e8f5e8;
-  color: #27ae60;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
+  background: #ecfdf5;
+  color: #059669;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #a7f3d0;
 }
 
 .btn-create-cv,
 .btn-upload-cv {
-  background: #27ae60;
+  background: linear-gradient(135deg, #16a34a, #15803d);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
+  padding: 12px 28px;
+  border-radius: 14px;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.3);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
 .btn-create-cv:hover,
 .btn-upload-cv:hover {
-  background: #219653;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
 }
 
-.btn-create-first {
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 16px;
-}
-
+/* Danh sách CV */
 .cv-list {
-  padding: 24px;
+  padding: 28px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  min-height: 300px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  min-height: 420px;
 }
 
+/* CARD CV SIÊU ĐẸP */
 .cv-card {
-  background: #fff;
-  border-radius: 14px;
+  background: white;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  border: 1px solid #f1f5f9;
   cursor: pointer;
   position: relative;
 }
 
 .cv-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+  transform: translateY(-12px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
 }
 
-.cv-card.created .cv-preview {
-  height: 180px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Khung preview nhỏ gọn, vừa đẹp */
+.mycv-preview-box {
+  height: 600px; /* Tăng chiều cao cho "sang" hơn */
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
   position: relative;
-  overflow: hidden;
+  box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.07);
 }
 
-.cv-card.created .cv-preview::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("data:image/svg+xml,...") center/cover; /* Có thể thêm pattern */
-  opacity: 0.1;
-}
-
-.template-preview span {
-  font-size: 48px;
-  color: white;
-  font-weight: bold;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.cv-uploaded-content {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-.cv-uploaded-content img {
+.mycv-preview-outer {
   width: 100%;
-  height: 180px;
-  object-fit: contain;
-  padding: 20px;
-  background: #f8f9fa;
-}
-
-.cv-info {
-  padding: 16px;
-}
-
-.cv-info h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2c3e50;
-  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center; /* Căn dọc giữa */
+  justify-content: center; /* Căn ngang giữa */
+  background: #f8fafc;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.cv-info p {
-  margin: 0;
-  font-size: 13px;
-  color: #95a5a6;
+/* TỈ LỆ HOÀN HẢO – ĐẸP NHẤT CHO MỌI TEMPLATE */
+.mycv-preview-inner {
+  width: 100%; /* 2 lần kích thước thật */
+  height: 100%;
+  transform: scale(0.5); /* = 1/2 → vừa đẹp, vừa to, vừa rõ */
+  transform-origin: center;
+  pointer-events: none;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-.cv-actions {
-  padding: 0 16px 16px;
-  text-align: center;
+/* Cắt margin/padding thừa của template gốc */
+.mycv-preview-inner > * {
+  margin: 0 !important;
+  padding: 50px 60px !important; /* Padding rộng rãi hơn → nhìn sang */
+  box-sizing: border-box !important;
+}
+
+/* Skeleton loading riêng, không đụng hàng */
+.mycv-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f5f5f5 25%, #e6e6e6 50%, #f5f5f5 75%);
+  background-size: 200% 100%;
+  animation: mycv-loading 1.8s infinite;
+  border-radius: 20px 20px 0 0;
+}
+
+@keyframes mycv-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Thông tin dưới card */
+.cv-info {
+  padding: 18px 20px;
+  .cv-info h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cv-info p {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+/* Nút xóa hiện khi hover */
+.delete-btn1 {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(239, 68, 68, 0.95);
+  color: white;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+.cv-card:hover .delete-btn {
+  opacity: 1;
+}
+.delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
 }
 
 .edit-hint {
-  font-size: 12px;
-  color: #3498db;
-  background: #ebf3fd;
-  padding: 6px 12px;
-  border-radius: 20px;
-  display: inline-block;
+  font-size: 13px;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-weight: 500;
 }
 
-/* Empty State */
+/* Empty state */
 .empty-state {
-  grid-column: 1 / -1;
   text-align: center;
-  padding: 40px 20px;
-  color: #7f8c8d;
+  padding: 60px 20px;
+  color: #64748b;
 }
 
 .empty-state img {
-  width: 180px;
+  width: 200px;
   margin-bottom: 24px;
-  opacity: 0.8;
-}
-
-/* Loading */
-.mycv-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 70vh;
-  color: #7f8c8d;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f0f2f5;
-  border-top: 5px solid #27ae60;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  opacity: 0.85;
 }

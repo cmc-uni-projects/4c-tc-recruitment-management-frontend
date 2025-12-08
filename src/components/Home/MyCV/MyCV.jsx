@@ -7,9 +7,8 @@ import { getMyCVs } from "../../../services/auth.services";
 import EmptyCreatedCV from "../../../assets/empty-cv-created.png";
 import EmptyUploadedCV from "../../../assets/empty-cv-upload.png";
 import { deleteCV } from "../../../services/auth.services";
+import CVPreviewCard from "./CVPreviewCard";
 import Swal from "sweetalert2";
-
-
 
 export default function MyCV() {
   const [createdCVs, setCreatedCVs] = useState([]);
@@ -36,7 +35,7 @@ export default function MyCV() {
       setUploadedCVs(uploaded);
     } catch (err) {
       console.error("Lỗi API /api/cv/my:", err.response || err);
-     Swal.fire({
+      Swal.fire({
         title: "Không tải được CV",
         text: "Vui lòng kiểm tra kết nối hoặc thử lại.",
         icon: "error",
@@ -75,7 +74,7 @@ export default function MyCV() {
       transition: { type: "spring", stiffness: 100 },
     },
   };
-   const handleDelete = async (cvId) => {
+  const handleDelete = async (cvId) => {
     Swal.fire({
       title: "Bạn có chắc muốn xóa?",
       html: `
@@ -153,7 +152,6 @@ export default function MyCV() {
             </motion.button>
           </div>
 
-
           <div className="cv-list">
             {createdCVs.length === 0 ? (
               <motion.div className="empty-state">
@@ -173,45 +171,15 @@ export default function MyCV() {
                 </motion.button>
               </motion.div>
             ) : (
-              createdCVs.map((cv, index) => (
-                <motion.div
-                  key={cv.id}
-                  variants={itemVariants}
-                  whileHover={{ y: -8 }}
-                  className="cv-card created"
-                  onClick={() => navigate(`/my-cv/edit/${cv.id}`)}
-                >
-                  <div className="cv-preview">
-                    <div className="template-preview">
-                      <span role="img" aria-label="template">
-                        Template
-                      </span>
-                    </div>
-                  </div>
-                  <div className="cv-info">
-                    <h3>{cv.title || "CV chưa đặt tên"}</h3>
-                    <p>Cập nhật: {formatDate(cv.updatedAt)}</p>
-                  </div>
-                  <div className="cv-actions">
-                    <span className="edit-hint">Click để chỉnh sửa và tải xuống</span>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(cv.id);
-                    }}
-                    className="delete-btn"
-                  >
-                    Xóa
-                  </button>
-                </motion.div>
+              createdCVs.map((cv) => (
+                <CVPreviewCard key={cv.id} cv={cv} onDelete={handleDelete} />
               ))
             )}
           </div>
         </motion.div>
 
         {/* CV đã tải lên */}
-        
+
         <motion.div variants={itemVariants} className="cv-section">
           <div className="cv-section-header">
             <div>
