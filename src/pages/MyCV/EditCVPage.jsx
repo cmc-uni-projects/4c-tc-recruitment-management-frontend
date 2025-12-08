@@ -142,15 +142,27 @@ export default function EditCVPage() {
     <input
       type="file"
       accept="image/*"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const imageUrl = URL.createObjectURL(file);
-          const newData = { ...formData, avatarUrl: imageUrl };
-          setFormData(newData);
-          setPreviewHtml(mergeHtml(baseHtml, newData));
-        }
-      }}
+      onChange={async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("http://localhost:8080/api/cv/upload-avatar", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: form
+  });
+
+  const json = await res.json();
+
+  const newData = { ...formData, avatarUrl: json.url };
+  setFormData(newData);
+  setPreviewHtml(mergeHtml(baseHtml, newData));
+}}
     />
     {formData.avatarUrl && (
       <div className="avatar-preview">
