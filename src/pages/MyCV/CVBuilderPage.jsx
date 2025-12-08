@@ -7,6 +7,7 @@ import { getAllTemplates, createCV } from "../../services/auth.services";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "./CVBuilderPage.css";
+import axios from "axios";
 
 export default function CVBuilderPage() {
   const navigate = useNavigate();
@@ -133,28 +134,47 @@ Swal.fire(
 
             
 {/* Upload Avatar */}
-  <div className="avatar-upload">
-    <label htmlFor="avatar">Ảnh đại diện</label>
-    <input
-      type="file"
-      id="avatar"
-      accept="image/*"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const imageUrl = URL.createObjectURL(file);
-          const newData = { ...formData, avatarUrl: imageUrl };
-          setFormData(newData);
-          updatePreview(selectedTemplate?.htmlLayout, newData);
-        }
-      }}
-    />
-    {formData.avatarUrl && (
-      <div className="avatar-preview">
-        <img src={formData.avatarUrl} alt="Avatar Preview" />
-      </div>
-    )}
-  </div>
+<div className="avatar-upload">
+  <label htmlFor="avatar">Ảnh đại diện</label>
+  <input
+    type="file"
+    id="avatar"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const form = new FormData();
+      form.append("file", file);
+
+      try {
+        const res = await axios.post(
+          "http://localhost:8080/api/cv/upload-avatar",
+          form,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        const newData = { ...formData, avatarUrl: res.data.url };
+        setFormData(newData);
+        updatePreview(selectedTemplate?.htmlLayout, newData);
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Lỗi", "Upload ảnh thất bại", "error");
+      }
+    }}
+  />
+
+  {formData.avatarUrl && (
+    <div className="avatar-preview">
+      <img src={formData.avatarUrl} alt="Avatar Preview" />
+    </div>
+  )}
+</div>
 
 
             <div className="form-grid">

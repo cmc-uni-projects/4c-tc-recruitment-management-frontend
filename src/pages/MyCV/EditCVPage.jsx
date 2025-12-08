@@ -1,7 +1,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMyCVs, renderCV, updateCV } from "../../services/auth.services";
+import {
+  getMyCVs,
+  renderCV,
+  updateCV,
+  getAllTemplates, // ✅ THÊM MỚI
+} from "../../services/auth.services";
 import { toast } from "react-toastify";
 import Navbar from "../../components/Layout/Navbar";
 import "./EditCVPage.css";
@@ -16,40 +21,52 @@ export default function EditCVPage() {
   const [formData, setFormData] = useState({});
   const [previewHtml, setPreviewHtml] = useState("");
   const [baseHtml, setBaseHtml] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // ✅ NEW: danh sách template & template đang chọn
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  // Hàm thay biến {{key}} trong HTML
   const mergeHtml = (html, data) => {
     if (!html) return "";
     let temp = html;
     Object.keys(data || {}).forEach((key) => {
       const regex = new RegExp(`{{${key}}}`, "g");
-      temp = temp.replace(regex, data[key] || "");
+      temp = temp.replace(regex, data[key] ?? "");
     });
     return temp;
   };
 
+  // Tải CV + render HTML hiện tại
   useEffect(() => {
     const loadCV = async () => {
       try {
         const res = await getMyCVs();
         const found = res.data.find((c) => c.id === cvId);
-
         if (!found) {
           Swal.fire("Lỗi", "Không tìm thấy CV này", "error");
           navigate("/my-cv");
           return;
         }
-
         setCv(found);
 
+        // Render layout hiện tại từ server (dựa theo templateId đang lưu)
         const renderRes = await renderCV(cvId);
-        const html = renderRes?.data?.htmlLayout || "";
-        const data = renderRes?.data?.data || {};
-
+        const html = renderRes?.data?.htmlLayout ?? "";
+        const data = renderRes?.data?.data ?? {};
         setBaseHtml(html);
         setFormData(data);
         setPreviewHtml(mergeHtml(html, data));
+
+        // ✅ Sau khi biết cv.templateId, tải danh sách mẫu và set mẫu đang dùng
+        const tplRes = await getAllTemplates();
+        setTemplates(tplRes.data || []);
+        const currentTpl =
+          (tplRes.data || []).find((t) => t.id === found.templateId) || null;
+        setSelectedTemplate(currentTpl);
       } catch (err) {
         console.error("Lỗi tải CV:", err);
         Swal.fire("Lỗi", "Tải CV thất bại", "error");
@@ -58,10 +75,10 @@ export default function EditCVPage() {
         setLoading(false);
       }
     };
-
     if (cvId) loadCV();
   }, [cvId, navigate]);
 
+  // Thay đổi input → cập nhật form & preview
   const handleChange = (e) => {
     const { name, value } = e.target;
     const newData = { ...formData, [name]: value };
@@ -69,25 +86,40 @@ export default function EditCVPage() {
     setPreviewHtml(mergeHtml(baseHtml, newData));
   };
 
+  // ✅ NEW: chọn mẫu → cập nhật baseHtml + preview
+  const handleSelectTemplate = (template) => {
+    setSelectedTemplate(template);
+    setBaseHtml(template?.htmlLayout ?? "");
+    setPreviewHtml(mergeHtml(template?.htmlLayout ?? "", formData));
+    if (template?.name) {
+      Swal.fire("Đã chọn mẫu", template.name, "info");
+    }
+  };
+
+  // Lưu CV (kèm templateId đang chọn nếu có)
   const handleSave = async () => {
     if (!formData.fullname?.trim()) {
       Swal.fire("Cảnh báo", "Vui lòng nhập họ tên", "warning");
       return;
     }
-
     setSaving(true);
     try {
       await updateCV(cvId, {
-        title: `${formData.fullname} - ${formData.position || "CV"}`.trim(),
-        templateId: cv.templateId,
+        title: `${formData.fullname} - ${formData.position ?? "CV"}`.trim(),
+        templateId: selectedTemplate?.id ?? cv.templateId, // ✅ cập nhật templateId
         visibility: "PRIVATE",
         data: formData,
       });
+      
+if (selectedTemplate?.id) {
+   setCv(prev => ({ ...prev, templateId: selectedTemplate.id })); // ✅ đồng bộ state
+ }
 
       Swal.fire("Thành công", "Cập nhật CV thành công!", "success");
 
+      // Render lại từ server để đồng bộ layout theo template mới
       const renderRes = await renderCV(cvId);
-      const html = renderRes?.data?.htmlLayout || "";
+      const html = renderRes?.data?.htmlLayout ?? "";
       setBaseHtml(html);
       setPreviewHtml(mergeHtml(html, formData));
     } catch (err) {
@@ -100,15 +132,13 @@ export default function EditCVPage() {
 
   const handleExportPDF = () => {
     const element = document.querySelector(".cv-preview");
-
     const opt = {
       margin: 0,
-      filename: `${formData.fullname || "cv"}_profile.pdf`,
+      filename: `${formData.fullname ?? "cv"}_profile.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" }
+      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
     };
-
     html2pdf().from(element).set(opt).save();
   };
 
@@ -142,15 +172,27 @@ export default function EditCVPage() {
     <input
       type="file"
       accept="image/*"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const imageUrl = URL.createObjectURL(file);
-          const newData = { ...formData, avatarUrl: imageUrl };
-          setFormData(newData);
-          setPreviewHtml(mergeHtml(baseHtml, newData));
-        }
-      }}
+      onChange={async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("http://localhost:8080/api/cv/upload-avatar", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: form
+  });
+
+  const json = await res.json();
+
+  const newData = { ...formData, avatarUrl: json.url };
+  setFormData(newData);
+  setPreviewHtml(mergeHtml(baseHtml, newData));
+}}
     />
     {formData.avatarUrl && (
       <div className="avatar-preview">
@@ -159,6 +201,7 @@ export default function EditCVPage() {
     )}
   </div>
 
+           
 
             {[
               { name: "fullname", label: "Họ và tên *", placeholder: "Nhập họ và tên" },
@@ -169,7 +212,7 @@ export default function EditCVPage() {
               { name: "summary", label: "Tóm tắt bản thân", placeholder: "Giới thiệu ngắn gọn về bạn" },
               { name: "experience", label: "Kinh nghiệm làm việc", placeholder: "Mô tả kinh nghiệm làm việc" },
               { name: "education", label: "Học vấn", placeholder: "Mô tả quá trình học tập" },
-              { name: "skills", label: "Kỹ năng (cách nhau bằng dấu phẩy)", placeholder: "VD: Java, React, SQL" }
+              { name: "skills", label: "Kỹ năng (cách nhau bằng dấu phẩy)", placeholder: "VD: Java, React, SQL" },
             ].map((field) => (
               <div className="form-group" key={field.name}>
                 <label>{field.label}</label>
@@ -178,14 +221,14 @@ export default function EditCVPage() {
                     name={field.name}
                     rows="4"
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={formData[field.name] ?? ""}
                     onChange={handleChange}
                   />
                 ) : (
                   <input
                     name={field.name}
                     placeholder={field.placeholder}
-                    value={formData[field.name] || ""}
+                    value={formData[field.name] ?? ""}
                     onChange={handleChange}
                   />
                 )}
@@ -204,8 +247,33 @@ export default function EditCVPage() {
             </button>
           </div>
 
-          {/* Preview bên phải */}
+          {/* Bên phải: Selector mẫu + Preview */}
           <div className="preview-section">
+            {/* ✅ NEW: Khối chọn mẫu */}
+            <div className="template-selector">
+              <h3>Chọn mẫu CV ({templates.length} mẫu)</h3>
+              <div className="template-grid">
+                {templates.map((tpl) => (
+                  <div
+                    key={tpl.id}
+                    className={`template-item ${
+                      selectedTemplate?.id === tpl.id ? "selected" : ""
+                    }`}
+                    onClick={() => handleSelectTemplate(tpl)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && handleSelectTemplate(tpl)}
+                    aria-pressed={selectedTemplate?.id === tpl.id}
+                    aria-label={`Chọn mẫu ${tpl.name}`}
+                  >
+                    <img src={tpl.previewImage} alt={tpl.name} />
+                    <p>{tpl.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview */}
             <h2>Xem trước CV</h2>
             <div className="cv-preview">
               <div dangerouslySetInnerHTML={{ __html: previewHtml }} />

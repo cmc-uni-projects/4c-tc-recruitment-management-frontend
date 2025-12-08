@@ -84,7 +84,7 @@ const CVPreviewCard = ({ cv, onDelete }) => {
       </div>
 
       <div className="cv-actions">
-        <span className="edit-hint">Click để chỉnh sửa</span>
+        <span className="edit-hint">Click để chỉnh sửa và tải xuống</span>
       </div>
 
       <button onClick={handleDelete} className="delete-btn1">
