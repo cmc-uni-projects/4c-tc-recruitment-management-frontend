@@ -49,7 +49,7 @@ export default function CreateCVPage() {
         {loading ? (
           <div className="loading">Đang tải mẫu CV...</div>
         ) : (
-          <div className="template-grid">
+          <div className="template-grid1">
             {templates.map((template) => (
               <div
                 key={template.id}

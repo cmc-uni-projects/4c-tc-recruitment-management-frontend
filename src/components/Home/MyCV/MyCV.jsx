@@ -8,6 +8,7 @@ import EmptyCreatedCV from "../../../assets/empty-cv-created.png";
 import EmptyUploadedCV from "../../../assets/empty-cv-upload.png";
 import { deleteCV } from "../../../services/auth.services";
 import CVPreviewCard from "./CVPreviewCard";
+import CvIcon from "../../../assets/cv-upload-default.png";
 import Swal from "sweetalert2";
 
 export default function MyCV() {
@@ -220,7 +221,7 @@ export default function MyCV() {
                     rel="noopener noreferrer"
                     className="cv-uploaded-content"
                   >
-                    <img src="/images/pdf-icon-large.png" alt="PDF" />
+                    <img src={CvIcon} alt="CV Icon" />
                     <div className="cv-info">
                       <h3>{cv.title || "CV tải lên"}</h3>
                       <p>Tải lên: {formatDate(cv.updatedAt)}</p>

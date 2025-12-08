@@ -201,27 +201,7 @@ if (selectedTemplate?.id) {
     )}
   </div>
 
-            <div className="form-group">
-              <label>Ảnh đại diện</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const imageUrl = URL.createObjectURL(file);
-                    const newData = { ...formData, avatarUrl: imageUrl };
-                    setFormData(newData);
-                    setPreviewHtml(mergeHtml(baseHtml, newData));
-                  }
-                }}
-              />
-              {formData.avatarUrl && (
-                <div className="avatar-preview">
-                  <img src={formData.avatarUrl} alt="Avatar Preview" />
-                </div>
-              )}
-            </div>
+           
 
             {[
               { name: "fullname", label: "Họ và tên *", placeholder: "Nhập họ và tên" },
