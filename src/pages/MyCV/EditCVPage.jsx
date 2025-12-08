@@ -166,6 +166,40 @@ if (selectedTemplate?.id) {
           {/* Form bên trái */}
           <div className="form-section">
             <h2>Nhập thông tin của bạn</h2>
+            
+<div className="form-group">
+    <label>Ảnh đại diện</label>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch("http://localhost:8080/api/cv/upload-avatar", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: form
+  });
+
+  const json = await res.json();
+
+  const newData = { ...formData, avatarUrl: json.url };
+  setFormData(newData);
+  setPreviewHtml(mergeHtml(baseHtml, newData));
+}}
+    />
+    {formData.avatarUrl && (
+      <div className="avatar-preview">
+        <img src={formData.avatarUrl} alt="Avatar Preview" />
+      </div>
+    )}
+  </div>
 
             <div className="form-group">
               <label>Ảnh đại diện</label>
