@@ -3,11 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import {
-  companyAPI,
-  employerAPI,
-  fileAPI,
-} from "../../services/auth.services";
+import { companyAPI } from "../../services/auth.services";
 import "./CompanyInfo.css";
 
 /* ========= Danh sách tỉnh/thành ========= */
@@ -17,12 +13,12 @@ const VIETNAM_PROVINCES = [
   "Đồng Nai","Đồng Tháp","Gia Lai","Hà Giang","Hà Nam","Hà Tĩnh","Hậu Giang","Hòa Bình","Hưng Yên","Khánh Hòa",
   "Kiên Giang","Kon Tum","Lai Châu","Lâm Đồng","Lạng Sơn","Long An","Nam Định","Nghệ An","Ninh Bình","Ninh Thuận",
   "Phú Thọ","Phú Yên","Quảng Bình","Quảng Nam","Quảng Ngãi","Quảng Ninh","Quảng Trị","Sóc Trăng","Sơn La","Tây Ninh",
-  "Thái Bình","Thái Nguyên","Thanh Hóa","Thừa Thiên Huế","Tiền Giang","Trà Vinh","Tuyên Quang","Vĩnh Long","Vĩnh Phúc","Yên Bái"
+  "Thái Bình","Thái Nguyên","Thanh Hóa","Thừa Thiên Huế","Tiền Giang","Trà Vinh","Tuyển Quang","Vĩnh Long","Vĩnh Phúc","Yên Bái"
 ];
 
 /* ========= Helpers ========= */
 const currentYear = new Date().getFullYear();
-const onlyDigits = (s) => (s || "").replace(/[^0-9]/g, "");
+const onlyDigits = (s) => (s ?? "").replace(/[^\d]/g, "");
 const isValidUrl = (value) => {
   if (!value) return false;
   try { const u = new URL(value); return ["http:", "https:"].includes(u.protocol); }
@@ -38,13 +34,11 @@ function CitySelect({ value, onChange, options, label = "Thành phố (City)", p
   const [hi, setHi] = useState(-1);
   const ref = useRef(null);
   const filtered = options.filter((c) => c.toLowerCase().includes(query.trim().toLowerCase()));
-
   useEffect(() => {
     const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setHi(-1); } };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
-
   const select = (val) => { onChange(val); setOpen(false); setQuery(""); setHi(-1); };
   const onKey = (e) => {
     if (!open && ["ArrowDown","ArrowUp"].includes(e.key)) { setOpen(true); return; }
@@ -53,15 +47,14 @@ function CitySelect({ value, onChange, options, label = "Thành phố (City)", p
     else if (e.key === "Enter") { if (open && hi >= 0 && filtered[hi]) { e.preventDefault(); select(filtered[hi]); } }
     else if (e.key === "Escape") { setOpen(false); setHi(-1); }
   };
-
   return (
     <div className="form-row full" ref={ref}>
-      <label>{label}</label>
+      <label> {label} <span className="required">*</span> </label>
       <input
         type="text"
         className={`combobox-input ${error ? "input-error" : ""}`}
         placeholder={placeholder}
-        value={open ? query : (value || "")}
+        value={open ? query : (value ?? "")}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setOpen(true)}
         onClick={() => setOpen(true)}
@@ -114,22 +107,23 @@ const CompanyInfo = () => {
   /* Create form (HR) */
   const [form, setForm] = useState({
     name: "", taxCode: "", industry: "", description: "",
-    logoUrl: "", coverUrl: "", website: "",
-    address: "", city: "", size: "MEDIUM", foundedYear: "",
-    // ✅ GPKD (lưu vào bảng companies)
-    businessRegistrationUrl: "",
-    businessRegistrationFileName: "",
+    logoUrl: "", coverUrl: "", website: "", address: "", city: "", size: "MEDIUM", foundedYear: "",
   });
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
   const [creatingCompany, setCreatingCompany] = useState(false);
 
-  /* Wizard 2 bước (1: Form, 2: Review) */
+  /* Stepper */
   const [step, setStep] = useState(1);
 
   /* Pending company & polling */
   const [pendingCompany, setPendingCompany] = useState(null);
   const pollRef = useRef(null);
+
+  /* ========= NEW: Upload GPKD ========= */
+  const [brFile, setBrFile] = useState(null);
+  const [brPreview, setBrPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   /* ========= Load public companies ========= */
   useEffect(() => {
@@ -148,9 +142,18 @@ const CompanyInfo = () => {
   }, []);
 
   /* ========= Validation ========= */
+  const currentYear = new Date().getFullYear();
+  const isValidUrl = (value) => {
+    if (!value) return false;
+    try { const u = new URL(value); return ["http:", "https:"].includes(u.protocol); }
+    catch { return false; }
+  };
+  const isValidYear = (y) => /^\d{4}$/.test(String(y)) && y >= 1800 && y <= currentYear;
+  const onlyDigits = (s) => (s ?? "").replace(/[^\d]/g, "");
+  const isValidTaxCode = (tax) => /^\d{10,13}$/.test(onlyDigits(tax));
+
   const validate = (d) => {
     const e = {};
-    // Cơ bản
     if (!d.name?.trim()) e.name = "Tên công ty là bắt buộc";
     if (!isValidTaxCode(d.taxCode)) e.taxCode = "Mã số thuế 10–13 chữ số";
     if (!d.industry?.trim()) e.industry = "Ngành nghề là bắt buộc";
@@ -162,43 +165,57 @@ const CompanyInfo = () => {
     if (!d.city?.trim()) e.city = "Thành phố là bắt buộc";
     if (!d.size) e.size = "Quy mô là bắt buộc";
     if (!isValidYear(Number(d.foundedYear))) e.foundedYear = `Năm thành lập phải từ 1800 đến ${currentYear}`;
-    // ✅ GPKD: bắt buộc khi tạo
-    if (!isValidUrl(d.businessRegistrationUrl)) e.businessRegistrationUrl = "URL GPKD (http/https)";
-    if (!d.businessRegistrationFileName?.trim()) e.businessRegistrationFileName = "Tên file GPKD là bắt buộc";
+    // ✅ NEW: file GPKD
+    if (!brFile) e.businessRegistrationFile = "Vui lòng upload file GPKD (PDF/Ảnh)";
     return e;
   };
   const onField = (k, v) => {
     setForm((prev) => ({ ...prev, [k]: k === "taxCode" ? onlyDigits(v) : v }));
     setTouched((prev) => ({ ...prev, [k]: true }));
   };
-  useEffect(() => { setErrors(validate(form)); }, [form]);
-
+  useEffect(() => { setErrors(validate(form)); }, [form, brFile]);
   const isStep1Valid = () => {
     const e = validate(form);
-    return !(
-      e.name || e.taxCode || e.industry || e.description || e.logoUrl ||
-      e.coverUrl || e.website || e.address || e.city || e.size || e.foundedYear ||
-      e.businessRegistrationUrl || e.businessRegistrationFileName
-    );
+    return !(e.name || e.taxCode || e.industry || e.description || e.logoUrl || e.coverUrl || e.website || e.address || e.city || e.size || e.foundedYear || e.businessRegistrationFile);
   };
 
-  /* ========= GỬI DUYỆT với Countdown 5s ========= */
+  /* ========= Upload handlers ========= */
+  const onFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) { setBrFile(null); setBrPreview(null); return; }
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+    if (!allowed.includes(file.type)) {
+      Swal.fire("Lỗi", "Chỉ chấp nhận file: JPG, PNG, PDF", "error");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      Swal.fire("Lỗi", "File không được vượt quá 10MB", "error");
+      return;
+    }
+    setBrFile(file);
+    if (file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onloadend = () => setBrPreview(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      setBrPreview("/pdf-preview.png");
+    }
+  };
+
+  /* ========= Gửi tạo công ty (HR) – multipart ========= */
   const confirmAndCreateCompany = async () => {
-    // Chạm tất cả để hiện lỗi nếu có
     setTouched(Object.keys(form).reduce((acc, k) => (acc[k] = true, acc), {}));
     if (!isStep1Valid()) {
       Swal.fire({ icon: "warning", title: "Thông tin chưa hợp lệ", text: "Vui lòng kiểm tra các trường được đánh dấu." });
       return;
     }
-
-    // SweetAlert2 với đếm ngược 5 giây
     let seconds = 5;
     const { isConfirmed } = await Swal.fire({
       icon: "info",
       title: "Vui lòng kiểm tra kỹ lại thông tin",
       html: `
         <div style="text-align:left">
-          <p>Hãy rà soát lại tất cả thông tin công ty (tên, MST, địa chỉ, website, GPKD...).</p>
+          <p>Hãy rà soát lại toàn bộ thông tin công ty (tên, MST, địa chỉ, website, GPKD...).</p>
           <p><b>Trong ${seconds} giây tới</b>, bạn chưa thể gửi duyệt. Sau khi hết thời gian, nút "Gửi duyệt" sẽ khả dụng.</p>
         </div>
         <div id="countdown" style="margin-top:8px;font-weight:700;">Còn ${seconds}s</div>
@@ -224,20 +241,18 @@ const CompanyInfo = () => {
         }, 1000);
       },
     });
-
     if (!isConfirmed) return;
 
     setCreatingCompany(true);
     try {
-      // HR tạo công ty: service sẽ set verify = PENDING & yêu cầu có URL GPKD
-      const res = await companyAPI.create(form);
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => { if (v !== null && v !== undefined) fd.append(k, v); });
+      fd.append("businessRegistrationFile", brFile); // <-- key file phải khớp BE
+      const res = await companyAPI.createForHR(fd);   // multipart endpoint cho HR
       const company = res.data;
-
-      // BẮT BUỘC: set đầy đủ state để chuyển Step 2
       setPendingCompany(company);
       setActiveTab("create");
       setStep(2);
-
       Swal.fire({
         icon: "success",
         title: "Đã gửi yêu cầu duyệt",
@@ -245,8 +260,6 @@ const CompanyInfo = () => {
         timer: 2000,
         showConfirmButton: false,
       });
-
-      // Bắt đầu polling trạng thái duyệt
       startPolling(company.companyId);
     } catch (err) {
       Swal.fire({
@@ -259,7 +272,6 @@ const CompanyInfo = () => {
     }
   };
 
-  /* ========= Poll verify ========= */
   const startPolling = (companyId) => {
     stopPolling();
     pollRef.current = setInterval(async () => {
@@ -284,23 +296,16 @@ const CompanyInfo = () => {
       } catch { /* im lặng */ }
     }, 8000);
   };
-  const stopPolling = () => {
-    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-  };
+  const stopPolling = () => { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; } };
   useEffect(() => stopPolling, []);
 
-  /* ========= Tiếp tục → Nhập thông tin cá nhân ========= */
   const goToPersonalInfo = () => {
     const c = selectedCompany ?? pendingCompany;
-    if (!c) {
-      Swal.fire({ icon: "info", title: "Vui lòng chọn/đợi công ty được duyệt" }); return;
-    }
+    if (!c) { Swal.fire({ icon: "info", title: "Vui lòng chọn/đợi công ty được duyệt" }); return; }
     localStorage.setItem("selectedCompany", JSON.stringify(c));
     localStorage.setItem("selected_company_id", c.companyId);
     navigate("/hr/profile");
   };
-
-  /* ========= Reset flow (chỉ dùng ở tab select) ========= */
   const resetFlow = () => {
     stopPolling();
     setPendingCompany(null);
@@ -311,7 +316,6 @@ const CompanyInfo = () => {
     localStorage.removeItem("selectedCompanyId");
   };
 
-  /* ========= Render ========= */
   return (
     <div className="hr-company-wrap">
       {/* Header */}
@@ -346,7 +350,6 @@ const CompanyInfo = () => {
                   aria-label="Tìm kiếm công ty theo tên"
                 />
               </div>
-
               {loadingCompanies ? (
                 <div className="skeleton-grid">
                   {Array.from({ length: 6 }, (_, i) => (
@@ -394,7 +397,6 @@ const CompanyInfo = () => {
                   </div>
                 </div>
               </div>
-
               <div className="actions" style={{ marginTop: 12 }}>
                 <button className="btn secondary" onClick={() => setSelectedCompany(null)}>Chọn lại</button>
                 <button className="btn primary" onClick={goToPersonalInfo}>
@@ -409,7 +411,7 @@ const CompanyInfo = () => {
       {/* CREATE TAB */}
       {activeTab === "create" && (
         <div className="card glass">
-          {/* ✅ Stepper luôn hiển thị */}
+          {/* Stepper */}
           <div className="stepper">
             {["Thông tin cơ bản", "Xem lại & Chờ duyệt"].map((label, i) => {
               const idx = i + 1;
@@ -423,12 +425,12 @@ const CompanyInfo = () => {
             })}
           </div>
 
-          {/* STEP 1: Form + Gửi duyệt (SweetAlert 5s) */}
+          {/* STEP 1: Form + Gửi duyệt */}
           {step === 1 && (
             <form className="grid-2" onSubmit={(e) => e.preventDefault()}>
               {/* Tên công ty */}
-              <div className="form-row full">
-                <label>Tên công ty *</label>
+              <div className="form-row">
+                <label>Tên công ty <span className="required">*</span></label>
                 <input
                   value={form.name}
                   onChange={(e) => onField("name", e.target.value)}
@@ -438,9 +440,10 @@ const CompanyInfo = () => {
                 />
                 {touched.name && errors.name && <div className="error-text">{errors.name}</div>}
               </div>
+
               {/* MST */}
               <div className="form-row">
-                <label>Mã số thuế (10–13 số) *</label>
+                <label>Mã số thuế (10–13 số) <span className="required">*</span></label>
                 <input
                   value={form.taxCode}
                   onChange={(e) => onField("taxCode", e.target.value)}
@@ -451,9 +454,10 @@ const CompanyInfo = () => {
                 />
                 {touched.taxCode && errors.taxCode && <div className="error-text">{errors.taxCode}</div>}
               </div>
+
               {/* Ngành nghề */}
               <div className="form-row">
-                <label>Ngành nghề *</label>
+                <label>Ngành nghề <span className="required">*</span></label>
                 <input
                   value={form.industry}
                   onChange={(e) => onField("industry", e.target.value)}
@@ -463,9 +467,10 @@ const CompanyInfo = () => {
                 />
                 {touched.industry && errors.industry && <div className="error-text">{errors.industry}</div>}
               </div>
+
               {/* Mô tả */}
-              <div className="form-row full">
-                <label>Mô tả (≥ 30 ký tự) *</label>
+              <div className="form-row">
+                <label>Mô tả (≥ 30 ký tự) <span className="required">*</span></label>
                 <textarea
                   rows={4}
                   value={form.description}
@@ -476,9 +481,10 @@ const CompanyInfo = () => {
                 />
                 {touched.description && errors.description && <div className="error-text">{errors.description}</div>}
               </div>
+
               {/* Logo URL */}
-              <div className="form-row full">
-                <label>Logo URL *</label>
+              <div className="form-row">
+                <label>Logo URL <span className="required">*</span></label>
                 <input
                   value={form.logoUrl}
                   onChange={(e) => onField("logoUrl", e.target.value)}
@@ -488,9 +494,10 @@ const CompanyInfo = () => {
                 />
                 {touched.logoUrl && errors.logoUrl && <div className="error-text">{errors.logoUrl}</div>}
               </div>
+
               {/* Cover URL */}
-              <div className="form-row full">
-                <label>Ảnh bìa URL *</label>
+              <div className="form-row">
+                <label>Ảnh bìa URL <span className="required">*</span></label>
                 <input
                   value={form.coverUrl}
                   onChange={(e) => onField("coverUrl", e.target.value)}
@@ -500,9 +507,10 @@ const CompanyInfo = () => {
                 />
                 {touched.coverUrl && errors.coverUrl && <div className="error-text">{errors.coverUrl}</div>}
               </div>
+
               {/* Website */}
-              <div className="form-row full">
-                <label>Website *</label>
+              <div className="form-row">
+                <label>Website <span className="required">*</span></label>
                 <input
                   value={form.website}
                   onChange={(e) => onField("website", e.target.value)}
@@ -512,9 +520,10 @@ const CompanyInfo = () => {
                 />
                 {touched.website && errors.website && <div className="error-text">{errors.website}</div>}
               </div>
+
               {/* Địa chỉ */}
-              <div className="form-row full">
-                <label>Địa chỉ *</label>
+              <div className="form-row">
+                <label>Địa chỉ <span className="required">*</span></label>
                 <input
                   value={form.address}
                   onChange={(e) => onField("address", e.target.value)}
@@ -524,16 +533,18 @@ const CompanyInfo = () => {
                 />
                 {touched.address && errors.address && <div className="error-text">{errors.address}</div>}
               </div>
-              {/* City */}
+
+              {/* City combobox */}
               <CitySelect
                 value={form.city}
                 onChange={(val) => onField("city", val)}
                 options={VIETNAM_PROVINCES}
                 error={touched.city ? errors.city : ""}
               />
+
               {/* Quy mô */}
               <div className="form-row">
-                <label>Quy mô *</label>
+                <label>Quy mô <span className="required">*</span></label>
                 <select
                   value={form.size}
                   onChange={(e) => onField("size", e.target.value)}
@@ -547,9 +558,10 @@ const CompanyInfo = () => {
                 </select>
                 {touched.size && errors.size && <div className="error-text">{errors.size}</div>}
               </div>
+
               {/* Năm thành lập */}
               <div className="form-row">
-                <label>Năm thành lập *</label>
+                <label>Năm thành lập <span className="required">*</span></label>
                 <input
                   type="number"
                   value={form.foundedYear}
@@ -560,32 +572,37 @@ const CompanyInfo = () => {
                 />
                 {touched.foundedYear && errors.foundedYear && <div className="error-text">{errors.foundedYear}</div>}
               </div>
-              {/* ✅ GPKD: URL + tên file */}
+
+              {/* ✅ Upload Giấy phép kinh doanh */}
               <div className="form-row full">
-                <label>URL Giấy phép kinh doanh *</label>
-                <input
-                  value={form.businessRegistrationUrl}
-                  onChange={(e) => onField("businessRegistrationUrl", e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, businessRegistrationUrl: true }))}
-                  className={touched.businessRegistrationUrl && errors.businessRegistrationUrl ? "input-error" : ""}
-                  placeholder="https://storage.example.com/MyCompany_BR.pdf"
-                />
-                {touched.businessRegistrationUrl && errors.businessRegistrationUrl && (
-                  <div className="error-text">{errors.businessRegistrationUrl}</div>
-                )}
-              </div>
-              <div className="form-row full">
-                <label>Tên file GPKD *</label>
-                <input
-                  value={form.businessRegistrationFileName}
-                  onChange={(e) => onField("businessRegistrationFileName", e.target.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, businessRegistrationFileName: true }))}
-                  className={touched.businessRegistrationFileName && errors.businessRegistrationFileName ? "input-error" : ""}
-                  placeholder="VD: BR_CMC_Global.pdf"
-                />
-                {touched.businessRegistrationFileName && errors.businessRegistrationFileName && (
-                  <div className="error-text">{errors.businessRegistrationFileName}</div>
-                )}
+                <label>Giấy phép kinh doanh (PDF/Ảnh) <span className="required">*</span></label>
+                <div className="upload-section">
+                  <div className="drop-zone">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,application/pdf"
+                      onChange={onFileChange}
+                      id="br-file-input"
+                    />
+                    <label htmlFor="br-file-input" className="drop-label">
+                      {brFile || brPreview ? (
+                        <div className="file-preview">
+                          <span className="file-name">{brFile?.name ?? "Đã tải lên GPKD"}</span>
+                          {brPreview && <img src={brPreview} alt="Preview" className="preview-img" />}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="upload-icon">Upload</div>
+                          <p>Kéo & thả file vào đây hoặc nhấn để chọn</p>
+                          <p className="file-info">Tối đa 10MB • JPG, PNG, PDF</p>
+                          <button type="button" className="btn-choose-file">Chọn file</button>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                  {errors.businessRegistrationFile && <div className="error-text">{errors.businessRegistrationFile}</div>}
+                </div>
               </div>
 
               {/* Actions */}
@@ -596,7 +613,7 @@ const CompanyInfo = () => {
                 <button
                   className="btn primary"
                   type="button"
-                  onClick={confirmAndCreateCompany} // <-- SweetAlert 5s
+                  onClick={confirmAndCreateCompany}
                   disabled={creatingCompany}
                   title={!isStep1Valid() ? "Hoàn thành thông tin trước khi gửi duyệt" : ""}
                 >
@@ -606,17 +623,14 @@ const CompanyInfo = () => {
             </form>
           )}
 
-          {/* STEP 2: Review & Chờ duyệt (readonly) */}
+          {/* STEP 2: Review & Chờ duyệt */}
           {step === 2 && (
             <>
-              {/* Thanh trạng thái trên cùng */}
               <div className="status-bar">
                 <span className={`verify-badge ${String(pendingCompany?.verify ?? "PENDING").toLowerCase()}`}>
                   {pendingCompany?.verify ?? "PENDING"}
                 </span>
               </div>
-
-              {/* Review readonly */}
               <div className="review">
                 <h3>Tổng quan thông tin (chỉ xem)</h3>
                 <div className="review-grid">
@@ -645,13 +659,8 @@ const CompanyInfo = () => {
                       </a>
                     </div>
                     <div className="kv"><span>Địa chỉ:</span><b className="one-line">{pendingCompany?.address ?? form.address}</b></div>
-                    <div className="kv"><span>GPKD URL:</span>
-                      <a href={pendingCompany?.businessRegistrationUrl ?? form.businessRegistrationUrl} target="_blank" rel="noreferrer">
-                        {pendingCompany?.businessRegistrationUrl ?? form.businessRegistrationUrl}
-                      </a>
-                    </div>
-                    <div className="kv"><span>GPKD file:</span><b className="one-line">
-                      {pendingCompany?.businessRegistrationFileName ?? form.businessRegistrationFileName}
+                    <div className="kv"><span>GPKD:</span><b className="one-line">
+                      {pendingCompany?.businessRegistrationFileName ?? (brFile?.name ?? "Đã upload")}
                     </b></div>
                   </div>
                 </div>
@@ -660,8 +669,6 @@ const CompanyInfo = () => {
                   Khi Admin duyệt (APPROVE) hoặc từ chối (REJECT), hệ thống sẽ hiển thị thông báo tương ứng.
                 </p>
               </div>
-
-              {/* Actions: KHÔNG có nút sửa/gửi lại; chỉ khi APPROVE mới cho đi tiếp */}
               <div className="pending-actions">
                 {pendingCompany?.verify === "APPROVE" ? (
                   <button
@@ -689,7 +696,8 @@ const CompanyInfo = () => {
         </div>
       )}
     </div>
-  );
+   );
 };
+
 
 export default CompanyInfo;

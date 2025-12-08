@@ -72,33 +72,29 @@ export const jobAPI = {
 
 };
 
-// Company API
+
 export const companyAPI = {
   // Public
   getFeatured: () => api.get("/companies/featured"),
   getAllActive: () => api.get("/companies/public"),
   getById: (id) => api.get(`/companies/public/${id}`),
 
-  // Admin / HR
+  // Admin / HR (giữ nguyên)
   getAll: () => api.get("/companies"),
-  create: (data) => api.post("/companies", data),
+  create: (data) => api.post("/companies", data), // CHỈ Admin dùng
   update: (id, data) => api.put(`/companies/${id}`, data),
   delete: (id) => api.delete(`/companies/${id}`),
-  getByIdAdmin: (id) => api.get(`/companies/${id}`), // ADMIN/HR view – full payload
+  getByIdAdmin: (id) => api.get(`/companies/${id}`),
 
-  // NEW: Verify actions
+  // Verify
   approve: (id) => api.patch(`/companies/${id}/approve`),
-  reject: (companyId, reason) => 
-    api.patch(`/companies/${companyId}/reject`, { reason }), // Gửi { reason: "..." }
-
-  // NEW: Featured toggle (chỉ cho ACTIVE + APPROVE)
+  reject: (companyId, reason) => api.patch(`/companies/${companyId}/reject`, { reason }),
   setFeatured: (id, featured) => api.patch(`/companies/${id}/featured?featured=${featured}`),
-  
-// HR: yêu cầu duyệt công ty
   requestVerification: (companyId) => api.post(`/companies/${companyId}/request-verification`),
 
-  // ✅ NEW: HR cập nhật công ty theo luồng riêng (nếu cần enforce GPKD khi chưa có)
-  updateForHR: (id, data) => api.put(`/companies/hr/${id}`, data),
+  // ✅ NEW: HR tạo company qua multipart
+createForHR: (formData) => api.post("/companies/hr", formData),           // multipart
+  updateForHR: (id, formData) => api.put(`/companies/hr/${id}`, formData),  // multipart
 };
 
 export const employerAPI = {

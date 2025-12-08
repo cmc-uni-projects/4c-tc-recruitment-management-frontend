@@ -461,24 +461,27 @@ export default function AdminCompanyManager() {
       Swal.fire({ icon: "error", title: "Lỗi", text: "Duyệt thất bại." });
     }
   };
-  const handleReject = async (id) => {
-    const confirm = await Swal.fire({
-      title: "Từ chối công ty?",
-      text: "Công ty sẽ không public và bị ẩn khỏi danh sách nổi bật.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Từ chối",
-      cancelButtonText: "Hủy",
-    });
-    if (!confirm.isConfirmed) return;
-    try {
-      await companyAPI.reject(id);
-      Swal.fire({ icon: "success", title: "Đã từ chối công ty", timer: 1500, showConfirmButton: false });
-      fetchCompanies();
-    } catch {
-      Swal.fire({ icon: "error", title: "Lỗi", text: "Từ chối thất bại." });
-    }
-  };
+ 
+const handleReject = async (id) => {
+  const { value: reason } = await Swal.fire({
+    title: "Từ chối công ty?",
+    input: "textarea",
+    inputLabel: "Lý do từ chối (bắt buộc)",
+    inputPlaceholder: "VD: Thiếu dấu đỏ, thông tin MST không khớp...",
+    showCancelButton: true,
+    confirmButtonText: "Từ chối",
+    cancelButtonText: "Hủy",
+    inputValidator: (v) => (!v?.trim() ? "Vui lòng nhập lý do!" : undefined),
+  });
+  if (!reason) return;
+  try {
+    await companyAPI.reject(id, reason.trim()); // <-- gửi lý do
+    Swal.fire({ icon: "success", title: "Đã từ chối công ty", timer: 1500, showConfirmButton: false });
+    fetchCompanies();
+  } catch {
+    Swal.fire({ icon: "error", title: "Lỗi", text: "Từ chối thất bại." });
+  }
+};
 
   /** ===== Toggle Featured row action ===== */
   const toggleFeatured = async (company) => {
