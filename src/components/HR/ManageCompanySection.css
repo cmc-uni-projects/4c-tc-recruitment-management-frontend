@@ -222,6 +222,7 @@
   font-size: 15px;
   transition: all 0.2s;
   background: white;
+  height: 44px;
 }
 .form-group input:focus,
 .form-group select:focus,
@@ -241,6 +242,7 @@
   display: flex;
   gap: 24px;
   margin-top: 8px;
+  justify-content: center;
 }
 .radio-buttons label {
   display: flex;
@@ -270,6 +272,7 @@
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  margin: 20px 0px 0px;
 }
 .btn-save {
   padding: 12px 32px;
@@ -448,4 +451,20 @@
   .company-logo-floating { width: 140px; height: 140px; left: 20px; }
   .company-main-info, .company-details-section { margin: 20px; padding: 24px; }
   .cover-photo { height: 240px; }
+}
+
+/* === thêm vào ManageCompanySection.css === */
+
+/* Hàng 2 cột dùng cho các cặp trường liên quan (VD: foundedYear + taxCode) */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Responsive: khi nhỏ hơn 992px thì về 1 cột */
+@media (max-width: 992px) {
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
 }
