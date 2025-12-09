@@ -146,7 +146,7 @@ export default function JobDetail() {
                   </div>
                   <div>
                     <p className="label">Kinh nghiệm</p>
-                    <p className="value">{job.experience || "Không yêu cầu"}</p>
+                    <p className="value">{job.experienceRequired + " năm" || "Không yêu cầu"}</p>
                   </div>
                 </div>
               </div>
