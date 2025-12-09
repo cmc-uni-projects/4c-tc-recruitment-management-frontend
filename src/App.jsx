@@ -16,7 +16,7 @@ import CompanyDetailPage from "./pages/Company/CompanyDetailPage";
 import JobDetail from "./components/Job/JobDetail";
 import SearchPage from "./pages/Search/SearchPage";
 import CompanyListPage from "./pages/Company/CompanyListPage";
-
+import CompanyJobsPage from "./pages/Company/CompanyJobsPage";
 // Protected Pages
 import HRPage from "./pages/HR/HRPage";
 import AdminPage from "./pages/Admin/AdminPage";
@@ -65,6 +65,7 @@ function App() {
         <Route path="/jobs/:jobId" element={<JobDetail />} />
         <Route path="/search-results" element={<SearchPage />} />
         <Route path="/companies/public" element={<CompanyListPage />} />
+        <Route path="/company/:id/jobs" element={<CompanyJobsPage />} />
 
         {/* Trang lỗi 403 */}
         <Route path="/403" element={<ForbiddenPage />} />

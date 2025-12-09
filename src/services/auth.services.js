@@ -70,6 +70,9 @@ export const jobAPI = {
 
   getMyCompanyJobs: () => api.get("/jobs/my-company"),
 
+    // ⭐ 11. Public: Lấy job theo companyId
+  getJobsByCompany: (companyId) =>
+    api.get(`/jobs/public/company/${companyId}`),
 };
 
 // Company API

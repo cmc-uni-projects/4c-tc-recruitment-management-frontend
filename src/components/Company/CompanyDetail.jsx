@@ -11,12 +11,13 @@ const CompanyDetail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    companyAPI.getById(id)
-      .then(res => {
+    companyAPI
+      .getById(id)
+      .then((res) => {
         setCompany(res.data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Lỗi khi tải công ty:", err);
         Swal.fire("Lỗi", "Không thể tải thông tin công ty", "error");
         setLoading(false);
@@ -29,41 +30,42 @@ const CompanyDetail = () => {
   return (
     <div className="company-detail-page">
       {/* ==================== HERO ==================== */}
-<section className="detail-hero">
-  {/* Ảnh cover */}
-  <div className="detail-cover">
-    <img
-      src={company.coverUrl || "/default-cover.jpg"}
-      alt="Cover"
-      className="detail-cover-img"
-      onError={e => e.currentTarget.src = "/default-cover.jpg"}
-    />
-  </div>
+      <section className="detail-hero">
+        {/* Ảnh cover */}
+        <div className="detail-cover">
+          <img
+            src={company.coverUrl || "/default-cover.jpg"}
+            alt="Cover"
+            className="detail-cover-img"
+            onError={(e) => (e.currentTarget.src = "/default-cover.jpg")}
+          />
+        </div>
 
-  {/* Logo nổi + Nội dung bên dưới */}
-  <div className="detail-hero-below">
-    <div className="detail-logo-wrapper">
-      <img
-        src={company.logoUrl || "/default-logo.png"}
-        alt={company.name}
-        className="detail-logo"
-        onError={e => e.currentTarget.src = "/default-logo.png"}
-      />
-    </div>
+        {/* Logo nổi + Nội dung bên dưới */}
+        <div className="detail-hero-below">
+          <div className="detail-logo-wrapper">
+            <img
+              src={company.logoUrl || "/default-logo.png"}
+              alt={company.name}
+              className="detail-logo"
+              onError={(e) => (e.currentTarget.src = "/default-logo.png")}
+            />
+          </div>
 
-    <div className="detail-title">
-      <h1>{company.name}</h1>
-      <p className="detail-subtitle">
-        <i className="fa-solid fa-briefcase"></i> {company.industry}
-      </p>
-      {company.city && (
-        <p className="detail-city">
-          <i className="fa-solid fa-map-marker-alt"></i> {company.city}, Việt Nam
-        </p>
-      )}
-    </div>
-  </div>
-</section>
+          <div className="detail-title">
+            <h1>{company.name}</h1>
+            <p className="detail-subtitle">
+              <i className="fa-solid fa-briefcase"></i> {company.industry}
+            </p>
+            {company.city && (
+              <p className="detail-city">
+                <i className="fa-solid fa-map-marker-alt"></i> {company.city},
+                Việt Nam
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* ==================== INFO GRID ==================== */}
       <section className="detail-info-section">
@@ -84,7 +86,11 @@ const CompanyDetail = () => {
                 <strong>Website</strong>
                 <p>
                   {company.website ? (
-                    <a href={company.website} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={company.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {company.website}
                     </a>
                   ) : (
@@ -117,7 +123,9 @@ const CompanyDetail = () => {
               <i className="fa-solid fa-file-lines info-icon"></i>
               <div>
                 <strong>Giới thiệu công ty</strong>
-                <p className="company-desc">{company.description || "Chưa có mô tả."}</p>
+                <p className="company-desc">
+                  {company.description || "Chưa có mô tả."}
+                </p>
               </div>
             </div>
           </div>
@@ -125,7 +133,10 @@ const CompanyDetail = () => {
 
         {/* Nút hành động */}
         <div className="detail-actions">
-          <Link to={`/jobs?company=${company.companyId}`} className="btn-primary">
+          <Link
+            to={`/company/${company.companyId}/jobs`}
+            className="btn-primary"
+          >
             Xem việc làm tại {company.name}
           </Link>
           <button className="btn-secondary" onClick={() => navigate(-1)}>
