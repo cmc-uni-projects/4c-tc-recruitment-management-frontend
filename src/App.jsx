@@ -42,6 +42,7 @@ import ProfileLayout from "./components/HR/ProfileLayout";
 import PersonalInfo from "./components/HR/PersonalInfo";
 import CompanyInfo from "./components/HR/CompanyInfo";
 import BusinessRegistration from "./components/HR/BusinessRegistration";
+import HrStatisticsPage from "./pages/HR/HrStatisticsPage";
 
 // Component bảo vệ
 import ProtectedRoute, { ForbiddenPage } from "./components/ProtectedRoute";
@@ -85,6 +86,7 @@ function App() {
           <Route path="/hr" element={<HRPage />} />
           <Route path="/hr/jobs" element={<ManageJobPage />} />
           <Route path="/hr/companies" element={<ManageCompanyPage />} />
+          <Route path="/hr/statistics" element={<HrStatisticsPage />} />
           {/* HR Profile (có layout lồng nhau) */}
           <Route path="/hr/profile" element={<HRProfilePage />}>
             <Route element={<ProfileLayout />}>

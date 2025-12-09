@@ -1,0 +1,111 @@
+
+/* src/pages/HR/HrStatisticsPage.css */
+
+/* Wrapper */
+.hr-dashboard {
+  padding: 32px 24px;
+  background: linear-gradient(135deg, #f8f9fc 0%, #eef1f5 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Title */
+.hr-dashboard-title {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.hr-dashboard-title h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+.hr-dashboard-title p {
+  color: #6e6e73;
+  font-size: 17px;
+  margin-top: 8px;
+}
+
+/* Stats Cards */
+.hr-stats-grid {
+  margin-bottom: 40px;
+}
+.hr-stat-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 130px;
+}
+.hr-stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+.hr-stat-icon {
+  font-size: 36px;
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  color: white;
+}
+.hr-stat-icon.job {
+  background: linear-gradient(135deg, #007aff, #0066cc);
+}
+.hr-stat-icon.company {
+  background: linear-gradient(135deg, #34c759, #248a3d);
+}
+.hr-stat-icon.cv {
+  background: linear-gradient(135deg, #ff9f0a, #e68a00);
+}
+
+/* Chart Cards */
+.hr-chart-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+}
+.hr-chart-card .ant-card-head {
+  background: transparent;
+  border-bottom: none;
+  padding: 20px 24px 0;
+}
+.hr-chart-card .ant-card-head-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+.hr-chart-container {
+  height: 340px;
+  padding: 16px;
+  position: relative;
+}
+
+/* Loading */
+.hr-loading-wrapper {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hr-dashboard-title h1 {
+    font-size: 28px;
+  }
+  .hr-stat-card {
+    height: 110px;
+    padding: 18px;
+  }
+  .hr-chart-container {
+    height: 280px;
+  }
+}
