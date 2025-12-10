@@ -124,7 +124,6 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
                   <div><strong>Website:</strong> {company?.website ? <a href={company.website} target="_blank" rel="noreferrer">{company.website}</a> : "—"}</div>
                   <div><strong>Địa chỉ:</strong> {company?.address || "—"}</div>
                   <div><strong>Thành phố:</strong> {company?.city || "—"}</div>
-                  <div><strong>Mã công ty:</strong> {company?.companyId || "—"}</div>
                   <div><strong>Trạng thái:</strong> <span className="status-pending">PENDING</span></div>
                 </div>
               </div>
