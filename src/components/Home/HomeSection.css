@@ -798,3 +798,116 @@ transform: none;
   height: auto;
   object-fit: contain;
 }
+/* =============== TOP NGÀNH NGHỀ NỔI BẬT – SIÊU ĐẸP, ẢNH TO =============== */
+.industry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.industry-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transition: all 0.4s ease;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+}
+
+.industry-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* ẢNH TO CHIẾM ĐÚNG NỬA CARD – CỐ ĐỊNH KÍCH THƯỚC */
+.industry-image {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background-color: #f59e0b;
+}
+.industry-image img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+
+.industry-card:hover .industry-cover-img {
+  transform: scale(1.1);
+}
+
+.industry-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #004d40, #009688);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 50px;
+}
+
+/* PHẦN THÔNG TIN BÊN DƯỚI */
+.industry-info {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.industry-info h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #004d40;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
+}
+
+.industry-info p {
+  font-size: 14.5px;
+  color: #444;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Skeleton khi đang load */
+.skeleton-cover {
+  height: 180px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.8s infinite;
+}
+
+.skeleton-title {
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  width: 80%;
+  margin: 20px auto 10px;
+  animation: loading 1.8s infinite;
+}
+
+.skeleton-desc {
+  height: 40px;
+  background: #e0e0e0;
+  border-radius: 8px;
+  width: 90%;
+  margin: 0 auto;
+  animation: loading 1.8s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

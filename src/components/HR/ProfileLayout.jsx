@@ -15,9 +15,6 @@ const ProfileLayout = () => {
           <NavLink to="/hr/profile" end className={({ isActive }) => isActive ? "active" : ""}>
             Thông tin cá nhân
           </NavLink>
-          <NavLink to="/hr/profile/business-registration" className={({ isActive }) => isActive ? "active" : ""}>
-            Giấy đăng ký/Giấy Phép kinh doanh
-          </NavLink>
           <NavLink to="/hr/profile/settings" className={({ isActive }) => isActive ? "active" : ""}>
             Cài đặt
           </NavLink>

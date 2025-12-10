@@ -11,8 +11,8 @@ import iconaccounting from "../../assets/icons/ke-toan-kiem-toan.png";
 import iconmarketing from "../../assets/icons/marketing-truyen-thong-quang-cao.png";
 import { jobCategoryAPI } from "../../services/auth.services.js";
 import LatestJobsSection from "../Job/LatestJobsSection.jsx";
-import {companyAPI } from "../../services/auth.services.js";
-import {jobAPI } from "../../services/auth.services.js";
+import { companyAPI } from "../../services/auth.services.js";
+import { jobAPI } from "../../services/auth.services.js";
 import featuredBanner from "../../assets/featured-banner.jpg";
 import toppyBanner from "../../assets/toppy_unemployed.png";
 import { Link } from "react-router-dom";
@@ -48,69 +48,64 @@ export default function HomeSection() {
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [jobStats, setJobStats] = useState({ jobsPosting: 0, jobsNewToday: 0 });
 
-  
-useEffect(() => {
-  const fetchJobStats = async () => {
-    try {
-      // Lấy danh sách việc làm đã duyệt
-      const approvedRes = await jobAPI.getApprovedJobs();
-      const jobsPosting = approvedRes.data.length;
+  useEffect(() => {
+    const fetchJobStats = async () => {
+      try {
+        // Lấy danh sách việc làm đã duyệt
+        const approvedRes = await jobAPI.getApprovedJobs();
+        const jobsPosting = approvedRes.data.length;
 
-      // Lấy danh sách việc làm mới nhất
-      const latestRes = await jobAPI.getLatestJobs();
-      const today = new Date().toISOString().split("T")[0];
+        // Lấy danh sách việc làm mới nhất
+        const latestRes = await jobAPI.getLatestJobs();
+        const today = new Date().toISOString().split("T")[0];
 
-      // Đếm số việc làm mới hôm nay
-      const jobsNewToday = latestRes.data.filter(job =>
-        job.createdAt.startsWith(today)
-      ).length;
+        // Đếm số việc làm mới hôm nay
+        const jobsNewToday = latestRes.data.filter((job) =>
+          job.createdAt.startsWith(today)
+        ).length;
 
-      setJobStats({ jobsPosting, jobsNewToday });
-    } catch (error) {
-      console.error("Lỗi khi tải thống kê việc làm:", error);
-    }
-  };
+        setJobStats({ jobsPosting, jobsNewToday });
+      } catch (error) {
+        console.error("Lỗi khi tải thống kê việc làm:", error);
+      }
+    };
 
-  fetchJobStats();
-}, []);
-
+    fetchJobStats();
+  }, []);
 
   useEffect(() => {
-  const fetchLocations = async () => {
-    try {
-      const res = await jobAPI.getApprovedJobs();
-      const jobs = res.data;
+    const fetchLocations = async () => {
+      try {
+        const res = await jobAPI.getApprovedJobs();
+        const jobs = res.data;
 
-      // Tạo map: { Hà Nội: 12, HCM: 8, ... }
-      const locationCount = {};
+        // Tạo map: { Hà Nội: 12, HCM: 8, ... }
+        const locationCount = {};
 
-      jobs.forEach(job => {
-        const loc = job.location?.trim();
-        if (!loc) return; // bỏ job không có location
+        jobs.forEach((job) => {
+          const loc = job.location?.trim();
+          if (!loc) return; // bỏ job không có location
 
-        if (!locationCount[loc]) {
-          locationCount[loc] = 1;
-        } else {
-          locationCount[loc]++;
-        }
-      });
+          if (!locationCount[loc]) {
+            locationCount[loc] = 1;
+          } else {
+            locationCount[loc]++;
+          }
+        });
 
-      // Convert từ object sang array để sort
-      const sortedLocations = Object.entries(locationCount)
-        .map(([loc, count]) => ({ loc, count }))
-        .sort((a, b) => b.count - a.count); // sort giảm dần
+        // Convert từ object sang array để sort
+        const sortedLocations = Object.entries(locationCount)
+          .map(([loc, count]) => ({ loc, count }))
+          .sort((a, b) => b.count - a.count); // sort giảm dần
 
-      setLocations(sortedLocations);
+        setLocations(sortedLocations);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách địa điểm:", error);
+      }
+    };
 
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách địa điểm:", error);
-    }
-  };
-
-  fetchLocations();
-}, []);
-
-
+    fetchLocations();
+  }, []);
 
   useEffect(() => {
     const fetchPopularCategories = async () => {
@@ -143,16 +138,15 @@ useEffect(() => {
 
     fetchFeaturedCompanies();
   }, []);
-const handleSearch = () => {
-  const query = new URLSearchParams({
-    keyword: keyword || "",
-    location: location || "",
-    category: category || "",
-  }).toString();
+  const handleSearch = () => {
+    const query = new URLSearchParams({
+      keyword: keyword || "",
+      location: location || "",
+      category: category || "",
+    }).toString();
 
-  navigate(`/search-results?${query}`);
-};
-
+    navigate(`/search-results?${query}`);
+  };
 
   const openVideoModal = () => {
     setIsVideoLoading(true);
@@ -170,140 +164,164 @@ const handleSearch = () => {
       <section className="banner">
         <h2>Smart Hire - Tạo CV, Tìm việc làm, Tuyển dụng hiệu quả</h2>
         {/* Thanh tìm kiếm chính */}
-      {/* === SEARCH BAR (REWRITTEN) === */}
-<div className="search-bar2">
+        {/* === SEARCH BAR (REWRITTEN) === */}
+        <div className="search-bar2">
+          {/* Category Dropdown - Đồng bộ với API */}
+          <select
+            className="category-select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">Danh mục nghề</option>
 
-  {/* Category Dropdown - Đồng bộ với API */}
-  <select
-    className="category-select"
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-  >
-    <option value="">Danh mục nghề</option>
+            {popularCategories.map((cat) => (
+              <option key={cat.categoryId || cat.name} value={cat.categoryId}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
 
-    {popularCategories.map((cat) => (
-      <option key={cat.categoryId || cat.name} value={cat.categoryId}>
-        {cat.name}
-      </option>
-    ))}
-  </select>
+          {/* Keyword input */}
+          <input
+            type="text"
+            placeholder="Vị trí tuyển dụng, tên công ty..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
 
-  {/* Keyword input */}
-  <input
-    type="text"
-    placeholder="Vị trí tuyển dụng, tên công ty..."
-    value={keyword}
-    onChange={(e) => setKeyword(e.target.value)}
-    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-  />
+          {/* Location */}
+          <div className="location-select-wrapper">
+            <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            >
+              <option value="">Địa điểm</option>
 
-  {/* Location */}
-  <div className="location-select-wrapper">
-    <i className="fa-solid fa-location-dot select-multi-location__icon"></i>
-    <select value={location} onChange={(e) => setLocation(e.target.value)}>
-  <option value="">Địa điểm</option>
+              {locations.map((item) => (
+                <option key={item.loc} value={item.loc}>
+                  {item.loc} ({item.count} việc làm)
+                </option>
+              ))}
+            </select>
+          </div>
 
-  {locations.map((item) => (
-    <option key={item.loc} value={item.loc}>
-      {item.loc} ({item.count} việc làm)
-    </option>
-  ))}
-</select>
+          <button className="btn-search" onClick={handleSearch}>
+            Tìm kiếm
+          </button>
+        </div>
 
-
-  </div>
-
-  <button className="btn-search" onClick={handleSearch}>
-    Tìm kiếm
-  </button>
-</div>
-
-      
-       
-<div className="job-banner">
-  <div className="banner-left">
-    <div className="banner-header">
-      <i className="fa fa-briefcase"></i>
-      <span>Thị trường việc làm hôm nay</span>
-      <span className="date">{new Date().toLocaleDateString()}</span>
-    </div>
-    <div className="job-stats">
-      <span className="active-jobs">
-        Việc làm đang tuyển <strong>{jobStats.jobsPosting.toLocaleString()}</strong>
-      </span>
-      <span className="new-jobs">
-        Việc làm mới hôm nay <strong>{jobStats.jobsNewToday.toLocaleString()}</strong>
-      </span>
-    </div>
-  </div>
-  <div className="banner-right">
-    <img src={toppyBanner} alt="Toppy Banner" className="banner-image2" />
-  </div>
-</div>
-
-        <section className="hero-video-section">
-        <div className="hero-video-container">
-          <div className="hero-video-thumbnail" onClick={openVideoModal}>
-            <img
-              src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-              alt="Giới thiệu Smart Hire"
-              className="video-thumb"
-            />
-            <div className="video-play-overlay">
-              <button className="video-play-btn">
-                <i className="fa-solid fa-play"></i>
-              </button>
-              <p>Xem video giới thiệu</p>
+        <div className="job-banner">
+          <div className="banner-left">
+            <div className="banner-header">
+              <i className="fa fa-briefcase"></i>
+              <span>Thị trường việc làm hôm nay</span>
+              <span className="date">{new Date().toLocaleDateString()}</span>
+            </div>
+            <div className="job-stats">
+              <span className="active-jobs">
+                Việc làm đang tuyển{" "}
+                <strong>{jobStats.jobsPosting.toLocaleString()}</strong>
+              </span>
+              <span className="new-jobs">
+                Việc làm mới hôm nay{" "}
+                <strong>{jobStats.jobsNewToday.toLocaleString()}</strong>
+              </span>
             </div>
           </div>
-          <div className="hero-video-text">
-            <h3>Tiếp lợi thế, nối thành công</h3>
-            <p>
-              Smart Hire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ
-              tại Việt Nam
-            </p>
+          <div className="banner-right">
+            <img
+              src={toppyBanner}
+              alt="Toppy Banner"
+              className="banner-image2"
+            />
           </div>
         </div>
-      </section>
+
+        <section className="hero-video-section">
+          <div className="hero-video-container">
+            <div className="hero-video-thumbnail" onClick={openVideoModal}>
+              <img
+                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                alt="Giới thiệu Smart Hire"
+                className="video-thumb"
+              />
+              <div className="video-play-overlay">
+                <button className="video-play-btn">
+                  <i className="fa-solid fa-play"></i>
+                </button>
+                <p>Xem video giới thiệu</p>
+              </div>
+            </div>
+            <div className="hero-video-text">
+              <h3>Tiếp lợi thế, nối thành công</h3>
+              <p>
+                Smart Hire - Hệ sinh thái nhân sự tiên phong ứng dụng công nghệ
+                tại Việt Nam
+              </p>
+            </div>
+          </div>
+        </section>
       </section>
       {/* === HERO VIDEO SECTION === */}
-      
+
       {/* === TIN TUYỂN DỤNG MỚI NHẤT === */}
       <div id="latest-jobs">
         <LatestJobsSection />
-        </div>
+      </div>
       {/* === NGÀNH NGHỀ NỔI BẬT === */}
       <section className="industry-section">
         <div className="industry-header">
           <h2>Top ngành nghề nổi bật</h2>
           <p>
-            Bạn muốn tìm việc mới? Xem danh sách việc làm <a href="#">tại đây</a>
+            Bạn muốn tìm việc mới? Xem danh sách việc làm{" "}
+            <a href="#">tại đây</a>
           </p>
         </div>
         <div className="industry-grid">
           {popularCategories.length > 0
             ? popularCategories.map((item, index) => (
-              <div key={item.categoryId || index} className="industry-card">
-                <div className="industry-icon-placeholder">
-                  <i className="fa-solid fa-briefcase"></i>
+                <div key={item.categoryId || index} className="industry-card">
+                  {/* ẢNH TO CỐ ĐỊNH 100% CHIỀU RỘNG + 180PX CHIỀU CAO */}
+                  <div className="industry-image">
+                    {item.iconUrl ? (
+                      <img
+                        src={item.iconUrl}
+                        alt={item.name}
+                        className="industry-cover-img"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://via.placeholder.com/600x180/004d40/ffffff?text=No+Image";
+                        }}
+                      />
+                    ) : (
+                      <div className="industry-cover-placeholder">
+                        <i className="fa-solid fa-briefcase"></i>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* PHẦN CHỮ BÊN DƯỚI */}
+                  <div className="industry-info">
+                    <h3>{item.name}</h3>
+                    <p>
+                      {item.description
+                        ? item.description.length > 70
+                          ? item.description.substring(0, 70) + "..."
+                          : item.description
+                        : "Nhiều vị trí hấp dẫn đang chờ bạn"}
+                    </p>
+                  </div>
                 </div>
-                <h3>{item.name}</h3>
-                <span>
-                  {item.description
-                    ? item.description.length > 50
-                      ? item.description.substring(0, 50) + "..."
-                      : item.description
-                    : "Nhiều việc làm"}
-                </span>
-              </div>
-            ))
+              ))
             : [...Array(8)].map((_, i) => (
-              <div key={i} className="industry-card skeleton">
-                <div className="skeleton-icon"></div>
-                <div className="skeleton-text"></div>
-                <div className="skeleton-subtext"></div>
-              </div>
-            ))}
+                <div key={i} className="industry-card skeleton">
+                  <div className="skeleton-cover"></div>
+                  <div className="skeleton-title"></div>
+                  <div className="skeleton-desc"></div>
+                </div>
+              ))}
         </div>
       </section>
       {/* === THƯƠNG HIỆU LỚN === */}
@@ -315,49 +333,52 @@ const handleSearch = () => {
               Hàng trăm thương hiệu lớn tiêu biểu đang tuyển dụng trên TopCV Pro
             </p>
           </div>
-           <button
-  className="btn-pro"
-  onClick={() => navigate("/companies/public")}
->
-  Xem tất cả công ty
-</button>
+          <button
+            className="btn-pro"
+            onClick={() => navigate("/companies/public")}
+          >
+            Xem tất cả công ty
+          </button>
         </div>
         <div className="brand-subtitle">
-  <h3>Danh sách công ty tiêu biểu của top ngành nghề</h3>
-</div>
+          <h3>Danh sách công ty tiêu biểu của top ngành nghề</h3>
+        </div>
         <div className="brand-grid-wrapper">
-<div className="banner-wrapper">
-  <img src={featuredBanner} className="featured-banner-img"/>
-</div>
+          <div className="banner-wrapper">
+            <img src={featuredBanner} className="featured-banner-img" />
+          </div>
 
+          {/* Danh sách công ty nổi bật */}
 
-{/* Danh sách công ty nổi bật */}
+          <div className="company-grid">
+            {featuredCompanies.slice(0, 6).map((company) => (
+              <Link
+                to={`/company/public/${company.companyId}`}
+                className="brand-card"
+                key={company.companyId}
+              >
+                <div
+                  className="company-cover"
+                  style={{ backgroundImage: `url(${company.coverUrl})` }}
+                >
+                  <img
+                    src={company.logoUrl || "/default-logo.png"}
+                    alt={company.name}
+                    className="company-logo"
+                  />
+                </div>
 
-<div className="company-grid">
-  {featuredCompanies.slice(0, 6).map((company) => (
-    <Link to={`/company/public/${company.companyId}`} className="brand-card" key={company.companyId}>
-      <div
-        className="company-cover"
-        style={{ backgroundImage: `url(${company.coverUrl})` }}
-      >
-        <img
-          src={company.logoUrl || "/default-logo.png"}
-          alt={company.name}
-          className="company-logo"
-        />
-      </div>
-
-      <div className="company-info">
-        <h3 className="company-name">{company.name}</h3>
-        <p className="company-address">
-          <strong>Địa chỉ:</strong> {company.address}
-        </p>
-        <p className="company-description">{company.description}</p>
-      </div>
-    </Link>
-  ))}
-</div>
-</div>
+                <div className="company-info">
+                  <h3 className="company-name">{company.name}</h3>
+                  <p className="company-address">
+                    <strong>Địa chỉ:</strong> {company.address}
+                  </p>
+                  <p className="company-description">{company.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* === MODAL VIDEO === */}

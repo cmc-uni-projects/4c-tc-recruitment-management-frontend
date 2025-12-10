@@ -11,6 +11,7 @@ export default function JobCategoryManager() {
     name: "",
     description: "",
     isPopular: false,
+    iconUrl: "",
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -39,10 +40,11 @@ export default function JobCategoryManager() {
         name: category.name,
         description: category.description || "",
         isPopular: category.isPopular,
+        iconUrl: category.iconUrl || "",
       });
       setEditingId(category.categoryId);
     } else {
-      setForm({ name: "", description: "", isPopular: false });
+      setForm({ name: "", description: "", isPopular: false, iconUrl: "" });
       setEditingId(null);
     }
     setIsModalOpen(true);
@@ -50,7 +52,7 @@ export default function JobCategoryManager() {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setForm({ name: "", description: "", isPopular: false });
+    setForm({ name: "", description: "", isPopular: false, iconUrl: "" });
     setEditingId(null);
   };
 
@@ -78,8 +80,7 @@ export default function JobCategoryManager() {
     }
   };
 
-  
-const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     Swal.fire({
       title: "Bạn có chắc muốn xóa ngành nghề này?",
       text: "Hành động này không thể hoàn tác!",
@@ -97,12 +98,15 @@ const handleDelete = async (id) => {
           Swal.fire("Đã xóa!", "Ngành nghề đã được xóa thành công.", "success");
         } catch (err) {
           console.error("Lỗi xóa:", err);
-          Swal.fire("Lỗi","Xoá thất bại.Có thể nghành đang được sử dụng.","error");
+          Swal.fire(
+            "Lỗi",
+            "Xoá thất bại.Có thể nghành đang được sử dụng.",
+            "error"
+          );
         }
       }
     });
   };
-
 
   return (
     <div className="job-category-manager">
@@ -119,6 +123,7 @@ const handleDelete = async (id) => {
         <table className="category-table">
           <thead>
             <tr>
+              <th>Icon</th>
               <th>Tên ngành nghề</th>
               <th>Mô tả</th>
               <th>Nổi bật</th>
@@ -128,14 +133,39 @@ const handleDelete = async (id) => {
           <tbody>
             {categories.length === 0 ? (
               <tr>
-                <td colSpan="4" className="no-data">
+                <td colSpan="5" className="no-data">
                   Chưa có ngành nghề nào
                 </td>
               </tr>
             ) : (
               categories.map((cat) => (
                 <tr key={cat.categoryId}>
-                  <td>{cat.name}</td>
+                  {/* THÊM CỘT ICON Ở ĐÂY – ĐẦU TIÊN */}
+                  <td style={{ textAlign: "center", padding: "10px" }}>
+                    {cat.iconUrl ? (
+                      <img
+                        src={cat.iconUrl}
+                        alt={cat.name}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "contain",
+                          borderRadius: "8px",
+                          border: "1px solid #eee",
+                        }}
+                        onError={(e) => {
+                          e.target.src =
+                            "https://via.placeholder.com/40/cccccc/666666?text=Icon";
+                        }}
+                      />
+                    ) : (
+                      <span style={{ color: "#ccc", fontSize: "20px" }}>-</span>
+                    )}
+                  </td>
+
+                  <td>
+                    <strong>{cat.name}</strong>
+                  </td>
                   <td>{cat.description || "-"}</td>
                   <td>{cat.popular ? "Có" : "Không"}</td>
                   <td className="actions">
@@ -185,6 +215,52 @@ const handleDelete = async (id) => {
                   placeholder="Mô tả ngắn về ngành nghề (tùy chọn)"
                   rows="3"
                 />
+              </div>
+
+              {/* MỚI: Ô NHẬP LINK ẢNH ICON */}
+              <div className="form-group">
+                <label>Link ảnh icon (tùy chọn)</label>
+                <input
+                  type="url"
+                  value={form.iconUrl}
+                  onChange={(e) =>
+                    setForm({ ...form, iconUrl: e.target.value })
+                  }
+                  placeholder="https://img.icons8.com/color/96/laptop-coding.png"
+                  style={{ fontSize: "14px" }}
+                />
+                {form.iconUrl && (
+                  <div style={{ marginTop: "8px", textAlign: "center" }}>
+                    <img
+                      src={form.iconUrl}
+                      alt="Preview"
+                      style={{
+                        width: "64px",
+                        height: "64px",
+                        objectFit: "contain",
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  </div>
+                )}
+                <small style={{ color: "#666", fontSize: "12px" }}>
+                  Gợi ý: Dùng ảnh từ{" "}
+                  <a href="https://icons8.com" target="_blank" rel="noreferrer">
+                    icons8.com
+                  </a>{" "}
+                  hoặc{" "}
+                  <a
+                    href="https://heroicons.com"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    heroicons.com
+                  </a>
+                </small>
               </div>
 
               <div className="form-group checkbox-group">

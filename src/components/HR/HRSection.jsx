@@ -261,7 +261,7 @@ const HRSection = ({ children }) => {
               ) : employer ? (
                 <div
                   className="verified-status not-verified"
-                  onClick={() => navigate("/hr/profile/business-registration")}
+                  onClick={() => navigate("/hr/profile")}
                   style={{ cursor: "pointer" }}
                 >
                   Tiếp tục xác thực
@@ -396,7 +396,6 @@ const HRSection = ({ children }) => {
                   <span className="highlight">+8 Top Points</span>
                 </p>
                 <div className="action-buttons">
-                  <button>Xác thực số điện thoại</button>
                   <button>Cập nhật thông tin công ty</button>
                   <button>Đăng tin tuyển dụng</button>
                 </div>
@@ -409,11 +408,6 @@ const HRSection = ({ children }) => {
                   <div className="explore-item">
                     <img src={exploreJob} alt="Đăng tin" />
                     <p>Đăng tin tuyển dụng</p>
-                    <button>Thử ngay</button>
-                  </div>
-                  <div className="explore-item">
-                    <img src={exploreCV} alt="Tìm CV" />
-                    <p>Tìm kiếm CV</p>
                     <button>Thử ngay</button>
                   </div>
                   <div className="explore-item">
@@ -516,7 +510,7 @@ const HRSection = ({ children }) => {
                     className="btn-primary"
                     onClick={() => {
                       setShowVerifyBlocker(false);
-                      navigate("/hr/profile/business-registration");
+                      navigate("/hr/profile");
                     }}
                   >
                     Xem chi tiết
@@ -543,7 +537,7 @@ const HRSection = ({ children }) => {
                     className="btn-primary"
                     onClick={() => {
                       setShowVerifyBlocker(false);
-                      navigate("/hr/profile/business-registration");
+                      navigate("/hr/profile");
                     }}
                   >
                     Tiếp tục xác thực
