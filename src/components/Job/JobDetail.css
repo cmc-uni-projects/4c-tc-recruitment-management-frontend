@@ -259,3 +259,20 @@
 .view-company-link:hover {
   text-decoration: underline;
 }
+
+.applied-btn {
+  background: #e0e0e0;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.reapply-btn {
+  background: #00b14f;
+  color: #fff;
+  margin-left: 8px;
+}
+
+.apply-btn {
+  background: #00b14f;
+  color: #fff;
+}

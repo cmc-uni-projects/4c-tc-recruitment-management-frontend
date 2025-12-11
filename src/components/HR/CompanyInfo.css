@@ -138,7 +138,7 @@
 
 /* ✅ Ô input gọn lại */
 .form-row input, .form-row textarea, .form-row select {
-  width: 100%; max-width: 500px;            /* giới hạn chiều rộng để đỡ quá dài */
+  width: 90%; max-width: 500px;            /* giới hạn chiều rộng để đỡ quá dài */
   padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
 }
 
