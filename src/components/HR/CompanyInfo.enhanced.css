@@ -1,0 +1,51 @@
+
+/* CompanyInfo.enhanced.css */
+/* Fix overlapping & beautify preview/pending sections */
+.company-preview .cover-photo-wrapper,
+.company-pending .cover-photo-wrapper {
+  margin-bottom: 140px; /* thêm khoảng cho logo nổi */
+}
+.company-main-info.preview {
+  margin: 20px 40px 0;
+  padding: 24px 32px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+}
+.company-preview .company-header,
+.company-pending .company-header {
+  align-items: flex-start;
+  gap: 16px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 700;
+}
+.company-details-section { margin: 24px 40px; }
+.detail-columns { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: 24px; }
+.detail-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow:0 4px 18px rgba(0,0,0,0.04); }
+.detail-card h3 { margin: 0 0 12px 0; font-size: 16px; color:#0f172a; }
+.kv { display:flex; gap:8px; align-items:center; margin:6px 0; }
+.kv span { width:160px; color:#64748b; font-size:14px; }
+.kv b, .kv a { color:#0f172a; font-weight:600; font-size:14px; }
+.kv a { text-decoration:none; color:#2563eb; }
+.kv a:hover { text-decoration:underline; }
+.desc-block { margin: 24px 0; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; }
+.desc-block h3 { margin: 0 0 8px; font-size: 16px; color:#0f172a; }
+.desc-block p { margin: 0; white-space: pre-wrap; color:#334155; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .company-main-info.preview { margin: 16px 20px 0;  .company-main-info.preview { margin: 16px 20px 0; padding: 20px; }
+  .company-details-section { margin: 16px 20px; }
+  .detail-columns { grid-template-columns: 1fr; }
+}}
+@media (max-width: 768px) {
+  .company-preview .cover-photo { height: 260px; }
+  .company-pending .cover-photo { height: 260px; }
+}
