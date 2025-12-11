@@ -5,7 +5,7 @@ import {
   getMyCVs,
   renderCV,
   updateCV,
-  getAllTemplates, // ✅ THÊM MỚI
+  getAllTemplates,
 } from "../../services/auth.services";
 import { toast } from "react-toastify";
 import Navbar from "../../components/Layout/Navbar";
@@ -13,31 +13,73 @@ import "./EditCVPage.css";
 import html2pdf from "html2pdf.js";
 import Swal from "sweetalert2";
 
+/** ====== Helpers ====== */
+
+// Chuyển URL ảnh -> base64 dataURL để tránh CORS/taint canvas
+async function toDataURL(url) {
+  // Nếu đã là dataURL thì trả lại luôn
+  if (!url || url.startsWith("data:")) return url;
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    // Nếu lỗi, trả lại URL cũ (vẫn hiển thị trên màn hình)
+    return url;
+  }
+}
+
+// Chờ tất cả <img> bên trong root load xong (tránh ảnh trắng)
+function waitForImagesLoaded(root) {
+  if (!root) return Promise.resolve();
+  const imgs = Array.from(root.querySelectorAll("img"));
+  if (!imgs.length) return Promise.resolve();
+  return Promise.all(
+    imgs.map(
+      (img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise((res) => {
+              img.onload = () => res();
+              img.onerror = () => res(); // đừng treo nếu ảnh lỗi
+            })
+    )
+  );
+}
+
+// Đảm bảo các <img> trong HTML string có crossOrigin="anonymous"
+function addCrossOriginToImg(html) {
+  if (!html) return html;
+  return html.replace(/<img(\s)/gi, '<img crossOrigin="anonymous"$1');
+}
+
 export default function EditCVPage() {
   const { cvId } = useParams();
   const navigate = useNavigate();
-
   const [cv, setCv] = useState(null);
   const [formData, setFormData] = useState({});
   const [previewHtml, setPreviewHtml] = useState("");
   const [baseHtml, setBaseHtml] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // ✅ NEW: danh sách template & template đang chọn
+  // Templates
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  // Hàm thay biến {{key}} trong HTML
+  // Hàm thay biến {{key}} trong HTML + thêm crossOrigin cho <img>
   const mergeHtml = (html, data) => {
     if (!html) return "";
     let temp = html;
-    Object.keys(data || {}).forEach((key) => {
-      const regex = new RegExp(`{{${key}}}`, "g");
+    Object.keys(data ?? {}).forEach((key) => {
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, "g");
       temp = temp.replace(regex, data[key] ?? "");
     });
-    return temp;
+    return addCrossOriginToImg(temp);
   };
 
   // Tải CV + render HTML hiện tại
@@ -56,16 +98,26 @@ export default function EditCVPage() {
         // Render layout hiện tại từ server (dựa theo templateId đang lưu)
         const renderRes = await renderCV(cvId);
         const html = renderRes?.data?.htmlLayout ?? "";
-        const data = renderRes?.data?.data ?? {};
+        let data = renderRes?.data?.data ?? {};
+
+        // ✅ Nếu có avatarUrl là URL -> convert sang dataURL để export PDF không lỗi
+        if (data.avatarUrl && !String(data.avatarUrl).startsWith("data:")) {
+          try {
+            const dataUrl = await toDataURL(data.avatarUrl);
+            data = { ...data, avatarUrl: dataUrl };
+          } catch {}
+        }
+
         setBaseHtml(html);
         setFormData(data);
         setPreviewHtml(mergeHtml(html, data));
 
-        // ✅ Sau khi biết cv.templateId, tải danh sách mẫu và set mẫu đang dùng
+        // templates
         const tplRes = await getAllTemplates();
-        setTemplates(tplRes.data || []);
-        const currentTpl =
-          (tplRes.data || []).find((t) => t.id === found.templateId) || null;
+        setTemplates(tplRes.data ?? []);
+        const currentTpl = (tplRes.data ?? []).find(
+          (t) => t.id === found.templateId
+        ) ?? null;
         setSelectedTemplate(currentTpl);
       } catch (err) {
         console.error("Lỗi tải CV:", err);
@@ -86,7 +138,7 @@ export default function EditCVPage() {
     setPreviewHtml(mergeHtml(baseHtml, newData));
   };
 
-  // ✅ NEW: chọn mẫu → cập nhật baseHtml + preview
+  // Chọn template
   const handleSelectTemplate = (template) => {
     setSelectedTemplate(template);
     setBaseHtml(template?.htmlLayout ?? "");
@@ -96,7 +148,7 @@ export default function EditCVPage() {
     }
   };
 
-  // Lưu CV (kèm templateId đang chọn nếu có)
+  // Lưu CV
   const handleSave = async () => {
     if (!formData.fullname?.trim()) {
       Swal.fire("Cảnh báo", "Vui lòng nhập họ tên", "warning");
@@ -106,18 +158,14 @@ export default function EditCVPage() {
     try {
       await updateCV(cvId, {
         title: `${formData.fullname} - ${formData.position ?? "CV"}`.trim(),
-        templateId: selectedTemplate?.id ?? cv.templateId, // ✅ cập nhật templateId
+        templateId: selectedTemplate?.id ?? cv.templateId,
         visibility: "PRIVATE",
         data: formData,
       });
-      
-if (selectedTemplate?.id) {
-   setCv(prev => ({ ...prev, templateId: selectedTemplate.id })); // ✅ đồng bộ state
- }
-
+      if (selectedTemplate?.id) {
+        setCv((prev) => ({ ...prev, templateId: selectedTemplate.id }));
+      }
       Swal.fire("Thành công", "Cập nhật CV thành công!", "success");
-
-      // Render lại từ server để đồng bộ layout theo template mới
       const renderRes = await renderCV(cvId);
       const html = renderRes?.data?.htmlLayout ?? "";
       setBaseHtml(html);
@@ -130,15 +178,53 @@ if (selectedTemplate?.id) {
     }
   };
 
-  const handleExportPDF = () => {
+  // ✅ Upload avatar: đọc file -> upload -> nhận URL -> chuyển sang dataURL để tránh CORS
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch("http://localhost:8080/api/cv/upload-avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: form,
+      });
+      const json = await res.json();
+
+      // Convert sang dataURL
+      const dataUrl = await toDataURL(json.url);
+      const newData = { ...formData, avatarUrl: dataUrl };
+      setFormData(newData);
+      setPreviewHtml(mergeHtml(baseHtml, newData));
+    } catch (err) {
+      console.error("Upload avatar lỗi:", err);
+      toast.error("Upload avatar thất bại");
+    }
+  };
+
+  // ✅ Xuất PDF: chờ ảnh + bật useCORS + allowTaint:false
+  const handleExportPDF = async () => {
     const element = document.querySelector(".cv-preview");
+
+    // Chờ ảnh load, đặc biệt là avatar
+    await waitForImagesLoaded(element);
+
     const opt = {
       margin: 0,
       filename: `${formData.fullname ?? "cv"}_profile.pdf`,
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,      // quan trọng
+        allowTaint: false,  // an toàn hơn
+        backgroundColor: null,
+      },
       jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
     };
+
     html2pdf().from(element).set(opt).save();
   };
 
@@ -166,42 +252,21 @@ if (selectedTemplate?.id) {
           {/* Form bên trái */}
           <div className="form-section">
             <h2>Nhập thông tin của bạn</h2>
-            
-<div className="form-group">
-    <label>Ảnh đại diện</label>
-    <input
-      type="file"
-      accept="image/*"
-      onChange={async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
 
-  const form = new FormData();
-  form.append("file", file);
-
-  const res = await fetch("http://localhost:8080/api/cv/upload-avatar", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    body: form
-  });
-
-  const json = await res.json();
-
-  const newData = { ...formData, avatarUrl: json.url };
-  setFormData(newData);
-  setPreviewHtml(mergeHtml(baseHtml, newData));
-}}
-    />
-    {formData.avatarUrl && (
-      <div className="avatar-preview">
-        <img src={formData.avatarUrl} alt="Avatar Preview" />
-      </div>
-    )}
-  </div>
-
-           
+            <div className="form-group">
+              <label>Ảnh đại diện</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+              />
+              {formData.avatarUrl && (
+                <div className="avatar-preview">
+                  {/* Nếu template dùng {{avatarUrl}} cho <img>, phần này chỉ là preview bên trái */}
+                  <img src={formData.avatarUrl} alt="Avatar Preview" />
+                </div>
+              )}
+            </div>
 
             {[
               { name: "fullname", label: "Họ và tên *", placeholder: "Nhập họ và tên" },
@@ -238,6 +303,7 @@ if (selectedTemplate?.id) {
             <button onClick={handleSave} disabled={saving} className="btn-save">
               {saving ? "Đang lưu..." : "Lưu CV"}
             </button>
+
             <button
               onClick={handleExportPDF}
               className="btn-save"
@@ -249,16 +315,14 @@ if (selectedTemplate?.id) {
 
           {/* Bên phải: Selector mẫu + Preview */}
           <div className="preview-section">
-            {/* ✅ NEW: Khối chọn mẫu */}
+            {/* Chọn mẫu */}
             <div className="template-selector">
               <h3>Chọn mẫu CV ({templates.length} mẫu)</h3>
               <div className="template-grid">
                 {templates.map((tpl) => (
                   <div
                     key={tpl.id}
-                    className={`template-item ${
-                      selectedTemplate?.id === tpl.id ? "selected" : ""
-                    }`}
+                    className={`template-item ${selectedTemplate?.id === tpl.id ? "selected" : ""}`}
                     onClick={() => handleSelectTemplate(tpl)}
                     role="button"
                     tabIndex={0}
