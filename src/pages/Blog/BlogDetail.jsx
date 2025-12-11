@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import "./BlogDetail.css";
+import Navbar from "../../components/Layout/Navbar";
 
 // ✅ Import ảnh với tên file chính xác
 import tipImage from "../../assets/tips.webp";
@@ -58,6 +59,8 @@ const BlogDetail = () => {
   }
 
   return (
+    <>
+    <Navbar />
     <div className="blog-detail">
       <img
         src={blog.thumbnail}
@@ -78,6 +81,7 @@ const BlogDetail = () => {
         </Link>
       </div>
     </div>
+    </>
   );
 };
 

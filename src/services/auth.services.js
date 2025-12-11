@@ -125,6 +125,10 @@ export const employerAPI = {
   });
   return api.put(`/employers/${employerId}`, formData); // ← ĐÃ SỬA
 },
+
+ /** ADMIN: lấy tất cả nhà tuyển dụng */
+  getAll: () => api.get("/employers"),
+
   // 3. HR/ADMIN: Lấy thông tin Employer theo ID
   getEmployerById: (employerId) => api.get(`/employers/${employerId}`),
 
