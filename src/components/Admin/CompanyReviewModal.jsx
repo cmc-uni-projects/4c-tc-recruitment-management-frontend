@@ -120,6 +120,21 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
   const getLogoUrl = () =>
     company?.logoUrl || company?.logo?.url || company?.brandLogoUrl;
 
+
+  // Chuẩn hóa URL: nhận vào url hoặc path, trả về URL tuyệt đối
+  const toAbsoluteUrl = (urlOrPath) => {
+    const base = import.meta.env.VITE_API_URL || "http://localhost:8080";
+    if (!urlOrPath) return null;
+
+    // Nếu đã là URL tuyệt đối thì trả về luôn
+    if (/^https?:\/\//i.test(urlOrPath)) return urlOrPath;
+
+    // Nếu là kiểu "uploads/xxx.pdf" hoặc "/uploads/xxx.pdf" => ghép base
+    const hasLeadingSlash = urlOrPath.startsWith("/");
+    return `${base}${hasLeadingSlash ? "" : "/"}${urlOrPath}`;
+  };
+
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -181,14 +196,20 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
               </div>
 
               {/* GPKD */}
-              {company?.businessRegistrationUrl && (
+
+              {(company?.businessRegistrationUrl || company?.businessRegistrationPath) && (
                 <div className="file-box" style={{ marginTop: 24 }}>
                   <p><strong>Giấy phép kinh doanh:</strong></p>
-                  <a href={company.businessRegistrationUrl} target="_blank" rel="noreferrer">
-                    {company.businessRegistrationFileName || "Xem file GPKD"}
+                  <a
+                    href={toAbsoluteUrl(company?.businessRegistrationUrl || company?.businessRegistrationPath)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {company?.businessRegistrationFileName || "Xem file GPKD"}
                   </a>
                 </div>
               )}
+
             </section>
           </div>
         )}
