@@ -44,6 +44,7 @@
 }
 
 .profile-main-area {
+  width: 80%;;
   flex: 1;
   background: #fff;
   padding: 32px;
