@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../Layout/Navbar";
-import { jobAPI, companyAPI } from "../../services/auth.services";
+import { jobAPI, companyAPI, applicationAPI } from "../../services/auth.services";
 import "./JobDetail.css";
 import axios from "axios";
 import ApplyForm from "../Applications/ApplyForm";
-import { Modal, Box } from "@mui/material";
+import { Modal } from "@mui/material";
 import Swal from "sweetalert2";
 
 export default function JobDetail() {
@@ -14,6 +14,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [showApplyForm, setShowApplyForm] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
@@ -61,6 +62,20 @@ export default function JobDetail() {
     };
     checkSavedStatus();
   }, [jobId, token, userId]);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !jobId) return;
+
+    applicationAPI.getMyApplications(token)
+      .then(res => {
+        const applied = (res.data || []).some(app => app.jobId === jobId);
+        setIsApplied(applied);
+      })
+      .catch(err => console.error("Lỗi kiểm tra đã ứng tuyển:", err));
+  }, [jobId]);
+
 
   const formatSalary = (min, max) => {
     if (min && max) {
@@ -163,9 +178,22 @@ export default function JobDetail() {
               </div>
 
               <div className="job-actions">
-                <button className="apply-btn" onClick={() => setShowApplyForm(true)}>
-                  Ứng tuyển ngay
-                </button>
+
+                {isApplied ? (
+                  <>
+                    <button className="applied-btn" disabled>
+                      Đã ứng tuyển
+                    </button>
+                    <button className="reapply-btn" onClick={() => setShowApplyForm(true)}>
+                      Ứng tuyển lại
+                    </button>
+                  </>
+                ) : (
+                  <button className="apply-btn" onClick={() => setShowApplyForm(true)}>
+                    Ứng tuyển ngay
+                  </button>
+                )}
+
                 <button className="save-btn" onClick={handleSaveJob}>
                   <i className={`fa-heart ${isSaved ? "fa-solid" : "fa-regular"}`}></i>
                   <span>{isSaved ? "Đã lưu" : "Lưu tin"}</span>
@@ -220,9 +248,11 @@ export default function JobDetail() {
       </div>
 
       {/* Modal hiển thị form ứng tuyển */}
-      
+
       <Modal open={showApplyForm} onClose={() => setShowApplyForm(false)}>
-      <ApplyForm jobId={job.jobId} jobTitle={job.title} onClose={() => setShowApplyForm(false)} />
+        <ApplyForm jobId={job.jobId} jobTitle={job.title} onClose={() => setShowApplyForm(false)}
+          onApplied={() => setIsApplied(true)} // cập nhật ngay sau khi nộp
+        />
       </Modal>
 
     </>

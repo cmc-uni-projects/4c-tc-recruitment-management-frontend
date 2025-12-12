@@ -14,7 +14,7 @@ import {
 import "./ApplyForm.css";
 import Swal from "sweetalert2";
 
-const ApplyForm = ({ jobId, jobTitle, onClose }) => {
+const ApplyForm = ({ jobId, jobTitle, onClose, onApplied }) => {
   const [cvs, setCvs] = useState([]);
   const [selectedOption, setSelectedOption] = useState("recent");
   const [selectedCv, setSelectedCv] = useState("");
@@ -35,17 +35,23 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
       return;
     }
 
-    const data = { jobId, cvId: selectedCv || cvs[0]?.id, notes };
+    const data = {
+      jobId,
+      cvId: selectedOption === "other" ? selectedCv : cvs[0]?.id,
+      notes,
+    };
 
     try {
       await applicationAPI.create(data, token);
       Swal.fire("Thành công", "Ứng tuyển thành công!", "success");
+      onApplied?.(); // cập nhật isApplied = true ở JobDetail
       onClose();
     } catch (error) {
       console.error(error);
       Swal.fire("Lỗi", "Có lỗi xảy ra khi ứng tuyển", "error");
     }
   };
+
 
   return (
     <div className="apply-form-container">
@@ -128,14 +134,14 @@ const ApplyForm = ({ jobId, jobTitle, onClose }) => {
         </Alert>
 
         <div className="action-buttons">
-         
-<Button
-  variant="outlined"
-  onClick={onClose}
-  className="cancel-btn"
->
-  Hủy
-</Button>
+
+          <Button
+            variant="outlined"
+            onClick={onClose}
+            className="cancel-btn"
+          >
+            Hủy
+          </Button>
 
           <Button variant="contained" sx={{ backgroundColor: "#00b14f" }} onClick={handleSubmit}>
             Nộp hồ sơ ứng tuyển

@@ -145,9 +145,8 @@
 
 /* Inputs */
 .form-row input, .form-row textarea, .form-row select {
-  width: 90%;
-  padding: 12px;
-  border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
+  width: 90%; max-width: 500px;            /* giới hạn chiều rộng để đỡ quá dài */
+  padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
 }
 .input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
 .error-text { margin-top: 6px; color: var(--danger); font-size: 12px; }
