@@ -230,3 +230,61 @@ background: linear-gradient(135deg, #55ac58 0%, #256528 100%);
   cursor: not-allowed;
   transform: none !important;
 }
+
+/* --- Company Cover & Logo --- */
+.company-media {
+  position: relative;
+  margin-bottom: 16px;          /* cách khối thông tin một chút */
+  border-radius: 10px;          /* bo tròn nhẹ cho cover */
+  overflow: hidden;             /* để logo không bị tràn viền cover */
+  background: #f4f5f7;
+}
+
+/* Ảnh bìa */
+.company-cover {
+  display: block;
+  width: 100%;
+  height: 160px;                /* chiều cao bìa trong modal */
+  object-fit: cover;            /* crop đẹp */
+}
+
+/* Logo nhỏ, overlay trên cover */
+.company-logo {
+  position: absolute;
+  left: 16px;
+  bottom: -24px;                /* “nổi” một phần dưới mép cover */
+  width: 64px;                  /* logo nhỏ */
+  height: 64px;
+  object-fit: contain;          /* giữ tỉ lệ logo */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  padding: 8px;                 /* tạo khoảng trắng xung quanh logo */
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Để nội dung bên dưới không bị logo đè lên, tạo khoảng trống nhỏ */
+.modal-body .block:first-of-type {
+  margin-top: 28px;             /* tránh va chạm với logo "thò" xuống */
+}
+
+/* cho biết ảnh có thể bấm */
+.clickable {
+  cursor: zoom-in;
+}
+
+/* tinh chỉnh popup SweetAlert hiển thị ảnh */
+.img-preview-popup {
+  padding: 0 !important;  /* sát khung */
+  background: transparent; /* tập trung vào ảnh */
+}
+
+/* nếu cần giới hạn chiều rộng popup theo viewport (tùy chọn) */
+.swal2-popup .swal2-image {
+  max-width: 90vw;  /* không vượt quá màn hình theo chiều ngang */
+  max-height: 80vh; /* không vượt quá chiều cao */
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+

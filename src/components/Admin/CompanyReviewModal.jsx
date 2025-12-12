@@ -57,44 +57,69 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
 
   // TỪ CHỐI CÔNG TY – GỌI ĐÚNG API
   const handleReject = async () => {
-  const { value: reason } = await Swal.fire({
-    title: "Từ chối duyệt công ty",
-    input: "textarea",
-    inputLabel: "Lý do từ chối (bắt buộc)",
-    inputPlaceholder: "VD: Giấy phép kinh doanh bị mờ, thiếu con dấu đỏ, thông tin không khớp với MST...",
-    showCancelButton: true,
-    confirmButtonText: "Từ chối",
-    cancelButtonText: "Hủy",
-    confirmButtonColor: "#d33",
-    inputValidator: (value) => {
-      if (!value?.trim()) return "Bạn phải nhập lý do từ chối!";
-    },
-  });
-
-  if (!reason) return;
-
-  try {
-    setActionLoading(true);
-    
-    // ĐÃ SỬA: GỬI KÈM LÝ DO
-    await companyAPI.reject(companyId, reason.trim());
-
-    Swal.fire({
-      icon: "success",
-      title: "Đã từ chối!",
-      text: "HR sẽ thấy chính xác lý do bạn vừa nhập.",
-      timer: 3000
+    const { value: reason } = await Swal.fire({
+      title: "Từ chối duyệt công ty",
+      input: "textarea",
+      inputLabel: "Lý do từ chối (bắt buộc)",
+      inputPlaceholder: "VD: Giấy phép kinh doanh bị mờ, thiếu con dấu đỏ, thông tin không khớp với MST...",
+      showCancelButton: true,
+      confirmButtonText: "Từ chối",
+      cancelButtonText: "Hủy",
+      confirmButtonColor: "#d33",
+      inputValidator: (value) => {
+        if (!value?.trim()) return "Bạn phải nhập lý do từ chối!";
+      },
     });
 
-    onSuccess?.();
-    onClose?.();
-  } catch (err) {
-    const msg = err?.response?.data?.message || "Không thể từ chối công ty";
-    Swal.fire("Lỗi", msg, "error");
-  } finally {
-    setActionLoading(false);
-  }
-};
+    if (!reason) return;
+
+    try {
+      setActionLoading(true);
+
+      // ĐÃ SỬA: GỬI KÈM LÝ DO
+      await companyAPI.reject(companyId, reason.trim());
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã từ chối!",
+        text: "HR sẽ thấy chính xác lý do bạn vừa nhập.",
+        timer: 3000
+      });
+
+      onSuccess?.();
+      onClose?.();
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Không thể từ chối công ty";
+      Swal.fire("Lỗi", msg, "error");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // --- THÊM 2 HÀM NÀY NGAY TRONG COMPONENT ---
+  const openImagePreview = (url, title = "Xem ảnh") => {
+    if (!url) return;
+    Swal.fire({
+      title,
+      imageUrl: url,
+      imageAlt: title,
+      width: "auto",
+      backdrop: true,
+      showConfirmButton: false,       // click ra ngoài để đóng
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      customClass: {
+        popup: "img-preview-popup",
+      },
+    });
+  };
+
+  const getCoverUrl = () =>
+    company?.coverUrl || company?.cover?.url || company?.bannerUrl;
+
+  const getLogoUrl = () =>
+    company?.logoUrl || company?.logo?.url || company?.brandLogoUrl;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
@@ -109,6 +134,33 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
           <div className="modal-body error">{error}</div>
         ) : (
           <div className="modal-body">
+
+            {(company?.coverUrl || company?.cover?.url || company?.bannerUrl) && (
+              <div className="company-media">
+
+                <img
+                  className="company-cover clickable"
+                  src={getCoverUrl()}
+                  alt="Ảnh bìa công ty"
+                  loading="lazy"
+                  onClick={() => openImagePreview(getCoverUrl(), "Ảnh bìa công ty")}
+                />
+
+                {/* Logo overlay */}
+                {(getLogoUrl()) && (
+                  <img
+                    className="company-logo clickable"
+                    src={getLogoUrl()}
+                    alt="Logo công ty"
+                    loading="lazy"
+                    onClick={() => openImagePreview(getLogoUrl(), "Logo công ty")}
+                  />
+
+                )}
+              </div>
+            )}
+
+
             {/* Company Block */}
             <section className="block">
               <h5>Thông tin doanh nghiệp</h5>
