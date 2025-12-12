@@ -865,24 +865,12 @@ const CompanyInfo = () => {
                       </a>
                     </div>
                     <div className="kv"><span>Địa chỉ:</span><b className="one-line">{pendingCompany?.address ?? form.address}</b></div>
-                    <div className="kv"><span>GPKD:</span><b className="one-line">{pendingCompany?.businessRegistrationFileName ?? (brFile?.name ?? "Chưa có")}</b></div>
                   </div>
                 </div>
 
                 <div className="desc-block">
                   <h3>Mô tả</h3>
                   <p>{pendingCompany?.description ?? form.description ?? "Chưa có mô tả"}</p>
-                </div>
-
-                {/* GPKD preview */}
-                <div className="review-br-box" style={{ marginTop: 12 }}>
-                  <div className="media-label">Giấy phép kinh doanh</div>
-                  <img
-                    className="review-br"
-                    src={pendingCompany?.businessRegistrationPreviewUrl ?? (brPreview ?? "/pdf-preview.png")}
-                    alt="GPKD (preview)"
-                    onError={(e) => { e.currentTarget.src = "/pdf-preview.png"; }}
-                  />
                 </div>
 
                 {/* Actions */}
