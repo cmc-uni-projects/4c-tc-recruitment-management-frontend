@@ -32,7 +32,7 @@ const CompanyDetail = () => {
       {/* ==================== HERO ==================== */}
       <section className="detail-hero">
         {/* Ảnh cover */}
-        <div className="detail-cover">
+        <div className="detail-cover-company">
           <img
             src={company.coverUrl || "/default-cover.jpg"}
             alt="Cover"

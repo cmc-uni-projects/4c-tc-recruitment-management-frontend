@@ -89,16 +89,6 @@ const CompanyJobsPage = () => {
 
           <div className="cjp-info">
             <h1>{company.name}</h1>
-            <p className="cjp-industry">
-              <i className="fa-solid fa-briefcase"></i>{" "}
-              {company.industry || "Chưa cập nhật"}
-            </p>
-            {company.city && (
-              <p className="cjp-location">
-                <i className="fa-solid fa-map-marker-alt"></i> {company.city},
-                Việt Nam
-              </p>
-            )}
           </div>
         </div>
       </section>
@@ -134,14 +124,14 @@ const CompanyJobsPage = () => {
                   />
                   <div className="cjp-job-title-info">
                     <Link to={`/jobs/${job.jobId}`} className="cjp-job-title">
-                      {job.title}
+                      {job.title}{" "}
                     </Link>
+                    <p></p>
                     <Link
-                      to={`/company/${company.companyId}`}
+                      to={`/company/public/${company.companyId}`}
                       className="cjp-company-name"
                     >
                       {company.name}{" "}
-                      <i className="fa-solid fa-check-circle verified"></i>
                     </Link>
                   </div>
                 </div>
