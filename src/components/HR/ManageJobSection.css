@@ -131,67 +131,67 @@
   padding: 20px;
 }
 
-/* ========== FORM (thay mới hoàn toàn theo form của bạn) ========== */
 
-/* Overlay làm mờ nền */
-/* Overlay */
+/* ===========================
+   MODAL OVERLAY & CONTAINER
+=========================== */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(2px);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 999;
 }
 
-
 .modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px 28px;
-  width: 85%;
-  max-width: 800px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 28px;
+  width: min(960px, 92vw);
   max-height: 88vh;
   overflow-y: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  animation: fadeInUp 0.25s ease;
-  border-top: 4px solid #00b14f;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
+  border: 1px solid #eef2f7;
+  animation: modalPop 220ms ease-out;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes modalPop {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 18px;
+  margin: 0 0 18px 0;
   text-align: center;
-  color: #111827;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.2px;
 }
 
-/* Grid form */
+/* Scrollbar tinh tế */
+.modal-content::-webkit-scrollbar { width: 8px; }
+.modal-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ===========================
+   FORM GRID & INPUTS
+=========================== */
 .modal-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px 20px;
 }
 
-/* Một số ô full width nếu cần (ví dụ: tiêu đề, mô tả) */
-.modal-form .form-group.full-width {
-  grid-column: 1 / -1; /* Chiếm toàn bộ dòng */
+.form-group.full-width {
+  margin-top: 20px;
+  grid-column: 1 / -1;
 }
 
 .form-group {
@@ -199,37 +199,30 @@
   flex-direction: column;
 }
 
-.form-group label {
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: #374151;
+.form-group > label {
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
   font-size: 14px;
 }
 
-/* Input và Textarea chung */
 .form-group input,
 .form-group select,
 .form-group textarea {
   padding: 10px 12px;
   font-size: 14px;
   width: 100%;
-  box-sizing: border-box;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  background-color: #fafafa;
-}
-/* Select cao vừa phải */
-.form-group select {
-  height: 32px;
+  border-radius: 10px;
+  background-color: #f8fafc;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
-/* Hover & Focus */
 .form-group input:hover,
 .form-group select:hover,
 .form-group textarea:hover {
   border-color: #00b14f;
-  background-color: #f8fff9;
+  background-color: #f0fdf4;
 }
 
 .form-group input:focus,
@@ -237,47 +230,96 @@
 .form-group textarea:focus {
   outline: none;
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.14);
   background-color: #fff;
 }
-/* Select nhỏ hơn, gọn */
+
 .form-group select {
   height: 36px;
-  background-color: #fafafa;
 }
 
-/* Textarea lớn hơn, giống input nhưng có chiều cao */
 .form-group textarea {
-  min-height: 100px; /* Cao hơn để dễ nhập */
+  min-height: 110px;
   resize: vertical;
   font-family: inherit;
 }
 
-/* Actions */
-.modal-actions {
-  grid-column: span 4;
-  display: flex;
-  justify-content: flex-end; /* sát phải */
-  gap: 10px;
-  margin-top: 20px;
+.error-text {
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 13px;
 }
 
-.cancel-btn,
-.submit-btn {
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-weight: 600;
+/* ===========================
+   MÔ TẢ & YÊU CẦU 2 CỘT
+=========================== */
+.form-row.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.form-row.two-columns .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row.two-columns .ql-toolbar,
+.form-row.two-columns .ql-container {
+  width: 100%;
+}
+
+.form-row.two-columns .ql-container {
+  min-height: 200px;
+}
+
+@media (max-width: 992px) {
+  .form-row.two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================
+   QUILL EDITOR STYLE
+=========================== */
+.ql-toolbar.ql-snow {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px 10px 0 0;
+}
+
+.ql-container.ql-snow {
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 10px 10px;
+  background: #ffffff;
+}
+
+/* ===========================
+   ACTION BUTTONS
+=========================== */
+.modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.cancel-btn, .submit-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
   border: none;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.25s ease;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
 }
 
 .cancel-btn {
   background: #e5e7eb;
   color: #111827;
 }
-
 .cancel-btn:hover {
   background: #d1d5db;
   transform: translateY(-1px);
@@ -286,188 +328,77 @@
 .submit-btn {
   background: #00b14f;
   color: #fff;
+  box-shadow: 0 8px 16px rgba(0,177,79,0.18);
 }
-
 .submit-btn:hover {
-  background: #1f8b50;
+  background: #07904b;
   transform: translateY(-1px);
 }
-
-/* Cuộn mượt, gọn scrollbar */
-.modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-.modal-content::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 6px;
-}
-.modal-content::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+.submit-btn:active {
+  transform: translateY(0);
 }
 
-.error-box {
-  background: #ffe6e6;
-  color: #d8000c;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-
-.error-text {
-  color: #d8000c;
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex; justify-content: center; align-items: center;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.cancel-btn, .submit-btn {
-  padding: 8px 16px;
-  border: none;
-  cursor: pointer;
-}
-
-.submit-btn {
-  background: #007bff;
-  color: #fff;
-  border-radius: 4px;
-}
-
-.cancel-btn {
-  background: #ccc;
-  border-radius: 4px;
-}
-
-.job-detail p {
-  margin: 8px 0;
-  font-size: 14px;
-}
-.job-detail strong {
-  color: #333;
-}
-.view-btn {
-  background: #28a745;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.view-btn:hover {
-  background: #218838;
-}
-
-/* Badge đẹp, nhỏ, bo tròn, căn giữa tuyệt đối */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;   /* căn giữa chữ + tick */
-  gap: 5px;
-  min-width: 88px;           /* để 2 cái bằng nhau, không bị lệch */
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-/* APPROVED */
-.status-badge.approved {
-  background: #e6f7ee;
-  color: #0d8b42;
-}
-
-
-/* PENDING */
-.status-badge.pending {
-  background: #fff4e6;
-  color: #b76e00;
-}
-
-.application-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.application-table th, .application-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-
-.application-table th {
-  background: #f4f6f8;
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-/* Select dropdown */
-.application-table select {
-  padding: 6px 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
+/* ===========================
+   COMBOBOX STYLE
+=========================== */
 .combobox-input {
   width: 100%;
   padding: 10px;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
-  transition: border 0.2s;
+  background: #f8fafc;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 .combobox-input:focus {
   outline: none;
   border-color: #00b14f;
-  box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.12);
+  background: #fff;
 }
+
 .combobox-list {
   position: relative;
   margin-top: 6px;
-  max-height: 220px;
+  max-height: 240px;
   overflow: auto;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   background: #fff;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
 }
+
 .combobox-item {
-  padding: 8px 12px;
+  padding: 10px 12px;
   cursor: pointer;
+  font-size: 14px;
 }
 .combobox-item:hover,
 .combobox-item--active {
-  background: #f0fff4;
+  background: #f0fdf4;
 }
 .combobox-empty {
-  color: #6b7280;
+  color: #64748b;
   font-style: italic;
+  padding: 10px 12px;
 }
 
-
+/* ===========================
+   HIỂN THỊ RICH TEXT TRONG VIEW
+=========================== */
+.rich-content {
+  line-height: 1.7;
+  font-size: 14px;
+  color: #0f172a;
+}
+.rich-content ul {
+  list-style: disc;
+  margin-left: 1.2rem;
+}
+.rich-content ol {
+  list-style: decimal;
+  margin-left: 1.2rem;
+}
+.rich-content h1, .rich-content h2, .rich-content h3 {
+  margin-top: 0.8rem;
+}

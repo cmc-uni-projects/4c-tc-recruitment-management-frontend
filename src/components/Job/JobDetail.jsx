@@ -204,13 +204,13 @@ export default function JobDetail() {
             <div className="job-detail-section">
               <h2>Chi tiết tin tuyển dụng</h2>
               <h3>Mô tả công việc</h3>
-              <ul>
+              <ul style={{ listStyle: "none", paddingLeft: 0 }}>
                 {job.description?.split("\n").map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}
               </ul>
               <h3>Yêu cầu công việc</h3>
-              <ul>
+              <ul style={{ listStyle: "none", paddingLeft: 0 }}>
                 {job.requirements?.split("\n").map((item, idx) => (
                   <li key={idx}>{item}</li>
                 ))}
