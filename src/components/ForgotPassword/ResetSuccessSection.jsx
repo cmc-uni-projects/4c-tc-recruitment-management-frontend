@@ -12,14 +12,19 @@ export default function ResetSuccessSection() {
 
 
 
-      
+
 
       <div className="login-box">
         <h2>Đặt lại mật khẩu thành công!</h2>
         <p>Bạn có thể đăng nhập với mật khẩu mới.</p>
         <Link to="/login">
           <button className="btn-login">Đi đến đăng nhập</button>
-        </Link>
+        </Link>  
+
+
+
+
+        
       </div>
 
       <footer className="login-footer">
