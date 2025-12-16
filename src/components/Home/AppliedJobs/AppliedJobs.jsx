@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./AppliedJobs.css";
@@ -61,71 +60,98 @@ export default function AppliedJobs() {
   }
 
   return (
-    <div className="applied-jobs-layout">
-      {/* Cột trái */}
-      <div className="applied-jobs-left">
-        <h1 className="page-title">Việc làm đã ứng tuyển</h1>
+    <div className="applied-jobs-page">
+      <div className="applied-jobs-layout">
+        {/* Cột trái */}
+        <div className="applied-jobs-left">
+          <h1 className="page-title">Việc làm đã ứng tuyển</h1>
 
-        {/* Bộ lọc */}
-        <div className="filter-container">
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option>Tất cả</option>
-            <option value="PENDING">Đang chờ xử lý</option>
-            <option value="REVIEWED">NTD đã xem</option>
-            <option value="HIRED">Được chấp nhận</option>
-            <option value="REJECTED">Từ chối</option>
-          </select>
+          {/* Bộ lọc */}
+          <div className="filter-container">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option>Tất cả</option>
+              <option value="PENDING">Đang chờ xử lý</option>
+              <option value="REVIEWED">NTD đã xem</option>
+              <option value="HIRED">Được chấp nhận</option>
+              <option value="REJECTED">Từ chối</option>
+            </select>
+          </div>
+
+          {filteredApplications.length === 0 ? (
+            <div className="empty-applied-jobs">
+              <img
+                src="/images/empty-box.png"
+                alt="Empty"
+                className="empty-image"
+                onError={(e) => (e.target.style.display = "none")}
+              />
+              <p>Bạn chưa ứng tuyển công việc nào!</p>
+              <Link to="/jobs">
+                <button className="btn-find-jobs">Tìm việc ngay</button>
+              </Link>
+            </div>
+          ) : (
+            <div className="applied-jobs-list">
+              {filteredApplications.map((app) => (
+                <div className="applied-job-card" key={app.id}>
+                  <div className="applied-job-header">
+                    <div className="applied-job-title-info">
+                      <h3 className="applied-job-title">{app.jobTitle}</h3>
+                      <p className="company-name">CV: {app.cvTitle}</p>
+                    </div>
+                  </div>
+
+                  <div className="applied-job-meta">
+                    <span className="applied-pill">
+                      <i className="fa-solid fa-pen-to-square"></i> Ghi chú:{" "}
+                      {app.notes || "Không có"}
+                    </span>
+                    <span className="applied-pill">
+                      <i className="fa-regular fa-clock"></i> Ngày ứng tuyển:{" "}
+                      {formatDate(app.appliedAt)}
+                    </span>
+                  </div>
+
+                  <div className="applied-job-footer">
+                    <span
+                      className={`job-status status-${app.status.toLowerCase()}`}
+                    >
+                      {statusMap[app.status]}
+                    </span>
+
+                    <div className="job-actions1">
+                      <Link to={`/jobs/${app.jobId}`} className="btn-view-job">
+                        Xem chi tiết
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {filteredApplications.length === 0 ? (
-          <div className="empty-applied-jobs">
-            /images/empty-box.png
-            <p>Bạn chưa ứng tuyển công việc nào!</p>
-            <Link to="/jobs">
-              <button className="btn-find-jobs">Tìm việc ngay</button>
+        {/* Cột phải */}
+        <div className="applied-jobs-right">
+          <div className="profile-management">
+            <img
+              src="/images/profile-banner.png"
+              alt="Profile banner"
+              className="banner-image"
+              onError={(e) => (e.target.style.display = "none")}
+            />
+            <h4>Quản lý hồ sơ</h4>
+            <p>Cập nhật CV để tăng cơ hội được Nhà Tuyển Dụng xem xét</p>
+            <Link to="/my-cv">
+              <button className="btn-update-cv">Cập nhật CV ngay</button>
             </Link>
           </div>
-        ) : (
-       
-        <div className="applied-jobs-list">
-            {filteredApplications.map((app) => (
-              <div className="applied-job-card" key={app.id}>
-                <div className="job-info">
-                  <h3>{app.jobTitle}</h3>
-                  <p className="company-name">CV: {app.cvTitle}</p>
-                  <p className="job-location">Ghi chú: {app.notes || "Không có"}</p>
-                  <p className="job-date">Ngày ứng tuyển: {formatDate(app.appliedAt)}</p>
-                  <span className={`job-status status-${app.status.toLowerCase()}`}>
-                    {statusMap[app.status]}
-                  </span>
-                </div>
-                <div className="job-actions1">
-                  <Link to={`/jobs/${app.jobId}`} className="btn-view-job">
-                    Xem chi tiết
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Cột phải */}
-      <div className="applied-jobs-right">
-        <div className="profile-management">
-          /images/profile-banner.png
-          <h4>Quản lý hồ sơ</h4>
-          <p>Cập nhật CV để tăng cơ hội được Nhà Tuyển Dụng xem xét</p>
-          <Link to="/my-cv">
-            <button className="btn-update-cv">Cập nhật CV ngay</button>
-          </Link>
         </div>
       </div>
     </div>
   );
 }
-
