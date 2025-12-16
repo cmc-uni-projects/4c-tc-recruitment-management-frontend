@@ -131,67 +131,57 @@
   padding: 20px;
 }
 
-/* ========== FORM (thay mới hoàn toàn theo form của bạn) ========== */
 
-/* Overlay làm mờ nền */
-/* Overlay */
+/* ========== MODAL OVERLAY ========== */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
 
-
+/* ========== MODAL CONTENT ========== */
 .modal-content {
   background: #fff;
   border-radius: 12px;
-  padding: 20px 28px;
-  width: 85%;
-  max-width: 800px;
-  max-height: 88vh;
+  padding: 24px 32px;
+  width: min(90%, 840px);
+  max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  animation: fadeInUp 0.25s ease;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 0.3s ease;
   border-top: 4px solid #00b14f;
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-content h3 {
-  margin-top: 0;
-  margin-bottom: 18px;
+  margin: 0 0 18px;
   text-align: center;
   color: #111827;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
 }
 
-/* Grid form */
+/* ========== FORM GRID ========== */
 .modal-form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 20px;
 }
 
-/* Một số ô full width nếu cần (ví dụ: tiêu đề, mô tả) */
 .modal-form .form-group.full-width {
-  grid-column: 1 / -1; /* Chiếm toàn bộ dòng */
+  margin-top: 20px;
+  grid-column: 1 / -1;
 }
 
 .form-group {
@@ -200,76 +190,84 @@
 }
 
 .form-group label {
-  font-weight: 500;
-  margin-bottom: 5px;
+  font-weight: 600;
+  margin-bottom: 6px;
   color: #374151;
   font-size: 14px;
 }
 
-/* Input và Textarea chung */
+/* Inputs & Select */
 .form-group input,
-.form-group select,
-.form-group textarea {
+.form-group select {
   padding: 10px 12px;
   font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  transition: all 0.2s ease;
   background-color: #fafafa;
-}
-/* Select cao vừa phải */
-.form-group select {
-  height: 32px;
-}
-
-/* Hover & Focus */
-.form-group input:hover,
-.form-group select:hover,
-.form-group textarea:hover {
-  border-color: #00b14f;
-  background-color: #f8fff9;
+  transition: all 0.2s ease;
 }
 
 .form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: #00b14f;
+  box-shadow: 0 0 0 3px rgba(0, 177, 79, 0.1);
   background-color: #fff;
 }
-/* Select nhỏ hơn, gọn */
-.form-group select {
-  height: 36px;
-  background-color: #fafafa;
+
+/* Readonly field */
+.readonly-field {
+  background: #f3f4f6;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
 }
 
-/* Textarea lớn hơn, giống input nhưng có chiều cao */
-.form-group textarea {
-  min-height: 100px; /* Cao hơn để dễ nhập */
-  resize: vertical;
-  font-family: inherit;
+/* ========== REACT QUILL ========== */
+.quill {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  min-height: 160px;
 }
 
-/* Actions */
+.ql-toolbar.ql-snow {
+  border: 1px solid #d1d5db;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.ql-container.ql-snow {
+  border: 1px solid #d1d5db;
+  border-radius: 0 0 8px 8px;
+  min-height: 120px;
+}
+
+/* Placeholder text */
+.ql-editor::before {
+  color: #9aa3ad;
+  font-style: italic;
+}
+
+/* ========== ACTION BUTTONS ========== */
 .modal-actions {
-  grid-column: span 4;
+  grid-column: 1 / -1;
   display: flex;
-  justify-content: flex-end; /* sát phải */
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .cancel-btn,
 .submit-btn {
-  padding: 9px 16px;
+  padding: 10px 18px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
   border: none;
   cursor: pointer;
-  font-size: 14px;
   transition: all 0.25s ease;
 }
 
@@ -277,7 +275,6 @@
   background: #e5e7eb;
   color: #111827;
 }
-
 .cancel-btn:hover {
   background: #d1d5db;
   transform: translateY(-1px);
@@ -287,23 +284,36 @@
   background: #00b14f;
   color: #fff;
 }
-
 .submit-btn:hover {
-  background: #1f8b50;
+  background: #00943d;
   transform: translateY(-1px);
 }
 
-/* Cuộn mượt, gọn scrollbar */
+/* ========== ERROR TEXT ========== */
+.error-text {
+  color: #d8000c;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* Scrollbar gọn */
 .modal-content::-webkit-scrollbar {
   width: 8px;
 }
 .modal-content::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #c9cdd3;
   border-radius: 6px;
 }
 .modal-content::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  background: #aeb3ba;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-content { width: 94%; padding: 20px; }
+  .modal-form { grid-template-columns: 1fr; }
+}
+
 
 .error-box {
   background: #ffe6e6;
@@ -470,4 +480,11 @@
   font-style: italic;
 }
 
+/* Hiển thị nội dung HTML từ editor */
+.html-view {
+  line-height: 1.6;
+}
+.html-view p { margin: 8px 0; }
+.html-view ul, .html-view ol { margin: 8px 0 8px 24px; }
+.quill { background: #fff; } /* vùng editor */
 

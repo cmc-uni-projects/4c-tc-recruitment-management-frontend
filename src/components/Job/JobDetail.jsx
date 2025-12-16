@@ -8,6 +8,7 @@ import axios from "axios";
 import ApplyForm from "../Applications/ApplyForm";
 import { Modal } from "@mui/material";
 import Swal from "sweetalert2";
+import DOMPurify from "dompurify";
 
 export default function JobDetail() {
   const { jobId } = useParams();
@@ -234,25 +235,21 @@ export default function JobDetail() {
             <div className="job-detail-section">
               <h2>Chi tiết tin tuyển dụng</h2>
 
+
               <h3>Mô tả công việc</h3>
-              <div className="job-description">
-                {job.description
-                  ?.split("\n")
-                  .filter((item) => item.trim() !== "")
-                  .map((item, idx) => (
-                    <p key={`${item}-${idx}`}>{item}</p>
-                  ))}
-              </div>
+              <div
+                className="job-description html-view"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(job.description ?? "") }}
+              />
+
+
 
               <h3>Yêu cầu công việc</h3>
-              <div className="job-requirements">
-                {job.requirements
-                  ?.split("\n")
-                  .filter((item) => item.trim() !== "")
-                  .map((item, idx) => (
-                    <p key={`${item}-${idx}`}>{item}</p>
-                  ))}
-              </div>
+              <div
+                className="job-requirements html-view"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(job.requirements ?? "") }}
+              />
+
             </div>
           </div>
 
