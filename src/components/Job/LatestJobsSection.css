@@ -48,6 +48,7 @@
 }
 
 .company-logo1 {
+  margin-left : 4px;
   position: absolute;
   left: 16px;
 transform: none;
