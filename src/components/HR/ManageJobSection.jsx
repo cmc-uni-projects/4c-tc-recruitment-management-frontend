@@ -753,7 +753,7 @@ function ManageJobSection() {
                       </td>
                       <td>{app.notes || "-"}</td>
                       <td>
-                        <button onClick={() => handleViewCV(app)}>
+                        <button className="job-view-btn" onClick={() => handleViewCV(app)}>
                           Xem CV
                         </button>
                       </td>
@@ -866,7 +866,7 @@ function ManageJobSection() {
             )}
 
             <div className="modal-actions" style={{ marginTop: 12 }}>
-              <button onClick={closeCVModal}>Đóng</button>
+              <button className="cancel-btn" onClick={closeCVModal}>Đóng</button>
             </div>
           </div>
         </div>
