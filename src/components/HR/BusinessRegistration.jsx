@@ -17,6 +17,9 @@ const BusinessRegistration = () => {
   console.log("hsagdid: ", employerId);
   
 
+
+  
+
   useEffect(() => {
     if (employerData?.verificationStatus === "PENDING" || employerData?.verified) {
       navigate("/hr");
