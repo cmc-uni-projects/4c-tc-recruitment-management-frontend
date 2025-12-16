@@ -1,4 +1,3 @@
-
 // src/pages/Admin/ManageJobSection.jsx
 import React, { useEffect, useState } from "react";
 import "./ManageJobSection.css";
@@ -12,14 +11,7 @@ import {
   fetchCVBlobByUrl, // 👈 dùng để tải PDF private thành blob (nếu server yêu cầu token)
 } from "../../services/auth.services";
 import { replaceTemplate } from "../../untils/replaceTemplate";
-
-// ★ Rich Text Editor (React 19 friendly)
-import ReactQuill from "react-quill-new";                // nếu dùng react-quill: import ReactQuill from "react-quill";
-import "react-quill-new/dist/quill.snow.css";            // nếu dùng react-quill: import "react-quill/dist/quill.snow.css";
-
-// ★ Sanitize HTML chống XSS
-import DOMPurify from "dompurify";
-
+ 
 function ManageJobSection() {
   const [dropdownLoading, setDropdownLoading] = useState(false);
   const [companies, setCompanies] = useState([]);
@@ -27,17 +19,15 @@ function ManageJobSection() {
   const [categories, setCategories] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewJob, setViewJob] = useState(null);
-
+ 
   const [applications, setApplications] = useState([]);
   const [loadingApplications, setLoadingApplications] = useState(false);
-
+ 
   const [editingId, setEditingId] = useState(null);
-
-  // ★ Form state (description/requirements là HTML từ editor)
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -51,18 +41,17 @@ function ManageJobSection() {
     companyId: "",
     categoryId: "",
   });
-
   const [errors, setErrors] = useState({});
-
+ 
   // Modal CV
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
   const [selectedCV, setSelectedCV] = useState(null);
   const [loadingCV, setLoadingCV] = useState(false);
   const [cvPdfBlobUrl, setCvPdfBlobUrl] = useState(null); // blob URL cho PDF private
   const [cvViewMode, setCvViewMode] = useState("html"); // 'pdf' | 'html'
-
+ 
   const token = localStorage.getItem("token");
-
+ 
   // ========================= Helpers cho CV =========================
   // Nhận diện PDF cả khi url không chứa .pdf (ví dụ /files/view?id=...&mime=application/pdf)
   const isLikelyPdf = (url) => {
@@ -71,7 +60,7 @@ function ManageJobSection() {
       /mime=application\/pdf/i.test(url) ||
       /\/pdf(\/|$|\?)/i.test(url);
   };
-
+ 
   // Tạo absolute URL nếu backend trả relative path
   const toAbsoluteUrl = (url) => {
     if (!url) return null;
@@ -80,7 +69,7 @@ function ManageJobSection() {
     const backendOrigin = import.meta?.env?.VITE_API_BASE_URL || "http://localhost:8080";
     return backendOrigin.replace(/\/+$/, "") + "/" + url.replace(/^\/+/, "");
   };
-
+ 
   // ✅ Xem CV ứng viên (HTML ưu tiên nếu có; nếu không có HTML thì thử PDF)
   const handleViewCV = async (app) => {
     setLoadingCV(true);
@@ -88,13 +77,13 @@ function ManageJobSection() {
       const res = await renderCV(app.cvId); // API lấy CV theo cvId
       const { data } = res || {};
       const { htmlLayout, cvUrl, data: cvData } = data || {};
-
+ 
       // Chuẩn hóa URL PDF
       const absUrl = toAbsoluteUrl(cvUrl);
-
+ 
       // Render HTML nếu có template
       const cvHtml = htmlLayout ? replaceTemplate(htmlLayout, cvData) : null;
-
+ 
       // Thử tải blob PDF (nếu có URL và có vẻ là PDF)
       let blobUrl = null;
       if (absUrl && isLikelyPdf(absUrl)) {
@@ -112,7 +101,7 @@ function ManageJobSection() {
       } else {
         setCvPdfBlobUrl(null);
       }
-
+ 
       // Cập nhật state CV
       setSelectedCV({
         candidateName: app.candidateName,
@@ -120,7 +109,7 @@ function ManageJobSection() {
         cvHtml: cvHtml || null,
         cvData: cvData || null,
       });
-
+ 
       // Chọn mode hiển thị mặc định:
       // - Nếu có HTML → ưu tiên HTML (fix case "PDF không nhúng được nhưng HTML vẫn đọc được")
       // - Nếu không có HTML → thử PDF
@@ -132,7 +121,7 @@ function ManageJobSection() {
         // Không có HTML cũng không có PDF → hiển thị thông báo
         setCvViewMode("html");
       }
-
+ 
       setIsCVModalOpen(true);
     } catch (error) {
       console.error("Lỗi lấy CV:", error);
@@ -144,7 +133,7 @@ function ManageJobSection() {
       setLoadingCV(false);
     }
   };
-
+ 
   const closeCVModal = () => {
     setIsCVModalOpen(false);
     setSelectedCV(null);
@@ -153,7 +142,7 @@ function ManageJobSection() {
       setCvPdfBlobUrl(null);
     }
   };
-
+ 
   // ========================= Ứng viên / Job =========================
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
@@ -166,7 +155,7 @@ function ManageJobSection() {
       console.error("Lỗi cập nhật trạng thái:", error);
     }
   };
-
+ 
   const openViewModal = async (job) => {
     setViewJob(job);
     setIsViewModalOpen(true);
@@ -182,12 +171,13 @@ function ManageJobSection() {
       setLoadingApplications(false);
     }
   };
+ 
   const closeViewModal = () => {
     setIsViewModalOpen(false);
     setViewJob(null);
     setApplications([]);
   };
-
+ 
   // ========================= CitySelect =========================
   const vietnamProvinces = [
     "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
@@ -203,11 +193,11 @@ function ManageJobSection() {
     "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
     "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái",
   ];
-
+ 
   function CitySelect({
     value,
     onChange,
-    options,
+    options, // string[]
     placeholder = "Tìm kiếm tỉnh/thành...",
     label = "Địa điểm",
     required = true,
@@ -216,22 +206,22 @@ function ManageJobSection() {
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
     const [highlightIndex, setHighlightIndex] = useState(0);
-
+ 
     const filtered = options.filter((item) =>
       item.toLowerCase().includes(query.toLowerCase())
     );
-
+ 
     const selectValue = (val) => {
       onChange(val);
       setQuery(val);
       setOpen(false);
     };
-
+ 
     const onInputFocus = () => {
       setOpen(true);
       setHighlightIndex(0);
     };
-
+ 
     const onKeyDown = (e) => {
       if (!open) return;
       if (e.key === "ArrowDown") {
@@ -245,7 +235,7 @@ function ManageJobSection() {
         setOpen(false);
       }
     };
-
+ 
     return (
       <div className="form-group full-width">
         <label>{label}</label>
@@ -253,7 +243,7 @@ function ManageJobSection() {
           type="text"
           className={`combobox-input ${error ? "input-error" : ""}`}
           placeholder={placeholder}
-          value={open ? query : (value ?? "")}
+          value={open ? query : (value || "")}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={onInputFocus}
           onClick={() => setOpen(true)}
@@ -290,10 +280,11 @@ function ManageJobSection() {
       </div>
     );
   }
-
+ 
+  // Thêm vào đầu component
   const [locations, setLocations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-
+ 
   // Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
   useEffect(() => {
     const fetchLocations = async () => {
@@ -310,7 +301,7 @@ function ManageJobSection() {
     };
     fetchLocations();
   }, []);
-
+ 
   // ✅ Load danh sách Job
   const fetchJobs = async () => {
     try {
@@ -323,7 +314,7 @@ function ManageJobSection() {
       setLoading(false);
     }
   };
-
+ 
   // ✅ Load dropdown
   const fetchDropdownData = async () => {
     try {
@@ -342,24 +333,24 @@ function ManageJobSection() {
       setDropdownLoading(false);
     }
   };
-
+ 
   useEffect(() => {
     const loadCompanyInfo = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-
+ 
         setCompanyDisplayName("Đang tải công ty...");
         let companyName = null;
         let companyId = null;
-
-        // 1) Ưu tiên từ job đã đăng
+ 
+        // 1. Ưu tiên lấy từ job đã đăng (nếu có)
         try {
           const jobRes = await jobAPI.getMyCompanyJobs();
           const jobsList = jobRes.data || [];
           if (jobsList.length > 0) {
             const job = jobsList[0];
-            companyName = job.companyName ?? "Công ty của bạn";
+            companyName = job.companyName || "Công ty của bạn";
             companyId = job.companyId;
             localStorage.setItem("myCompany", JSON.stringify({ companyId, name: companyName }));
             localStorage.setItem("companyName", companyName);
@@ -373,8 +364,8 @@ function ManageJobSection() {
         } catch (err) {
           console.warn("Chưa có job nào hoặc lỗi không nghiêm trọng:", err);
         }
-
-        // 2) Nếu chưa có job → lấy từ employer
+ 
+        // 2. Nếu chưa có job → lấy từ API thông tin employer
         try {
           const res = await employerAPI.getMyEmployer();
           const company = res.data?.company || res.data;
@@ -392,7 +383,7 @@ function ManageJobSection() {
           console.error("Không lấy được thông tin công ty từ employerAPI:", err);
           setCompanyDisplayName("Chưa liên kết công ty");
         }
-
+ 
         // Load lại job + dropdown
         try {
           const jobRes = await jobAPI.getMyCompanyJobs();
@@ -410,16 +401,16 @@ function ManageJobSection() {
     };
     loadCompanyInfo();
   }, []);
-
+ 
   // ✅ Mở modal thêm/sửa job
   const openModal = async (job = null) => {
     await fetchDropdownData();
     const myCompany = JSON.parse(localStorage.getItem("myCompany") || "null");
-
+ 
     if (myCompany?.name) {
       localStorage.setItem("companyName", myCompany.name);
     }
-
+ 
     if (job) {
       setForm({
         title: job.title,
@@ -431,8 +422,8 @@ function ManageJobSection() {
         salaryMax: job.salaryMax || "",
         experienceRequired: job.experienceRequired || "",
         expiredAt: job.expiredAt ? job.expiredAt.slice(0, 16) : "",
-        companyId: job.companyId ?? myCompany?.companyId ?? "",
-        categoryId: job.categoryId ?? "",
+        companyId: job.companyId || myCompany?.companyId || "",
+        categoryId: job.categoryId || "",
       });
       setEditingId(job.jobId);
     } else {
@@ -446,7 +437,7 @@ function ManageJobSection() {
         salaryMax: "",
         experienceRequired: "",
         expiredAt: "",
-        companyId: myCompany?.companyId ?? "",
+        companyId: myCompany?.companyId || "",
         categoryId: "",
       });
       setEditingId(null);
@@ -454,14 +445,14 @@ function ManageJobSection() {
     setErrors({});
     setIsModalOpen(true);
   };
-
+ 
   // ✅ Đóng modal thêm/sửa job
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
     setErrors({});
   };
-
+ 
   // ✅ Validate
   const validateForm = () => {
     const newErrors = {};
@@ -469,48 +460,41 @@ function ManageJobSection() {
     const salaryMax = Number(form.salaryMax);
     const expiredDate = new Date(form.expiredAt);
     const now = new Date();
-
+ 
     if (!form.title.trim()) newErrors.title = "Tên vị trí không được để trống!";
     if (!form.categoryId) newErrors.categoryId = "Vui lòng chọn danh mục!";
     if (salaryMin <= 0) newErrors.salaryMin = "Lương tối thiểu phải > 0!";
     if (salaryMax <= 0) newErrors.salaryMax = "Lương tối đa phải > 0!";
-    if (salaryMin >= salaryMax) newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
+    if (salaryMin >= salaryMax)
+      newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
     if (!form.expiredAt) newErrors.expiredAt = "Vui lòng chọn ngày hết hạn!";
-    if (expiredDate <= now) newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
-    if (!plainText(form.description)) newErrors.description = "Mô tả không được để trống!";
-    if (!plainText(form.requirements)) newErrors.requirements = "Yêu cầu không được để trống!";
-
+    if (expiredDate <= now)
+      newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
+ 
     return newErrors;
   };
-
+ 
   // ✅ Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-
+ 
     try {
-      // ★ Sanitize trước khi gửi backend
-      const payload = {
-        ...form,
-        description: DOMPurify.sanitize(form.description),
-        requirements: DOMPurify.sanitize(form.requirements),
-      };
-
       if (editingId) {
-        await jobAPI.updateJob(editingId, payload);
+        await jobAPI.updateJob(editingId, form);
       } else {
-        await jobAPI.createJob(payload);
+        await jobAPI.createJob(form);
       }
       closeModal();
       fetchJobs();
     } catch (err) {
-      console.error("Lỗi:", err.response?.data ?? err);
+      console.error("Lỗi:", err.response?.data || err);
       setErrors({ api: "Thao tác thất bại, vui lòng thử lại!" });
     }
   };
-
+ 
   // ✅ Xóa job
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
@@ -521,32 +505,7 @@ function ManageJobSection() {
       console.error("Lỗi khi xóa job:", err);
     }
   };
-
-  // ===== Cấu hình React Quill =====
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      [{ indent: "-1" }, { indent: "+1" }],
-      [{ align: [] }],
-      ["link"],
-      ["clean"],
-    ],
-  };
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "indent",
-    "align",
-    "link",
-  ];
-  // (modules/formats theo tài liệu ReactQuill/Quill)  // [2](https://basicutils.com/learn/quilljs/react-quill-tutorial)[5](https://www.npmjs.com/package/react-quill-new)
-
+ 
   return (
     <div className="admin-content">
       <div className="job-category-manager">
@@ -556,7 +515,7 @@ function ManageJobSection() {
             + Thêm Job
           </button>
         </div>
-
+ 
         {loading ? (
           <p className="loading">Đang tải dữ liệu...</p>
         ) : (
@@ -574,26 +533,38 @@ function ManageJobSection() {
             <tbody>
               {jobs.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data">Chưa có công việc nào</td>
+                  <td colSpan="6" className="no-data">
+                    Chưa có công việc nào
+                  </td>
                 </tr>
               ) : (
                 jobs.map((job, index) => (
-                  <tr key={job.jobId ?? index}>
+                  <tr key={job.jobId || index}>
                     <td>{job.title}</td>
-                    <td>{job.location ?? "-"}</td>
+                    <td>{job.location || "-"}</td>
                     <td>{job.jobType}</td>
                     <td>
-                      {job.salaryMin?.toLocaleString()} - {job.salaryMax?.toLocaleString()} đ
+                      {job.salaryMin?.toLocaleString()} -{" "}
+                      {job.salaryMax?.toLocaleString()} đ
                     </td>
                     <td>{job.experienceRequired || 0} năm</td>
                     <td className="actions">
-                      <button className="job-view-btn" onClick={() => openViewModal(job)}>
+                      <button
+                        className="job-view-btn"
+                        onClick={() => openViewModal(job)}
+                      >
                         Xem
                       </button>
-                      <button className="job-edit-btn" onClick={() => openModal(job)}>
+                      <button
+                        className="job-edit-btn"
+                        onClick={() => openModal(job)}
+                      >
                         Sửa
                       </button>
-                      <button className="job-delete-btn" onClick={() => handleDelete(job.jobId)}>
+                      <button
+                        className="job-delete-btn"
+                        onClick={() => handleDelete(job.jobId)}
+                      >
                         Xóa
                       </button>
                     </td>
@@ -604,7 +575,7 @@ function ManageJobSection() {
           </table>
         )}
       </div>
-
+ 
       {/* Modal Chi tiết Job + Danh sách ứng viên */}
       {isViewModalOpen && viewJob && (
         <div className="modal-overlay" onClick={closeViewModal}>
@@ -612,35 +583,21 @@ function ManageJobSection() {
             <h3>Chi tiết công việc</h3>
             <div className="job-detail">
               <p><strong>Tiêu đề:</strong> {viewJob.title}</p>
-
-              <p><strong>Mô tả:</strong></p>
-              <div
-                className="html-view"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(viewJob.description ?? "Không có"),
-                }}
-              />
-
-              <p><strong>Yêu cầu:</strong></p>
-              <div
-                className="html-view"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(viewJob.requirements ?? "Không có"),
-                }}
-              />
-
-              <p><strong>Địa điểm:</strong> {viewJob.location ?? "-"}</p>
+              <p><strong>Mô tả:</strong> {viewJob.description || "Không có"}</p>
+              <p><strong>Yêu cầu:</strong> {viewJob.requirements || "Không có"}</p>
+              <p><strong>Địa điểm:</strong> {viewJob.location || "-"}</p>
               <p><strong>Loại công việc:</strong> {viewJob.jobType}</p>
               <p>
-                <strong>Lương:</strong> {viewJob.salaryMin?.toLocaleString()} -{" "}
+                <strong>Lương:</strong>{" "}
+                {viewJob.salaryMin?.toLocaleString()} -{" "}
                 {viewJob.salaryMax?.toLocaleString()} đ
               </p>
-              <p><strong>Kinh nghiệm:</strong> {viewJob.experienceRequired ?? 0} năm</p>
+              <p><strong>Kinh nghiệm:</strong> {viewJob.experienceRequired || 0} năm</p>
               <p><strong>Ngày hết hạn:</strong> {viewJob.expiredAt}</p>
-              <p><strong>Công ty:</strong> {viewJob.companyName ?? viewJob.companyId}</p>
-              <p><strong>Danh mục:</strong> {viewJob.categoryName ?? viewJob.categoryId}</p>
+              <p><strong>Công ty:</strong> {viewJob.companyName || viewJob.companyId}</p>
+              <p><strong>Danh mục:</strong> {viewJob.categoryName || viewJob.categoryId}</p>
             </div>
-
+ 
             <h4>Danh sách ứng viên</h4>
             {loadingApplications ? (
               <p>Đang tải ứng viên...</p>
@@ -660,9 +617,9 @@ function ManageJobSection() {
                 </thead>
                 <tbody>
                   {applications.map((app) => (
-                    <tr key={app.id ?? app.cvId}>
+                    <tr key={app.id || app.cvId}>
                       <td>{app.candidateName}</td>
-                      <td>{app.email ?? "Không có email"}</td>
+                      <td>{app.email || "Không có email"}</td>
                       <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
                       <td>
                         <select
@@ -686,20 +643,22 @@ function ManageJobSection() {
                 </tbody>
               </table>
             )}
-
+ 
             <div className="modal-actions">
-              <button className="cancel-btn" onClick={closeViewModal}>Đóng</button>
+              <button className="cancel-btn" onClick={closeViewModal}>
+                Đóng
+              </button>
             </div>
           </div>
         </div>
       )}
-
+ 
       {/* Modal CV - có toggle PDF / HTML, ưu tiên hiển thị HTML nếu có */}
       {isCVModalOpen && selectedCV && (
         <div className="modal-overlay" onClick={closeCVModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
-
+ 
             {/* Toggle giữa PDF upload và HTML render */}
             <div className="cv-toggle" style={{ display: "flex", gap: 8, marginBottom: 12 }}>
               <button
@@ -710,7 +669,7 @@ function ManageJobSection() {
               >
                 PDF upload
               </button>
-
+ 
               <button
                 className={`toggle-btn ${cvViewMode === "html" ? "active" : ""}`}
                 onClick={() => setCvViewMode("html")}
@@ -720,7 +679,7 @@ function ManageJobSection() {
                 CV render (HTML)
               </button>
             </div>
-
+ 
             {/* Nếu có URL file, hiển thị link mở tab mới để đảm bảo luôn xem được PDF */}
             {selectedCV.cvUrl && (
               <div style={{ marginBottom: 8 }}>
@@ -729,7 +688,7 @@ function ManageJobSection() {
                 </a>
               </div>
             )}
-
+ 
             {loadingCV ? (
               <p>Đang tải CV...</p>
             ) : cvViewMode === "pdf" ? (
@@ -742,7 +701,7 @@ function ManageJobSection() {
                       height="600px"
                       title="CV PDF"
                     />
-                    
+                   
                   </>
                 ) : selectedCV.cvUrl ? (
                   <>
@@ -777,14 +736,14 @@ function ManageJobSection() {
             ) : (
               <p>Không có CV được tải lên.</p>
             )}
-
+ 
             <div className="modal-actions" style={{ marginTop: 12 }}>
               <button onClick={closeCVModal}>Đóng</button>
             </div>
           </div>
         </div>
       )}
-
+ 
       {/* Modal Thêm/Sửa Job */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
@@ -801,35 +760,31 @@ function ManageJobSection() {
                 />
                 {errors.title && <p className="error-text">{errors.title}</p>}
               </div>
-
+ 
               {/* Mô tả */}
               <div className="form-group full-width">
-                <label>Mô tả *</label>
-                <ReactQuill
-                  theme="snow"
+                <label>Mô tả</label>
+                <textarea
+                  rows="3"
                   value={form.description}
-                  onChange={(val) => setForm({ ...form, description: val })}
-                  modules={quillModules}
-                  formats={quillFormats}
-                  placeholder="Nhập mô tả chi tiết công việc..."
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                 />
-                {errors.description && <p className="error-text">{errors.description}</p>}
               </div>
-
+ 
               {/* Yêu cầu */}
               <div className="form-group full-width">
-                <label>Yêu cầu *</label>
-                <ReactQuill
-                  theme="snow"
+                <label>Yêu cầu</label>
+                <textarea
+                  rows="2"
                   value={form.requirements}
-                  onChange={(val) => setForm({ ...form, requirements: val })}
-                  modules={quillModules}
-                  formats={quillFormats}
-                  placeholder="Nhập các yêu cầu đối với ứng viên..."
+                  onChange={(e) =>
+                    setForm({ ...form, requirements: e.target.value })
+                  }
                 />
-                {errors.requirements && <p className="error-text">{errors.requirements}</p>}
               </div>
-
+ 
               {/* Địa điểm (CitySelect) */}
               <CitySelect
                 value={form.location}
@@ -840,13 +795,15 @@ function ManageJobSection() {
                 required
                 error={errors.location}
               />
-
+ 
               {/* Loại công việc */}
               <div className="form-group">
                 <label>Loại công việc</label>
                 <select
                   value={form.jobType}
-                  onChange={(e) => setForm({ ...form, jobType: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, jobType: e.target.value })
+                  }
                 >
                   <option value="FULL_TIME">FULL_TIME</option>
                   <option value="PART_TIME">PART_TIME</option>
@@ -854,58 +811,72 @@ function ManageJobSection() {
                   <option value="REMOTE">REMOTE</option>
                 </select>
               </div>
-
+ 
               {/* Lương tối thiểu */}
               <div className="form-group">
                 <label>Lương tối thiểu</label>
                 <input
                   type="number"
                   value={form.salaryMin}
-                  onChange={(e) => setForm({ ...form, salaryMin: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, salaryMin: e.target.value })
+                  }
                 />
-                {errors.salaryMin && <p className="error-text">{errors.salaryMin}</p>}
+                {errors.salaryMin && (
+                  <p className="error-text">{errors.salaryMin}</p>
+                )}
               </div>
-
+ 
               {/* Lương tối đa */}
               <div className="form-group">
                 <label>Lương tối đa</label>
                 <input
                   type="number"
                   value={form.salaryMax}
-                  onChange={(e) => setForm({ ...form, salaryMax: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, salaryMax: e.target.value })
+                  }
                 />
-                {errors.salaryMax && <p className="error-text">{errors.salaryMax}</p>}
+                {errors.salaryMax && (
+                  <p className="error-text">{errors.salaryMax}</p>
+                )}
               </div>
-
+ 
               {/* Kinh nghiệm */}
               <div className="form-group">
                 <label>Kinh nghiệm yêu cầu (năm)</label>
                 <input
                   type="number"
                   value={form.experienceRequired}
-                  onChange={(e) => setForm({ ...form, experienceRequired: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, experienceRequired: e.target.value })
+                  }
                 />
               </div>
-
+ 
               {/* Ngày hết hạn */}
               <div className="form-group">
                 <label>Ngày hết hạn</label>
                 <input
                   type="datetime-local"
                   value={form.expiredAt}
-                  onChange={(e) => setForm({ ...form, expiredAt: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, expiredAt: e.target.value })
+                  }
                 />
-                {errors.expiredAt && <p className="error-text">{errors.expiredAt}</p>}
+                {errors.expiredAt && (
+                  <p className="error-text">{errors.expiredAt}</p>
+                )}
               </div>
-
+ 
               {/* Công ty (readonly) */}
               <div className="form-group">
                 <label>Công ty *</label>
                 <div className="readonly-field">{companyDisplayName}</div>
                 <input type="hidden" name="companyId" value={form.companyId} />
               </div>
-
-              {/* Danh mục */}
+ 
+              {/* Dropdown Danh mục */}
               <div className="form-group">
                 <label>Danh mục nghề *</label>
                 {dropdownLoading ? (
@@ -915,7 +886,9 @@ function ManageJobSection() {
                 ) : (
                   <select
                     value={form.categoryId}
-                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, categoryId: e.target.value })
+                    }
                   >
                     <option value="">-- Chọn danh mục --</option>
                     {categories.map((cat) => (
@@ -925,50 +898,29 @@ function ManageJobSection() {
                     ))}
                   </select>
                 )}
-                {errors.categoryId && <p className="error-text">{errors.categoryId}</p>}
+                {errors.categoryId && (
+                  <p className="error-text">{errors.categoryId}</p>
+                )}
               </div>
-
-              {/* Actions */}
+ 
               <div className="modal-actions">
-                <button type="button" className="cancel-btn" onClick={closeModal}>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={closeModal}
+                >
                   Hủy
                 </button>
                 <button type="submit" className="submit-btn">
                   {editingId ? "Cập nhật" : "Thêm mới"}
                 </button>
               </div>
-
-              {errors.api && <p className="error-text">{errors.api}</p>}
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal CV */}
-      {isCVModalOpen && selectedCV && (
-        <div className="modal-overlay" onClick={closeCVModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
-            {loadingCV ? (
-              <p>Đang tải CV...</p>
-            ) : selectedCV.cvUrl ? (
-              <iframe src={selectedCV.cvUrl} width="100%" height="500px" title="CV"></iframe>
-            ) : selectedCV.cvHtml ? (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(selectedCV.cvHtml),
-                }}
-              />
-            ) : (
-              <p>Không có CV được tải lên.</p>
-            )}
-            <button onClick={closeCVModal}>Đóng</button>
           </div>
         </div>
       )}
     </div>
   );
 }
-
+ 
 export default ManageJobSection;
-
