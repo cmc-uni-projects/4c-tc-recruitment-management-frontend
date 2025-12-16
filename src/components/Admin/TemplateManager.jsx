@@ -177,7 +177,7 @@ const handleDelete = async (id) => {
                   </td>
                   <td className="actions">
                     <button
-                      className="view-btn"
+                      className="view-btn1"
                       onClick={() => openPreview(tpl.htmlLayout)}
                     >
                       Xem

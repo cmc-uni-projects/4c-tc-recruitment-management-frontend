@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../Layout/Navbar";
@@ -7,6 +8,7 @@ import axios from "axios";
 import ApplyForm from "../Applications/ApplyForm";
 import { Modal } from "@mui/material";
 import Swal from "sweetalert2";
+import DOMPurify from "dompurify";
 
 export default function JobDetail() {
   const { jobId } = useParams();
@@ -19,6 +21,7 @@ export default function JobDetail() {
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
+  // --- Load chi tiết job ---
   useEffect(() => {
     const fetchJobDetail = async () => {
       try {
@@ -31,6 +34,7 @@ export default function JobDetail() {
     fetchJobDetail();
   }, [jobId]);
 
+  // --- Load thông tin công ty ---
   useEffect(() => {
     const fetchCompanyInfo = async () => {
       try {
@@ -45,6 +49,7 @@ export default function JobDetail() {
     }
   }, [job]);
 
+  // --- Kiểm tra trạng thái đã lưu ---
   useEffect(() => {
     const checkSavedStatus = async () => {
       if (!token || !userId) return;
@@ -54,7 +59,7 @@ export default function JobDetail() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const savedJobs = response.data;
-        const found = savedJobs.some((savedJob) => savedJob.jobId === jobId);
+        const found = (savedJobs || []).some((savedJob) => savedJob.jobId === jobId);
         setIsSaved(found);
       } catch (error) {
         console.error("Lỗi khi kiểm tra trạng thái lưu:", error);
@@ -63,20 +68,20 @@ export default function JobDetail() {
     checkSavedStatus();
   }, [jobId, token, userId]);
 
-
+  // --- Kiểm tra đã ứng tuyển ---
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token || !jobId) return;
-
-    applicationAPI.getMyApplications(token)
-      .then(res => {
-        const applied = (res.data || []).some(app => app.jobId === jobId);
+    const tok = localStorage.getItem("token");
+    if (!tok || !jobId) return;
+    applicationAPI
+      .getMyApplications(tok)
+      .then((res) => {
+        const applied = (res.data || []).some((app) => app.jobId === jobId);
         setIsApplied(applied);
       })
-      .catch(err => console.error("Lỗi kiểm tra đã ứng tuyển:", err));
+      .catch((err) => console.error("Lỗi kiểm tra đã ứng tuyển:", err));
   }, [jobId]);
 
-
+  // --- Format lương ---
   const formatSalary = (min, max) => {
     if (min && max) {
       return `${(min / 1_000_000).toFixed(0)} - ${(max / 1_000_000).toFixed(0)} triệu`;
@@ -84,6 +89,7 @@ export default function JobDetail() {
     return "Thỏa thuận";
   };
 
+  // --- Tính ngày còn lại ---
   const calculateDaysLeft = (expiredAt) => {
     const endDate = new Date(expiredAt);
     const today = new Date();
@@ -94,13 +100,20 @@ export default function JobDetail() {
     return diffDays > 0 ? diffDays : 0;
   };
 
+  // Khi chưa có job, render loading
+  if (!job) return <p>Đang tải thông tin công việc...</p>;
+
+  // Sử dụng lại biến, tránh tính toán lặp
+  const daysLeft = calculateDaysLeft(job.expiredAt);
+  const isExpired = daysLeft <= 0;
+
+  // --- Handler Lưu/Bỏ lưu tin ---
   const handleSaveJob = async () => {
     try {
       if (!token || !userId) {
         Swal.fire("Cảnh báo", "Bạn chưa đăng nhập!", "warning");
         return;
       }
-
       if (!isSaved) {
         await axios.post(`http://localhost:8080/api/saved-jobs`, null, {
           params: { userId, jobId },
@@ -114,7 +127,6 @@ export default function JobDetail() {
         });
         Swal.fire("Thông báo", "Đã bỏ lưu công việc!", "info");
       }
-
       setIsSaved(!isSaved);
     } catch (error) {
       console.error("Lỗi khi lưu/bỏ lưu công việc:", error);
@@ -122,8 +134,13 @@ export default function JobDetail() {
     }
   };
 
-  if (!job) return <p>Đang tải thông tin công việc...</p>;
+  // --- Helper mở form ứng tuyển (có chặn hết hạn) ---
+  const openApplyForm = () => {
+    if (isExpired) return; // Chặn mở form khi hết hạn
+    setShowApplyForm(true);
+  };
 
+  // --- Hiển thị ---
   return (
     <>
       <Navbar />
@@ -146,6 +163,7 @@ export default function JobDetail() {
                     <p className="value">{formatSalary(job.salaryMin, job.salaryMax)}</p>
                   </div>
                 </div>
+
                 <div className="info-item">
                   <div className="icon-circle">
                     <i className="fa-solid fa-location-dot"></i>
@@ -155,45 +173,57 @@ export default function JobDetail() {
                     <p className="value">{job.location}</p>
                   </div>
                 </div>
+
                 <div className="info-item">
                   <div className="icon-circle">
                     <i className="fa-solid fa-hourglass-half"></i>
                   </div>
                   <div>
                     <p className="label">Kinh nghiệm</p>
-                    <p className="value">{job.experienceRequired + " năm" || "Không yêu cầu"}</p>
+                    <p className="value">
+                      {job.experienceRequired ? `${job.experienceRequired} năm` : "Không yêu cầu"}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="deadline-info">
                 <p>
-                  <strong>Hạn nộp:</strong> {new Date(job.expiredAt).toLocaleDateString("vi-VN")}
+                  <strong>Hạn nộp:</strong>{" "}
+                  {new Date(job.expiredAt).toLocaleDateString("vi-VN")}
                 </p>
-                <p className="days-left">
-                  {calculateDaysLeft(job.expiredAt) > 0
-                    ? `Còn ${calculateDaysLeft(job.expiredAt)} ngày để ứng tuyển`
-                    : "Hết hạn ứng tuyển"}
+                <p className={`days-left ${isExpired ? "expired" : ""}`}>
+                  {isExpired ? "Hết hạn ứng tuyển" : `Còn ${daysLeft} ngày để ứng tuyển`}
                 </p>
               </div>
 
+              {/* Actions */}
               <div className="job-actions">
-
-                {isApplied ? (
-                  <>
-                    <button className="applied-btn" disabled>
-                      Đã ứng tuyển
-                    </button>
-                    <button className="reapply-btn" onClick={() => setShowApplyForm(true)}>
-                      Ứng tuyển lại
-                    </button>
-                  </>
-                ) : (
-                  <button className="apply-btn" onClick={() => setShowApplyForm(true)}>
-                    Ứng tuyển ngay
+                {/* Ẩn/chặn ứng tuyển khi hết hạn */}
+                {isExpired ? (
+                  <button className="apply-btn" disabled>
+                    Hết hạn ứng tuyển
                   </button>
+                ) : (
+                  <>
+                    {isApplied ? (
+                      <>
+                        <button className="applied-btn" disabled>
+                          Đã ứng tuyển
+                        </button>
+                        <button className="reapply-btn" onClick={openApplyForm}>
+                          Ứng tuyển lại
+                        </button>
+                      </>
+                    ) : (
+                      <button className="apply-btn" onClick={openApplyForm}>
+                        Ứng tuyển ngay
+                      </button>
+                    )}
+                  </>
                 )}
 
+                {/* Nút Lưu tin */}
                 <button className="save-btn" onClick={handleSaveJob}>
                   <i className={`fa-heart ${isSaved ? "fa-solid" : "fa-regular"}`}></i>
                   <span>{isSaved ? "Đã lưu" : "Lưu tin"}</span>
@@ -201,20 +231,25 @@ export default function JobDetail() {
               </div>
             </div>
 
+            {/* Chi tiết tin */}
             <div className="job-detail-section">
               <h2>Chi tiết tin tuyển dụng</h2>
+
+
               <h3>Mô tả công việc</h3>
-              <ul>
-                {job.description?.split("\n").map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
+              <div
+                className="job-description html-view"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(job.description ?? "") }}
+              />
+
+
+
               <h3>Yêu cầu công việc</h3>
-              <ul>
-                {job.requirements?.split("\n").map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
+              <div
+                className="job-requirements html-view"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(job.requirements ?? "") }}
+              />
+
             </div>
           </div>
 
@@ -227,19 +262,26 @@ export default function JobDetail() {
                 className="company-logo-injob"
               />
               <h3 className="company-name">{company?.name}</h3>
+
               <div className="company-info-item">
                 <i className="fa-solid fa-users"></i>
                 <span>{company?.size || "Đang cập nhật"}</span>
               </div>
+
               <div className="company-info-item">
                 <i className="fa-solid fa-briefcase"></i>
                 <span>{company?.industry || "Đang cập nhật"}</span>
               </div>
+
               <div className="company-info-item">
                 <i className="fa-solid fa-location-dot"></i>
                 <span>{company?.address || "Đang cập nhật"}</span>
               </div>
-              <a href={`/company/public/${company?.companyId}`} className="view-company-link">
+
+              <a
+                href={`/company/public/${company?.companyId}`}
+                className="view-company-link"
+              >
                 Xem trang công ty
               </a>
             </div>
@@ -248,13 +290,15 @@ export default function JobDetail() {
       </div>
 
       {/* Modal hiển thị form ứng tuyển */}
-
       <Modal open={showApplyForm} onClose={() => setShowApplyForm(false)}>
-        <ApplyForm jobId={job.jobId} jobTitle={job.title} onClose={() => setShowApplyForm(false)}
+        <ApplyForm
+          jobId={job.jobId}
+          jobTitle={job.title}
+          onClose={() => setShowApplyForm(false)}
           onApplied={() => setIsApplied(true)} // cập nhật ngay sau khi nộp
         />
       </Modal>
-
     </>
   );
 }
+``

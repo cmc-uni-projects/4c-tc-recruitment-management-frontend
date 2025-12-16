@@ -13,6 +13,13 @@ import {
 } from "../../services/auth.services";
 import { replaceTemplate } from "../../untils/replaceTemplate";
 
+// ★ Rich Text Editor (React 19 friendly)
+import ReactQuill from "react-quill-new";                // nếu dùng react-quill: import ReactQuill from "react-quill";
+import "react-quill-new/dist/quill.snow.css";            // nếu dùng react-quill: import "react-quill/dist/quill.snow.css";
+
+// ★ Sanitize HTML chống XSS
+import DOMPurify from "dompurify";
+
 function ManageJobSection() {
   const [dropdownLoading, setDropdownLoading] = useState(false);
   const [companies, setCompanies] = useState([]);
@@ -29,6 +36,8 @@ function ManageJobSection() {
   const [loadingApplications, setLoadingApplications] = useState(false);
 
   const [editingId, setEditingId] = useState(null);
+
+  // ★ Form state (description/requirements là HTML từ editor)
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -42,6 +51,7 @@ function ManageJobSection() {
     companyId: "",
     categoryId: "",
   });
+
   const [errors, setErrors] = useState({});
 
   // Modal CV
@@ -172,7 +182,6 @@ function ManageJobSection() {
       setLoadingApplications(false);
     }
   };
-
   const closeViewModal = () => {
     setIsViewModalOpen(false);
     setViewJob(null);
@@ -198,7 +207,7 @@ function ManageJobSection() {
   function CitySelect({
     value,
     onChange,
-    options, // string[]
+    options,
     placeholder = "Tìm kiếm tỉnh/thành...",
     label = "Địa điểm",
     required = true,
@@ -244,7 +253,7 @@ function ManageJobSection() {
           type="text"
           className={`combobox-input ${error ? "input-error" : ""}`}
           placeholder={placeholder}
-          value={open ? query : (value || "")}
+          value={open ? query : (value ?? "")}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={onInputFocus}
           onClick={() => setOpen(true)}
@@ -282,7 +291,6 @@ function ManageJobSection() {
     );
   }
 
-  // Thêm vào đầu component
   const [locations, setLocations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -345,13 +353,13 @@ function ManageJobSection() {
         let companyName = null;
         let companyId = null;
 
-        // 1. Ưu tiên lấy từ job đã đăng (nếu có)
+        // 1) Ưu tiên từ job đã đăng
         try {
           const jobRes = await jobAPI.getMyCompanyJobs();
           const jobsList = jobRes.data || [];
           if (jobsList.length > 0) {
             const job = jobsList[0];
-            companyName = job.companyName || "Công ty của bạn";
+            companyName = job.companyName ?? "Công ty của bạn";
             companyId = job.companyId;
             localStorage.setItem("myCompany", JSON.stringify({ companyId, name: companyName }));
             localStorage.setItem("companyName", companyName);
@@ -366,7 +374,7 @@ function ManageJobSection() {
           console.warn("Chưa có job nào hoặc lỗi không nghiêm trọng:", err);
         }
 
-        // 2. Nếu chưa có job → lấy từ API thông tin employer
+        // 2) Nếu chưa có job → lấy từ employer
         try {
           const res = await employerAPI.getMyEmployer();
           const company = res.data?.company || res.data;
@@ -423,8 +431,8 @@ function ManageJobSection() {
         salaryMax: job.salaryMax || "",
         experienceRequired: job.experienceRequired || "",
         expiredAt: job.expiredAt ? job.expiredAt.slice(0, 16) : "",
-        companyId: job.companyId || myCompany?.companyId || "",
-        categoryId: job.categoryId || "",
+        companyId: job.companyId ?? myCompany?.companyId ?? "",
+        categoryId: job.categoryId ?? "",
       });
       setEditingId(job.jobId);
     } else {
@@ -438,7 +446,7 @@ function ManageJobSection() {
         salaryMax: "",
         experienceRequired: "",
         expiredAt: "",
-        companyId: myCompany?.companyId || "",
+        companyId: myCompany?.companyId ?? "",
         categoryId: "",
       });
       setEditingId(null);
@@ -466,11 +474,11 @@ function ManageJobSection() {
     if (!form.categoryId) newErrors.categoryId = "Vui lòng chọn danh mục!";
     if (salaryMin <= 0) newErrors.salaryMin = "Lương tối thiểu phải > 0!";
     if (salaryMax <= 0) newErrors.salaryMax = "Lương tối đa phải > 0!";
-    if (salaryMin >= salaryMax)
-      newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
+    if (salaryMin >= salaryMax) newErrors.salaryMax = "Lương tối đa phải lớn hơn lương tối thiểu!";
     if (!form.expiredAt) newErrors.expiredAt = "Vui lòng chọn ngày hết hạn!";
-    if (expiredDate <= now)
-      newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
+    if (expiredDate <= now) newErrors.expiredAt = "Ngày hết hạn phải lớn hơn hiện tại!";
+    if (!plainText(form.description)) newErrors.description = "Mô tả không được để trống!";
+    if (!plainText(form.requirements)) newErrors.requirements = "Yêu cầu không được để trống!";
 
     return newErrors;
   };
@@ -483,15 +491,22 @@ function ManageJobSection() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
+      // ★ Sanitize trước khi gửi backend
+      const payload = {
+        ...form,
+        description: DOMPurify.sanitize(form.description),
+        requirements: DOMPurify.sanitize(form.requirements),
+      };
+
       if (editingId) {
-        await jobAPI.updateJob(editingId, form);
+        await jobAPI.updateJob(editingId, payload);
       } else {
-        await jobAPI.createJob(form);
+        await jobAPI.createJob(payload);
       }
       closeModal();
       fetchJobs();
     } catch (err) {
-      console.error("Lỗi:", err.response?.data || err);
+      console.error("Lỗi:", err.response?.data ?? err);
       setErrors({ api: "Thao tác thất bại, vui lòng thử lại!" });
     }
   };
@@ -506,6 +521,31 @@ function ManageJobSection() {
       console.error("Lỗi khi xóa job:", err);
     }
   };
+
+  // ===== Cấu hình React Quill =====
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }],
+      [{ align: [] }],
+      ["link"],
+      ["clean"],
+    ],
+  };
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "indent",
+    "align",
+    "link",
+  ];
+  // (modules/formats theo tài liệu ReactQuill/Quill)  // [2](https://basicutils.com/learn/quilljs/react-quill-tutorial)[5](https://www.npmjs.com/package/react-quill-new)
 
   return (
     <div className="admin-content">
@@ -534,38 +574,26 @@ function ManageJobSection() {
             <tbody>
               {jobs.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="no-data">
-                    Chưa có công việc nào
-                  </td>
+                  <td colSpan="6" className="no-data">Chưa có công việc nào</td>
                 </tr>
               ) : (
                 jobs.map((job, index) => (
-                  <tr key={job.jobId || index}>
+                  <tr key={job.jobId ?? index}>
                     <td>{job.title}</td>
-                    <td>{job.location || "-"}</td>
+                    <td>{job.location ?? "-"}</td>
                     <td>{job.jobType}</td>
                     <td>
-                      {job.salaryMin?.toLocaleString()} -{" "}
-                      {job.salaryMax?.toLocaleString()} đ
+                      {job.salaryMin?.toLocaleString()} - {job.salaryMax?.toLocaleString()} đ
                     </td>
                     <td>{job.experienceRequired || 0} năm</td>
                     <td className="actions">
-                      <button
-                        className="job-view-btn"
-                        onClick={() => openViewModal(job)}
-                      >
+                      <button className="job-view-btn" onClick={() => openViewModal(job)}>
                         Xem
                       </button>
-                      <button
-                        className="job-edit-btn"
-                        onClick={() => openModal(job)}
-                      >
+                      <button className="job-edit-btn" onClick={() => openModal(job)}>
                         Sửa
                       </button>
-                      <button
-                        className="job-delete-btn"
-                        onClick={() => handleDelete(job.jobId)}
-                      >
+                      <button className="job-delete-btn" onClick={() => handleDelete(job.jobId)}>
                         Xóa
                       </button>
                     </td>
@@ -584,19 +612,33 @@ function ManageJobSection() {
             <h3>Chi tiết công việc</h3>
             <div className="job-detail">
               <p><strong>Tiêu đề:</strong> {viewJob.title}</p>
-              <p><strong>Mô tả:</strong> {viewJob.description || "Không có"}</p>
-              <p><strong>Yêu cầu:</strong> {viewJob.requirements || "Không có"}</p>
-              <p><strong>Địa điểm:</strong> {viewJob.location || "-"}</p>
+
+              <p><strong>Mô tả:</strong></p>
+              <div
+                className="html-view"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(viewJob.description ?? "Không có"),
+                }}
+              />
+
+              <p><strong>Yêu cầu:</strong></p>
+              <div
+                className="html-view"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(viewJob.requirements ?? "Không có"),
+                }}
+              />
+
+              <p><strong>Địa điểm:</strong> {viewJob.location ?? "-"}</p>
               <p><strong>Loại công việc:</strong> {viewJob.jobType}</p>
               <p>
-                <strong>Lương:</strong>{" "}
-                {viewJob.salaryMin?.toLocaleString()} -{" "}
+                <strong>Lương:</strong> {viewJob.salaryMin?.toLocaleString()} -{" "}
                 {viewJob.salaryMax?.toLocaleString()} đ
               </p>
-              <p><strong>Kinh nghiệm:</strong> {viewJob.experienceRequired || 0} năm</p>
+              <p><strong>Kinh nghiệm:</strong> {viewJob.experienceRequired ?? 0} năm</p>
               <p><strong>Ngày hết hạn:</strong> {viewJob.expiredAt}</p>
-              <p><strong>Công ty:</strong> {viewJob.companyName || viewJob.companyId}</p>
-              <p><strong>Danh mục:</strong> {viewJob.categoryName || viewJob.categoryId}</p>
+              <p><strong>Công ty:</strong> {viewJob.companyName ?? viewJob.companyId}</p>
+              <p><strong>Danh mục:</strong> {viewJob.categoryName ?? viewJob.categoryId}</p>
             </div>
 
             <h4>Danh sách ứng viên</h4>
@@ -618,9 +660,9 @@ function ManageJobSection() {
                 </thead>
                 <tbody>
                   {applications.map((app) => (
-                    <tr key={app.id || app.cvId}>
+                    <tr key={app.id ?? app.cvId}>
                       <td>{app.candidateName}</td>
-                      <td>{app.email || "Không có email"}</td>
+                      <td>{app.email ?? "Không có email"}</td>
                       <td>{new Date(app.appliedAt).toLocaleDateString()}</td>
                       <td>
                         <select
@@ -646,9 +688,7 @@ function ManageJobSection() {
             )}
 
             <div className="modal-actions">
-              <button className="cancel-btn" onClick={closeViewModal}>
-                Đóng
-              </button>
+              <button className="cancel-btn" onClick={closeViewModal}>Đóng</button>
             </div>
           </div>
         </div>
@@ -764,26 +804,30 @@ function ManageJobSection() {
 
               {/* Mô tả */}
               <div className="form-group full-width">
-                <label>Mô tả</label>
-                <textarea
-                  rows="3"
+                <label>Mô tả *</label>
+                <ReactQuill
+                  theme="snow"
                   value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
+                  onChange={(val) => setForm({ ...form, description: val })}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Nhập mô tả chi tiết công việc..."
                 />
+                {errors.description && <p className="error-text">{errors.description}</p>}
               </div>
 
               {/* Yêu cầu */}
               <div className="form-group full-width">
-                <label>Yêu cầu</label>
-                <textarea
-                  rows="2"
+                <label>Yêu cầu *</label>
+                <ReactQuill
+                  theme="snow"
                   value={form.requirements}
-                  onChange={(e) =>
-                    setForm({ ...form, requirements: e.target.value })
-                  }
+                  onChange={(val) => setForm({ ...form, requirements: val })}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Nhập các yêu cầu đối với ứng viên..."
                 />
+                {errors.requirements && <p className="error-text">{errors.requirements}</p>}
               </div>
 
               {/* Địa điểm (CitySelect) */}
@@ -802,9 +846,7 @@ function ManageJobSection() {
                 <label>Loại công việc</label>
                 <select
                   value={form.jobType}
-                  onChange={(e) =>
-                    setForm({ ...form, jobType: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, jobType: e.target.value })}
                 >
                   <option value="FULL_TIME">FULL_TIME</option>
                   <option value="PART_TIME">PART_TIME</option>
@@ -819,13 +861,9 @@ function ManageJobSection() {
                 <input
                   type="number"
                   value={form.salaryMin}
-                  onChange={(e) =>
-                    setForm({ ...form, salaryMin: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, salaryMin: e.target.value })}
                 />
-                {errors.salaryMin && (
-                  <p className="error-text">{errors.salaryMin}</p>
-                )}
+                {errors.salaryMin && <p className="error-text">{errors.salaryMin}</p>}
               </div>
 
               {/* Lương tối đa */}
@@ -834,13 +872,9 @@ function ManageJobSection() {
                 <input
                   type="number"
                   value={form.salaryMax}
-                  onChange={(e) =>
-                    setForm({ ...form, salaryMax: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, salaryMax: e.target.value })}
                 />
-                {errors.salaryMax && (
-                  <p className="error-text">{errors.salaryMax}</p>
-                )}
+                {errors.salaryMax && <p className="error-text">{errors.salaryMax}</p>}
               </div>
 
               {/* Kinh nghiệm */}
@@ -849,9 +883,7 @@ function ManageJobSection() {
                 <input
                   type="number"
                   value={form.experienceRequired}
-                  onChange={(e) =>
-                    setForm({ ...form, experienceRequired: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, experienceRequired: e.target.value })}
                 />
               </div>
 
@@ -861,13 +893,9 @@ function ManageJobSection() {
                 <input
                   type="datetime-local"
                   value={form.expiredAt}
-                  onChange={(e) =>
-                    setForm({ ...form, expiredAt: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, expiredAt: e.target.value })}
                 />
-                {errors.expiredAt && (
-                  <p className="error-text">{errors.expiredAt}</p>
-                )}
+                {errors.expiredAt && <p className="error-text">{errors.expiredAt}</p>}
               </div>
 
               {/* Công ty (readonly) */}
@@ -877,7 +905,7 @@ function ManageJobSection() {
                 <input type="hidden" name="companyId" value={form.companyId} />
               </div>
 
-              {/* Dropdown Danh mục */}
+              {/* Danh mục */}
               <div className="form-group">
                 <label>Danh mục nghề *</label>
                 {dropdownLoading ? (
@@ -887,9 +915,7 @@ function ManageJobSection() {
                 ) : (
                   <select
                     value={form.categoryId}
-                    onChange={(e) =>
-                      setForm({ ...form, categoryId: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
                   >
                     <option value="">-- Chọn danh mục --</option>
                     {categories.map((cat) => (
@@ -899,24 +925,44 @@ function ManageJobSection() {
                     ))}
                   </select>
                 )}
-                {errors.categoryId && (
-                  <p className="error-text">{errors.categoryId}</p>
-                )}
+                {errors.categoryId && <p className="error-text">{errors.categoryId}</p>}
               </div>
 
+              {/* Actions */}
               <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={closeModal}
-                >
+                <button type="button" className="cancel-btn" onClick={closeModal}>
                   Hủy
                 </button>
                 <button type="submit" className="submit-btn">
                   {editingId ? "Cập nhật" : "Thêm mới"}
                 </button>
               </div>
+
+              {errors.api && <p className="error-text">{errors.api}</p>}
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal CV */}
+      {isCVModalOpen && selectedCV && (
+        <div className="modal-overlay" onClick={closeCVModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
+            {loadingCV ? (
+              <p>Đang tải CV...</p>
+            ) : selectedCV.cvUrl ? (
+              <iframe src={selectedCV.cvUrl} width="100%" height="500px" title="CV"></iframe>
+            ) : selectedCV.cvHtml ? (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(selectedCV.cvHtml),
+                }}
+              />
+            ) : (
+              <p>Không có CV được tải lên.</p>
+            )}
+            <button onClick={closeCVModal}>Đóng</button>
           </div>
         </div>
       )}
