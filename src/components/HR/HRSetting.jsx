@@ -165,9 +165,7 @@ function HRSetting() {
               <div className="hrset-company">
                 <div className="hrset-company__title">Công ty</div>
                 <div className="hrset-company__value">{getCompanyName(emp)}</div>
-                <div className="hrset-company__sub">
-                  ID: {getByPaths(emp, ["company.companyId", "company.id"]) ?? "-"}
-                </div>
+                
               </div>
             </div>
 
