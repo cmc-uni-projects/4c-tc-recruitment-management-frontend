@@ -250,3 +250,12 @@ export const fileAPI = {
     });
   },
 };
+
+export const fetchCVBlobByUrl = (cvUrl) => {
+  const token = localStorage.getItem("token");
+  return api.get(cvUrl, {
+    responseType: "blob",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+

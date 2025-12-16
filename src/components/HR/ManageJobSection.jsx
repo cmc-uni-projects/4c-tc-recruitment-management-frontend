@@ -1,4 +1,5 @@
 
+// src/pages/Admin/ManageJobSection.jsx
 import React, { useEffect, useState } from "react";
 import "./ManageJobSection.css";
 import {
@@ -8,6 +9,7 @@ import {
   applicationAPI,
   employerAPI,
   renderCV,
+  fetchCVBlobByUrl, // 👈 dùng để tải PDF private thành blob (nếu server yêu cầu token)
 } from "../../services/auth.services";
 import { replaceTemplate } from "../../untils/replaceTemplate";
 
@@ -29,6 +31,7 @@ function ManageJobSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewJob, setViewJob] = useState(null);
+
   const [applications, setApplications] = useState([]);
   const [loadingApplications, setLoadingApplications] = useState(false);
 
@@ -55,38 +58,103 @@ function ManageJobSection() {
   const [isCVModalOpen, setIsCVModalOpen] = useState(false);
   const [selectedCV, setSelectedCV] = useState(null);
   const [loadingCV, setLoadingCV] = useState(false);
+  const [cvPdfBlobUrl, setCvPdfBlobUrl] = useState(null); // blob URL cho PDF private
+  const [cvViewMode, setCvViewMode] = useState("html"); // 'pdf' | 'html'
 
   const token = localStorage.getItem("token");
 
-  // ===== Xem CV ứng viên =====
+  // ========================= Helpers cho CV =========================
+  // Nhận diện PDF cả khi url không chứa .pdf (ví dụ /files/view?id=...&mime=application/pdf)
+  const isLikelyPdf = (url) => {
+    if (!url) return false;
+    return /\.pdf(\?|$)/i.test(url) ||
+      /mime=application\/pdf/i.test(url) ||
+      /\/pdf(\/|$|\?)/i.test(url);
+  };
+
+  // Tạo absolute URL nếu backend trả relative path
+  const toAbsoluteUrl = (url) => {
+    if (!url) return null;
+    if (/^https?:\/\//i.test(url)) return url;
+    // Sửa theo môi trường của bạn, mặc định localhost:8080
+    const backendOrigin = import.meta?.env?.VITE_API_BASE_URL || "http://localhost:8080";
+    return backendOrigin.replace(/\/+$/, "") + "/" + url.replace(/^\/+/, "");
+  };
+
+  // ✅ Xem CV ứng viên (HTML ưu tiên nếu có; nếu không có HTML thì thử PDF)
   const handleViewCV = async (app) => {
     setLoadingCV(true);
     try {
-      const res = await renderCV(app.cvId);
-      const { data } = res;
-      const { htmlLayout, cvUrl } = data;
-      const cvHtml = replaceTemplate(htmlLayout, data.data);
+      const res = await renderCV(app.cvId); // API lấy CV theo cvId
+      const { data } = res || {};
+      const { htmlLayout, cvUrl, data: cvData } = data || {};
+
+      // Chuẩn hóa URL PDF
+      const absUrl = toAbsoluteUrl(cvUrl);
+
+      // Render HTML nếu có template
+      const cvHtml = htmlLayout ? replaceTemplate(htmlLayout, cvData) : null;
+
+      // Thử tải blob PDF (nếu có URL và có vẻ là PDF)
+      let blobUrl = null;
+      if (absUrl && isLikelyPdf(absUrl)) {
+        try {
+          const fileRes = await fetchCVBlobByUrl(absUrl);
+          const contentType = fileRes.headers?.["content-type"] || fileRes.headers?.get?.("content-type") || "";
+          // Nếu server trả đúng pdf, tạo blob; nếu không, vẫn tạo blob để trình duyệt cố mở
+          const blob = new Blob([fileRes.data], { type: contentType || "application/pdf" });
+          blobUrl = URL.createObjectURL(blob);
+          setCvPdfBlobUrl(blobUrl);
+        } catch (e) {
+          // Không tải được blob (do CORS/Authorization) → dùng trực tiếp URL
+          setCvPdfBlobUrl(null);
+        }
+      } else {
+        setCvPdfBlobUrl(null);
+      }
+
+      // Cập nhật state CV
       setSelectedCV({
         candidateName: app.candidateName,
-        cvUrl: cvUrl ?? null,
-        cvHtml: cvHtml ?? null,
-        cvData: data.data ?? null,
+        cvUrl: absUrl || null,
+        cvHtml: cvHtml || null,
+        cvData: cvData || null,
       });
+
+      // Chọn mode hiển thị mặc định:
+      // - Nếu có HTML → ưu tiên HTML (fix case "PDF không nhúng được nhưng HTML vẫn đọc được")
+      // - Nếu không có HTML → thử PDF
+      if (cvHtml) {
+        setCvViewMode("html");
+      } else if (blobUrl || (absUrl && isLikelyPdf(absUrl))) {
+        setCvViewMode("pdf");
+      } else {
+        // Không có HTML cũng không có PDF → hiển thị thông báo
+        setCvViewMode("html");
+      }
+
       setIsCVModalOpen(true);
     } catch (error) {
       console.error("Lỗi lấy CV:", error);
-      setSelectedCV({ candidateName: app.candidateName, cvUrl: null });
+      setSelectedCV({ candidateName: app.candidateName, cvUrl: null, cvHtml: null });
+      setCvPdfBlobUrl(null);
+      setCvViewMode("html");
       setIsCVModalOpen(true);
     } finally {
       setLoadingCV(false);
     }
   };
+
   const closeCVModal = () => {
     setIsCVModalOpen(false);
     setSelectedCV(null);
+    if (cvPdfBlobUrl) {
+      URL.revokeObjectURL(cvPdfBlobUrl);
+      setCvPdfBlobUrl(null);
+    }
   };
 
-  // ===== Cập nhật trạng thái ứng viên =====
+  // ========================= Ứng viên / Job =========================
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
       await applicationAPI.updateStatus(applicationId, newStatus, token);
@@ -99,7 +167,6 @@ function ManageJobSection() {
     }
   };
 
-  // ===== Modal xem Job =====
   const openViewModal = async (job) => {
     setViewJob(job);
     setIsViewModalOpen(true);
@@ -121,7 +188,7 @@ function ManageJobSection() {
     setApplications([]);
   };
 
-  // ===== City combobox =====
+  // ========================= CitySelect =========================
   const vietnamProvinces = [
     "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
     "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bắc Ninh",
@@ -134,7 +201,7 @@ function ManageJobSection() {
     "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
     "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
     "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế", "Tiền Giang",
-    "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái"
+    "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái",
   ];
 
   function CitySelect({
@@ -144,13 +211,13 @@ function ManageJobSection() {
     placeholder = "Tìm kiếm tỉnh/thành...",
     label = "Địa điểm",
     required = true,
-    error
+    error,
   }) {
     const [query, setQuery] = useState("");
     const [open, setOpen] = useState(false);
     const [highlightIndex, setHighlightIndex] = useState(0);
 
-    const filtered = options.filter(item =>
+    const filtered = options.filter((item) =>
       item.toLowerCase().includes(query.toLowerCase())
     );
 
@@ -227,27 +294,24 @@ function ManageJobSection() {
   const [locations, setLocations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Lấy danh sách địa điểm từ API jobAPI.getApprovedJobs()
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         const res = await jobAPI.getApprovedJobs();
         const jobs = res.data;
-        const dynamicLocations = jobs.map(job => job.location).filter(Boolean);
+        const dynamicLocations = jobs.map((job) => job.location).filter(Boolean);
         const uniqueLocations = [...new Set([...vietnamProvinces, ...dynamicLocations])];
         setLocations(uniqueLocations);
       } catch (error) {
         console.error("Lỗi khi tải danh sách địa điểm:", error);
-        setLocations(vietnamProvinces);
+        setLocations(vietnamProvinces); // fallback
       }
     };
     fetchLocations();
   }, []);
 
-  const filteredLocations = locations.filter(loc =>
-    loc.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // ===== Jobs list & dropdown =====
+  // ✅ Load danh sách Job
   const fetchJobs = async () => {
     try {
       setLoading(true);
@@ -260,6 +324,7 @@ function ManageJobSection() {
     }
   };
 
+  // ✅ Load dropdown
   const fetchDropdownData = async () => {
     try {
       setDropdownLoading(true);
@@ -291,7 +356,7 @@ function ManageJobSection() {
         // 1) Ưu tiên từ job đã đăng
         try {
           const jobRes = await jobAPI.getMyCompanyJobs();
-          const jobsList = jobRes.data ?? [];
+          const jobsList = jobRes.data || [];
           if (jobsList.length > 0) {
             const job = jobsList[0];
             companyName = job.companyName ?? "Công ty của bạn";
@@ -306,16 +371,16 @@ function ManageJobSection() {
             return;
           }
         } catch (err) {
-          console.warn("Chưa có job nào hoặc lỗi nhẹ:", err);
+          console.warn("Chưa có job nào hoặc lỗi không nghiêm trọng:", err);
         }
 
         // 2) Nếu chưa có job → lấy từ employer
         try {
           const res = await employerAPI.getMyEmployer();
-          const company = res.data?.company ?? res.data;
-          if (company?.companyId ?? company?.id) {
-            companyId = company.companyId ?? company.id;
-            companyName = company.name ?? company.companyName ?? "Công ty của bạn";
+          const company = res.data?.company || res.data;
+          if (company?.companyId || company?.id) {
+            companyId = company.companyId || company.id;
+            companyName = company.name || company.companyName || "Công ty của bạn";
             localStorage.setItem("myCompany", JSON.stringify({ companyId, name: companyName }));
             localStorage.setItem("companyName", companyName);
             setCompanyDisplayName(companyName);
@@ -328,12 +393,13 @@ function ManageJobSection() {
           setCompanyDisplayName("Chưa liên kết công ty");
         }
 
-        // Jobs + dropdown
+        // Load lại job + dropdown
         try {
           const jobRes = await jobAPI.getMyCompanyJobs();
-          setJobs(jobRes.data ?? []);
-        } catch { /* bình thường nếu chưa có job */ }
-
+          setJobs(jobRes.data || []);
+        } catch {
+          // người dùng chưa có job → bình thường
+        }
         await fetchDropdownData();
         setLoading(false);
       } catch (err) {
@@ -345,10 +411,11 @@ function ManageJobSection() {
     loadCompanyInfo();
   }, []);
 
-  // ===== Modal Add/Edit =====
+  // ✅ Mở modal thêm/sửa job
   const openModal = async (job = null) => {
     await fetchDropdownData();
-    const myCompany = JSON.parse(localStorage.getItem("myCompany") ?? "null");
+    const myCompany = JSON.parse(localStorage.getItem("myCompany") || "null");
+
     if (myCompany?.name) {
       localStorage.setItem("companyName", myCompany.name);
     }
@@ -356,13 +423,13 @@ function ManageJobSection() {
     if (job) {
       setForm({
         title: job.title,
-        description: job.description,                 // HTML từ editor
-        requirements: job.requirements ?? "",
-        location: job.location ?? "",
-        jobType: job.jobType ?? "FULL_TIME",
-        salaryMin: job.salaryMin ?? "",
-        salaryMax: job.salaryMax ?? "",
-        experienceRequired: job.experienceRequired ?? "",
+        description: job.description || "",
+        requirements: job.requirements || "",
+        location: job.location || "",
+        jobType: job.jobType || "FULL_TIME",
+        salaryMin: job.salaryMin || "",
+        salaryMax: job.salaryMax || "",
+        experienceRequired: job.experienceRequired || "",
         expiredAt: job.expiredAt ? job.expiredAt.slice(0, 16) : "",
         companyId: job.companyId ?? myCompany?.companyId ?? "",
         categoryId: job.categoryId ?? "",
@@ -388,19 +455,14 @@ function ManageJobSection() {
     setIsModalOpen(true);
   };
 
+  // ✅ Đóng modal thêm/sửa job
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
     setErrors({});
   };
 
-  // ===== Validate =====
-  const plainText = (html) => {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = html || "";
-    return (tmp.textContent || "").replace(/\s+/g, " ").trim();
-  };
-
+  // ✅ Validate
   const validateForm = () => {
     const newErrors = {};
     const salaryMin = Number(form.salaryMin);
@@ -421,7 +483,7 @@ function ManageJobSection() {
     return newErrors;
   };
 
-  // ===== Submit =====
+  // ✅ Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
@@ -449,6 +511,7 @@ function ManageJobSection() {
     }
   };
 
+  // ✅ Xóa job
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa công việc này?")) return;
     try {
@@ -522,24 +585,15 @@ function ManageJobSection() {
                     <td>
                       {job.salaryMin?.toLocaleString()} - {job.salaryMax?.toLocaleString()} đ
                     </td>
-                    <td>{job.experienceRequired ?? 0} năm</td>
+                    <td>{job.experienceRequired || 0} năm</td>
                     <td className="actions">
-                      <button
-                        className="view-btn1"
-                        onClick={() => openViewModal(job)}
-                      >
+                      <button className="job-view-btn" onClick={() => openViewModal(job)}>
                         Xem
                       </button>
-                      <button
-                        className="edit-btn"
-                        onClick={() => openModal(job)}
-                      >
+                      <button className="job-edit-btn" onClick={() => openModal(job)}>
                         Sửa
                       </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(job.jobId)}
-                      >
+                      <button className="job-delete-btn" onClick={() => handleDelete(job.jobId)}>
                         Xóa
                       </button>
                     </td>
@@ -551,7 +605,7 @@ function ManageJobSection() {
         )}
       </div>
 
-      {/* Modal xem Job (hiển thị HTML đã sanitize) */}
+      {/* Modal Chi tiết Job + Danh sách ứng viên */}
       {isViewModalOpen && viewJob && (
         <div className="modal-overlay" onClick={closeViewModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -613,7 +667,9 @@ function ManageJobSection() {
                       <td>
                         <select
                           value={app.status}
-                          onChange={(e) => handleStatusChange(app.applicationId, e.target.value)}
+                          onChange={(e) =>
+                            handleStatusChange(app.applicationId, e.target.value)
+                          }
                         >
                           <option value="PENDING">Đang xử lý</option>
                           <option value="REVIEWED">NTD đã xem</option>
@@ -621,7 +677,7 @@ function ManageJobSection() {
                           <option value="REJECTED">Từ chối</option>
                         </select>
                       </td>
-                      <td>{app.notes ?? "-"}</td>
+                      <td>{app.notes || "-"}</td>
                       <td>
                         <button onClick={() => handleViewCV(app)}>Xem CV</button>
                       </td>
@@ -638,12 +694,102 @@ function ManageJobSection() {
         </div>
       )}
 
-      {/* Modal Add/Edit (React Quill + CSS đẹp) */}
+      {/* Modal CV - có toggle PDF / HTML, ưu tiên hiển thị HTML nếu có */}
+      {isCVModalOpen && selectedCV && (
+        <div className="modal-overlay" onClick={closeCVModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Chi tiết CV của {selectedCV.candidateName}</h3>
+
+            {/* Toggle giữa PDF upload và HTML render */}
+            <div className="cv-toggle" style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              <button
+                className={`toggle-btn ${cvViewMode === "pdf" ? "active" : ""}`}
+                onClick={() => setCvViewMode("pdf")}
+                disabled={!selectedCV?.cvUrl && !cvPdfBlobUrl}
+                title="Xem file PDF đã upload"
+              >
+                PDF upload
+              </button>
+
+              <button
+                className={`toggle-btn ${cvViewMode === "html" ? "active" : ""}`}
+                onClick={() => setCvViewMode("html")}
+                disabled={!selectedCV?.cvHtml}
+                title="Xem CV render (HTML)"
+              >
+                CV render (HTML)
+              </button>
+            </div>
+
+            {/* Nếu có URL file, hiển thị link mở tab mới để đảm bảo luôn xem được PDF */}
+            {selectedCV.cvUrl && (
+              <div style={{ marginBottom: 8 }}>
+                <a href={selectedCV.cvUrl} target="_blank" rel="noreferrer">
+                  Mở CV (PDF) trong tab mới
+                </a>
+              </div>
+            )}
+
+            {loadingCV ? (
+              <p>Đang tải CV...</p>
+            ) : cvViewMode === "pdf" ? (
+              <>
+                {cvPdfBlobUrl ? (
+                  <>
+                    <iframe
+                      src={cvPdfBlobUrl}
+                      width="100%"
+                      height="600px"
+                      title="CV PDF"
+                    />
+                    
+                  </>
+                ) : selectedCV.cvUrl ? (
+                  <>
+                    {/* Fallback 1: iframe trực tiếp */}
+                    <iframe
+                      src={selectedCV.cvUrl}
+                      width="100%"
+                      height="600px"
+                      title="CV PDF"
+                    />
+                    {/* Fallback 2: object/embed nếu iframe bị chặn */}
+                    <object
+                      data={selectedCV.cvUrl}
+                      type="application/pdf"
+                      width="100%"
+                      height="600"
+                    >
+                      <embed src={selectedCV.cvUrl} type="application/pdf" width="100%" height="600" />
+                      <p>Trình duyệt hoặc máy chủ đang chặn nhúng PDF.</p>
+                    </object>
+                  </>
+                ) : (
+                  <p>Không tìm thấy PDF đã upload cho ứng viên này.</p>
+                )}
+              </>
+            ) : cvViewMode === "html" ? (
+              selectedCV.cvHtml ? (
+                <div dangerouslySetInnerHTML={{ __html: selectedCV.cvHtml }} />
+              ) : (
+                <p>CV render (HTML) không khả dụng.</p>
+              )
+            ) : (
+              <p>Không có CV được tải lên.</p>
+            )}
+
+            <div className="modal-actions" style={{ marginTop: 12 }}>
+              <button onClick={closeCVModal}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Thêm/Sửa Job */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>{editingId ? "Chỉnh sửa Job" : "Thêm Job mới"}</h3>
-
             <form className="modal-form" onSubmit={handleSubmit}>
               {/* Tên vị trí */}
               <div className="form-group full-width">
@@ -656,7 +802,7 @@ function ManageJobSection() {
                 {errors.title && <p className="error-text">{errors.title}</p>}
               </div>
 
-              {/* ★ Mô tả (Rich Text) */}
+              {/* Mô tả */}
               <div className="form-group full-width">
                 <label>Mô tả *</label>
                 <ReactQuill
@@ -670,7 +816,7 @@ function ManageJobSection() {
                 {errors.description && <p className="error-text">{errors.description}</p>}
               </div>
 
-              {/* ★ Yêu cầu (Rich Text) */}
+              {/* Yêu cầu */}
               <div className="form-group full-width">
                 <label>Yêu cầu *</label>
                 <ReactQuill
@@ -684,7 +830,7 @@ function ManageJobSection() {
                 {errors.requirements && <p className="error-text">{errors.requirements}</p>}
               </div>
 
-              {/* Địa điểm */}
+              {/* Địa điểm (CitySelect) */}
               <CitySelect
                 value={form.location}
                 onChange={(val) => setForm({ ...form, location: val })}
@@ -709,7 +855,7 @@ function ManageJobSection() {
                 </select>
               </div>
 
-              {/* Lương */}
+              {/* Lương tối thiểu */}
               <div className="form-group">
                 <label>Lương tối thiểu</label>
                 <input
@@ -720,6 +866,7 @@ function ManageJobSection() {
                 {errors.salaryMin && <p className="error-text">{errors.salaryMin}</p>}
               </div>
 
+              {/* Lương tối đa */}
               <div className="form-group">
                 <label>Lương tối đa</label>
                 <input
@@ -740,7 +887,7 @@ function ManageJobSection() {
                 />
               </div>
 
-              {/* Hạn nộp */}
+              {/* Ngày hết hạn */}
               <div className="form-group">
                 <label>Ngày hết hạn</label>
                 <input
@@ -824,3 +971,4 @@ function ManageJobSection() {
 }
 
 export default ManageJobSection;
+
