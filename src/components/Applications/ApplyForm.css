@@ -23,7 +23,7 @@
 
 /* Nội dung form */
 .apply-form {
-  width: 500px;
+  width: 650px;
   max-width: 95%;
   background: #ffffff;
   border-radius: 12px;
@@ -142,3 +142,39 @@
 .apply-form .submit-btn:hover {
   background: #009e45;
 }
+/* ===== THÊM SCROLL CHO FORM - CHỈ CẦN DÁN VÀO ĐÂY ===== */
+.apply-form {
+  max-height: 100vh;           /* Không chiếm quá 90% chiều cao màn hình */
+  overflow-y: auto;           /* Cho phép cuộn dọc khi nội dung dài */
+  padding-right: 8px;         /* Tránh nội dung bị dính vào thanh cuộn */
+}
+
+/* Làm thanh cuộn đẹp hơn (không bắt buộc, nhưng rất đẹp) */
+.apply-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.apply-form::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.apply-form::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 10px;
+}
+
+.apply-form::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Đảm bảo overlay không bị cuộn theo */
+.custom-modal {
+  overflow: hidden;
+}
+
+/* Trên mobile: cuộn mượt hơn, không bị giật */
+.apply-form {
+  -webkit-overflow-scrolling: touch;
+}
+/* ===== KẾT THÚC - CHỈ CẦN DÁN ĐOẠN NÀY ===== */
