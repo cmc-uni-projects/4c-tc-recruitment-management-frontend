@@ -129,7 +129,7 @@
 /* === Nút chính === */
 .btn.primary {
   display: inline-block;
-  padding: 14px 36px;
+  padding: 10px 36px;
   background: linear-gradient(135deg, #00b14f, #009e46);
   color: white;
   font-weight: 600;
