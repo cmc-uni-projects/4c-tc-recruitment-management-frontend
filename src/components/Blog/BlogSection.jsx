@@ -14,6 +14,9 @@ const BlogSection = () => {
     const fakeBlogs = [
       {
         id: 1,
+
+
+        
         title: "5 mẹo giúp CV nổi bật trong mắt nhà tuyển dụng",
         description:
           "Tìm hiểu cách tối ưu CV để thu hút sự chú ý của HR và hệ thống AI Matching.",
