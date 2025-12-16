@@ -14,6 +14,10 @@ import {
 import "./ApplyForm.css";
 import Swal from "sweetalert2";
 
+
+
+
+
 const ApplyForm = ({ jobId, jobTitle, onClose, onApplied }) => {
   const [cvs, setCvs] = useState([]);
   const [selectedOption, setSelectedOption] = useState("recent");
