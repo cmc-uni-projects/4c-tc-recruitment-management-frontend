@@ -21,6 +21,7 @@ export default function CompanyReviewModal({ companyId, onClose, onSuccess }) {
         setError("Không thể tải chi tiết hồ sơ công ty.");
       } finally {
         setLoading(false);
+        
       }
     };
 
