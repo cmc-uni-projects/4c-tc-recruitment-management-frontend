@@ -20,6 +20,7 @@ export default function AdminSection({ children }) {
     localStorage.clear();
     navigate("/");
   };
+  
   // Lấy số job đang chờ duyệt
   const fetchPendingCount = async () => {
     try {
