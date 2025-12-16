@@ -512,19 +512,19 @@ function ManageJobSection() {
 
                     <td className="actions">
                       <button
-                        className="job-view-btn"
+                        className="view-btn1"
                         onClick={() => openViewModal(job)}
                       >
                         Xem
                       </button>
                       <button
-                        className="job-edit-btn"
+                        className="edit-btn"
                         onClick={() => openModal(job)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="job-delete-btn"
+                        className="delete-btn"
                         onClick={() => handleDelete(job.jobId)}
                       >
                         Xóa

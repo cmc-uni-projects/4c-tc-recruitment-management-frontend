@@ -45,7 +45,7 @@
 .category-table th,
 .category-table td {
   border: 1px solid #e5e7eb;
-  padding: 12px 10px;
+  padding: 12px 0px;
   text-align: center
   ;
 }
@@ -83,13 +83,13 @@
 }
 
 /* Nút XEM - xanh dương nhạt */
-.job-view-btn {
-  background: #e3f2fd;
-  color: #1565c0;
+.view-btn1 {
+  background: #b551be;
+  color: #ffffff;
   border: 1px solid #bbdefb;
 }
-.job-view-btn:hover {
-  background: #bbdefb;
+.view-btn1:hover {
+  background: #8e1eb1;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(21, 101, 192, 0.15);
 }
