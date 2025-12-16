@@ -1,3 +1,8 @@
+.applied-jobs-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
 .applied-jobs-layout {
   display: flex;
   gap: 20px;
@@ -18,6 +23,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
+  color: #0f6938;
 }
 
 .filter-container {
@@ -25,17 +31,20 @@
 }
 
 .filter-select {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
 }
 
+/* Empty */
 .empty-applied-jobs {
   text-align: center;
   padding: 40px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .empty-image {
@@ -44,67 +53,152 @@
 }
 
 .btn-find-jobs {
-  background-color: #27ae60;
+  background-color: #198754;
   color: #fff;
   padding: 12px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
 }
 
+.btn-find-jobs:hover {
+  opacity: 0.92;
+}
+
+/* List */
 .applied-jobs-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 22px;
 }
 
+/* === Đồng bộ card giống CompanyJobsPage === */
 .applied-job-card {
+  background: #f1f8f5;
+  border: 1px solid #d1e7dd;
+  padding: 22px;
+  border-radius: 14px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  flex-direction: column;
+  gap: 14px;
+  transition: 0.2s;
 }
 
-.job-info h3 {
+.applied-job-card:hover {
+  background: #ffffff;
+  border-color: #198754;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.applied-job-header {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.applied-job-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.applied-job-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #0f6938;
 }
 
 .company-name {
-  color: #333;
+  color: #374151;
+  font-size: 15px;
+  margin-top: 3px;
   font-weight: 500;
 }
 
-.job-location {
-  color: #666;
-  margin: 4px 0;
+/* Meta giống pill */
+.applied-job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+  color: #374151;
 }
 
+.applied-pill {
+  background: #e8f5e9;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Footer */
+.applied-job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Status */
 .job-status {
   display: inline-block;
-  background-color: #eafaf1;
-  color: #27ae60;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
   font-size: 12px;
-  margin-top: 8px;
+  font-weight: 600;
 }
 
-.job-salary {
-  color: #e67e22;
-  font-weight: bold;
-  font-size: 16px;
+/* Status colors (giữ theo class hiện tại) */
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+.status-reviewed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+.status-hired {
+  background-color: #d4edda;
+  color: #155724;
+}
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
+/* Actions */
+.job-actions1 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.btn-view-job {
+  border: 1px solid #198754;
+  padding: 8px 20px;
+  border-radius: 8px;
+  color: #198754;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.25s;
+}
+
+.btn-view-job:hover {
+  background: #198754;
+  color: #fff;
+}
+
+/* Right card */
 .profile-management {
   background: #fff;
   padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
 }
 
@@ -119,10 +213,18 @@
 
 .banner-image {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 12px;
 }
 
-/* Loading spinner */
+/* Responsive */
+@media (max-width: 768px) {
+  .applied-jobs-layout {
+    flex-direction: column;
+  }
+}
+
+/* Loading spinner (giữ nguyên) */
 .loading-container {
   text-align: center;
   padding: 50px;
@@ -140,68 +242,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Hover effect for job card */
-.applied-job-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.applied-job-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Status colors */
-.status-pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-.status-interview {
-  background-color: #d1ecf1;
-  color: #0c5460;
-}
-.status-approved {
-  background-color: #d4edda;
-  color: #155724;
-}
-.status-rejected {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .applied-jobs-layout {
-    flex-direction: column;
-  }
-}
-
-.job-actions1 {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.btn-view-job {
-  display: inline-block;
-  background-color: #3498db; /* Màu xanh chuyên nghiệp */
-  color: #fff;
-  padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.btn-view-job:hover {
-  background-color: #2980b9; /* Màu đậm hơn khi hover */
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.btn-view-job:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
