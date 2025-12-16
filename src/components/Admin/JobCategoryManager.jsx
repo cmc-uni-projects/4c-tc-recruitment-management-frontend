@@ -15,6 +15,10 @@ export default function JobCategoryManager() {
   });
   const [editingId, setEditingId] = useState(null);
 
+
+
+
+  
   // Fetch all categories
   const fetchCategories = async () => {
     try {
