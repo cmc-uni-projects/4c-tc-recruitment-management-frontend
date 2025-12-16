@@ -59,17 +59,15 @@
   border-radius: 6px;
 }
 
-.view-btn {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+.view-btn1 {
+  background: #b551be;
+  color: #ffffff;
+  border: 1px solid #bbdefb;
 }
-
-.view-btn:hover {
-  background: #1d4ed8;
+.view-btn1:hover {
+  background: #8e1eb1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(21, 101, 192, 0.15);
 }
 
 .no-data {

@@ -524,13 +524,22 @@ function ManageJobSection() {
                     </td>
                     <td>{job.experienceRequired ?? 0} năm</td>
                     <td className="actions">
-                      <button className="job-view-btn" onClick={() => openViewModal(job)}>
+                      <button
+                        className="view-btn1"
+                        onClick={() => openViewModal(job)}
+                      >
                         Xem
                       </button>
-                      <button className="job-edit-btn" onClick={() => openModal(job)}>
+                      <button
+                        className="edit-btn"
+                        onClick={() => openModal(job)}
+                      >
                         Sửa
                       </button>
-                      <button className="job-delete-btn" onClick={() => handleDelete(job.jobId)}>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(job.jobId)}
+                      >
                         Xóa
                       </button>
                     </td>

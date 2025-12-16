@@ -102,7 +102,7 @@
 .detail-info { display: flex; gap: 12px; align-items: center; }
 .detail-logo { width: 56px; height: 56px; border-radius: 10px; border: 1px solid var(--border); object-fit: cover; }
 .actions, .form-actions, .pending-actions {
-  display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+  display: flex; gap: 8px; margin-top: 0px; flex-wrap: wrap;
 }
 
 /* Buttons */
