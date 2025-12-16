@@ -85,7 +85,7 @@
 .company-card.fancy .desc { padding: 0 12px 12px; color: #444; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* one-line */
-.one-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.one-line { overflow: hidden; text-overflow: ellipsis; }
 
 /* Verify badges */
 .verify-badge {
