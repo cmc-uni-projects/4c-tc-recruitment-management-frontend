@@ -220,9 +220,16 @@
 /* =============================
    No Jobs
 ============================= */
+
 .cjp-no-jobs {
   text-align: center;
   padding: 60px 20px;
+  display: flex;
+  flex-direction: column;
+  /* xếp ảnh trên chữ */
+  align-items: center;
+  /* căn giữa theo chiều ngang */
+  justify-content: center;
 }
 
 .cjp-btn-back-home {
