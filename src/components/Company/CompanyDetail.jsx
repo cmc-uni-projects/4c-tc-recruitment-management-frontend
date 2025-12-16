@@ -26,6 +26,11 @@ const CompanyDetail = () => {
       });
   }, [id]);
 
+
+
+
+
+  
   if (loading) return <div className="detail-skeleton">Đang tải...</div>;
   if (!company) return <div className="detail-error">Không tìm thấy công ty.</div>;
 
