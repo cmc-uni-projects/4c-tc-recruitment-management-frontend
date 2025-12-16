@@ -4,13 +4,15 @@ import { useParams, Link } from "react-router-dom";
 import { companyAPI, jobAPI } from "../../services/auth.services";
 import "./CompanyJobsPage.css"; // Tạo file CSS riêng
 import Swal from "sweetalert2";
+import emptyBoxImage from "../../assets/empty-box.png";
+import Navbar from "../../components/Layout/Navbar";
 
 const CompanyJobsPage = () => {
   const { id } = useParams(); // companyId
   const [company, setCompany] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,124 +69,139 @@ const CompanyJobsPage = () => {
   };
 
   return (
-    <div className="cjp-page">
-      {/* Hero giống CompanyDetail */}
-      <section className="cjp-hero">
-        <div className="cjp-cover">
-          <img
-            src={company.coverUrl || "/default-cover.jpg"}
-            alt="Cover"
-            onError={(e) => (e.target.src = "/default-cover.jpg")}
-          />
-        </div>
+    <>
+      <Navbar />
+      <div className="company-detail-page">
+        {/* Hero giống CompanyDetail */}
 
-        <div className="cjp-hero-content">
-          <div className="cjp-logo-wrapper">
+        <section className="detail-hero">
+          {/* Ảnh cover */}
+          <div className="detail-cover-company">
             <img
-              src={company.logoUrl || "/default-logo.png"}
-              alt={company.name}
-              onError={(e) => (e.target.src = "/default-logo.png")}
+              className="detail-cover-img"
+              src={company.coverUrl || "/default-cover.jpg"}
+              alt={`Cover ${company.name}`}
+              onError={(e) => (e.currentTarget.src = "/default-cover.jpg")}
             />
           </div>
 
-          <div className="cjp-info">
-            <h1>{company.name}</h1>
-          </div>
-        </div>
-      </section>
-
-      {/* Nội dung chính */}
-      <div className="cjp-container">
-        <div className="cjp-header">
-          <h2>
-            {jobs.length > 0
-              ? `${jobs.length} việc làm đang tuyển dụng`
-              : "Hiện chưa có việc làm nào"}
-          </h2>
-          <p>Tại {company.name}</p>
-        </div>
-
-        <div className="cjp-jobs-list">
-          {jobs.length === 0 ? (
-            <div className="cjp-no-jobs">
-              <img src="/no-jobs.svg" alt="Chưa có việc làm" />
-              <p>Hiện tại công ty chưa đăng tuyển vị trí nào.</p>
-              <Link to="/" className="cjp-btn-back-home">
-                Quay về trang chủ
-              </Link>
+          {/* Logo + Tiêu đề bên dưới */}
+          <div className="detail-hero-below">
+            <div className="detail-logo-wrapper">
+              <img
+                className="detail-logo"
+                src={company.logoUrl || "/default-logo.png"}
+                alt={`Logo ${company.name}`}
+                onError={(e) => (e.currentTarget.src = "/default-logo.png")}
+              />
             </div>
-          ) : (
-            jobs.map((job) => (
-              <div key={job.jobId} className="cjp-job-card">
-                <div className="cjp-job-header">
-                  <img
-                    src={company.logoUrl || "/default-logo.png"}
-                    alt={company.name}
-                    className="cjp-job-logo"
-                  />
-                  <div className="cjp-job-title-info">
-                    <Link to={`/jobs/${job.jobId}`} className="cjp-job-title">
-                      {job.title}{" "}
-                    </Link>
-                    <p></p>
-                    <Link
-                      to={`/company/public/${company.companyId}`}
-                      className="cjp-company-name"
-                    >
-                      {company.name}{" "}
+
+            <div className="detail-title">
+              <h1>{company.name}</h1>
+
+              {/* Ngành nghề (giữ kiểu code cũ: bullet) */}
+              {company.industry && (
+                <p className="detail-subtitle">{company.industry}</p>
+              )}
+
+              {/* Thành phố (emoji giống CompanyDetail) */}
+              {company.city && (
+                <p className="detail-city">{company.city}, Việt Nam</p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Nội dung chính */}
+        <div className="cjp-container">
+          <div className="cjp-header">
+            <h2>
+              {jobs.length > 0
+                ? `${jobs.length} việc làm đang tuyển dụng `
+                : "Hiện chưa có việc làm nào "}
+              tại {company.name}
+            </h2>
+          </div>
+
+          <div className="cjp-jobs-list">
+            {jobs.length === 0 ? (
+              <div className="cjp-no-jobs">
+                <img src={emptyBoxImage} alt="Empty Box" className="empty-image" />
+                <i>Nhà tuyển dụng sẽ sớm cập nhật việc làm!</i>
+              </div>
+            ) : (
+              jobs.map((job) => (
+                <div key={job.jobId} className="cjp-job-card">
+                  <div className="cjp-job-header">
+                    <img
+                      src={company.logoUrl || "/default-logo.png"}
+                      alt={company.name}
+                      className="cjp-job-logo"
+                    />
+                    <div className="cjp-job-title-info">
+                      <Link to={`/jobs/${job.jobId}`} className="cjp-job-title">
+                        {job.title}{" "}
+                      </Link>
+                      <p></p>
+                      <Link
+                        to={`/company/public/${company.companyId}`}
+                        className="cjp-company-name"
+                      >
+                        {company.name}{" "}
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="cjp-job-meta">
+                    <span className="cjp-salary">
+                      <i className="fa-solid fa-dollar-sign"></i>
+                      {formatSalary(job.salaryMin, job.salaryMax)}
+                    </span>
+                    <span className="cjp-location">
+                      <i className="fa-solid fa-map-marker-alt"></i>
+                      {job.location || "Toàn quốc"}
+                    </span>
+                  </div>
+
+                  <div className="cjp-job-tags">
+                    {job.jobType && (
+                      <span className="cjp-tag">
+                        {job.jobType.replace("_", " ")}
+                      </span>
+                    )}
+                    {job.experienceRequired > 0 && (
+                      <span className="cjp-tag">
+                        {job.experienceRequired} năm kinh nghiệm
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="cjp-job-footer">
+                    <span className="cjp-posted-time">
+                      <i className="fa-regular fa-clock"></i>{" "}
+                      {timeAgo(job.createdAt || job.postedAt)}
+                    </span>
+                    <Link to={`/jobs/${job.jobId}`} className="cjp-btn-apply">
+                      Xem chi tiết
                     </Link>
                   </div>
                 </div>
+              ))
+            )}
+          </div>
 
-                <div className="cjp-job-meta">
-                  <span className="cjp-salary">
-                    <i className="fa-solid fa-dollar-sign"></i>
-                    {formatSalary(job.salaryMin, job.salaryMax)}
-                  </span>
-                  <span className="cjp-location">
-                    <i className="fa-solid fa-map-marker-alt"></i>
-                    {job.location || "Toàn quốc"}
-                  </span>
-                </div>
-
-                <div className="cjp-job-tags">
-                  {job.jobType && (
-                    <span className="cjp-tag">
-                      {job.jobType.replace("_", " ")}
-                    </span>
-                  )}
-                  {job.experienceRequired > 0 && (
-                    <span className="cjp-tag">
-                      {job.experienceRequired} năm kinh nghiệm
-                    </span>
-                  )}
-                </div>
-
-                <div className="cjp-job-footer">
-                  <span className="cjp-posted-time">
-                    <i className="fa-regular fa-clock"></i>{" "}
-                    {timeAgo(job.createdAt || job.postedAt)}
-                  </span>
-                  <Link to={`/jobs/${job.jobId}`} className="cjp-btn-apply">
-                    Xem chi tiết
-                  </Link>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Nút quay lại */}
-        <div className="cjp-back-action">
-          <button
-            onClick={() => window.history.back()}
-            className="cjp-btn-secondary"
-          >
-            <i className="fa-solid fa-arrow-left"></i> Quay lại
-          </button>
+          {/* Nút quay lại */}
+          <div className="cjp-back-action">
+            <button
+              onClick={() => window.history.back()}
+              className="btn-secondary"
+            >
+              <i></i> Quay lại
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
