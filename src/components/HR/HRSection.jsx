@@ -345,11 +345,11 @@ const HRSection = ({ children }) => {
             </li>
             <li>
               <NavLink
-                to="/hr/activities"
+                to="/hr/setting"
                 className={({ isActive }) => (isActive ? "active" : "")}
                 onClick={requireVerification}
               >
-                Hoạt Động
+                Cài Đặt
               </NavLink>
             </li>
           </ul>
