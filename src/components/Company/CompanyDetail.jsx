@@ -1,8 +1,10 @@
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { companyAPI } from "../../services/auth.services";
 import "./CompanySection.css";
 import Swal from "sweetalert2";
+
 
 const CompanyDetail = () => {
   const { id } = useParams();
@@ -25,7 +27,7 @@ const CompanyDetail = () => {
   }, [id]);
 
   if (loading) return <div className="detail-skeleton">Đang tải...</div>;
-  if (!company) return <p className="detail-error">Không tìm thấy công ty.</p>;
+  if (!company) return <div className="detail-error">Không tìm thấy công ty.</div>;
 
   return (
     <div className="company-detail-page">
@@ -34,33 +36,40 @@ const CompanyDetail = () => {
         {/* Ảnh cover */}
         <div className="detail-cover-company">
           <img
-            src={company.coverUrl || "/default-cover.jpg"}
-            alt="Cover"
             className="detail-cover-img"
+            src={company.coverUrl || "/default-cover.jpg"}
+            alt={`Cover ${company.name}`}
             onError={(e) => (e.currentTarget.src = "/default-cover.jpg")}
           />
         </div>
 
-        {/* Logo nổi + Nội dung bên dưới */}
+        {/* Logo + Tiêu đề bên dưới */}
         <div className="detail-hero-below">
           <div className="detail-logo-wrapper">
             <img
-              src={company.logoUrl || "/default-logo.png"}
-              alt={company.name}
               className="detail-logo"
+              src={company.logoUrl || "/default-logo.png"}
+              alt={`Logo ${company.name}`}
               onError={(e) => (e.currentTarget.src = "/default-logo.png")}
             />
           </div>
 
           <div className="detail-title">
             <h1>{company.name}</h1>
-            <p className="detail-subtitle">
-              <i className="fa-solid fa-briefcase"></i> {company.industry}
-            </p>
+
+            {/* Ngành nghề */}
+            {company.industry && (
+              <p className="detail-subtitle">
+                {/* dùng ký tự • để đơn giản, giống style cũ */}
+                {company.industry}
+              </p>
+            )}
+
+            {/* Thành phố */}
             {company.city && (
               <p className="detail-city">
-                <i className="fa-solid fa-map-marker-alt"></i> {company.city},
-                Việt Nam
+                {/* dấu chấm vị trí */}
+                {company.city}, Việt Nam
               </p>
             )}
           </div>
@@ -71,76 +80,73 @@ const CompanyDetail = () => {
       <section className="detail-info-section">
         <div className="detail-info-grid">
           {/* Cột trái */}
-          <div className="detail-info-col">
-            <div className="info-card">
-              <i className="fa-solid fa-location-dot info-icon"></i>
-              <div>
-                <strong>Địa chỉ</strong>
-                <p>{company.address || "Chưa cập nhật"}</p>
-              </div>
-            </div>
-
-            <div className="info-card">
-              <i className="fa-solid fa-globe info-icon"></i>
-              <div>
-                <strong>Website</strong>
-                <p>
-                  {company.website ? (
-                    <a
-                      href={company.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {company.website}
-                    </a>
-                  ) : (
-                    "Chưa có"
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="info-card">
-              <i className="fa-solid fa-users info-icon"></i>
-              <div>
-                <strong>Quy mô</strong>
-                <p>{company.size || "Không xác định"}</p>
-              </div>
-            </div>
-
-            <div className="info-card">
-              <i className="fa-solid fa-calendar-alt info-icon"></i>
-              <div>
-                <strong>Năm thành lập</strong>
-                <p>{company.foundedYear || "Chưa cập nhật"}</p>
-              </div>
+          <div className="info-card">
+            <div className="info-icon" aria-hidden="true">📍</div>
+            <div>
+              <strong>Địa chỉ</strong>
+              <p>{company.address || "Chưa cập nhật"}</p>
             </div>
           </div>
 
-          {/* Cột phải - Mô tả */}
-          <div className="detail-info-col">
-            <div className="info-card description-card">
-              <i className="fa-solid fa-file-lines info-icon"></i>
-              <div>
-                <strong>Giới thiệu công ty</strong>
-                <p className="company-desc">
-                  {company.description || "Chưa có mô tả."}
-                </p>
-              </div>
+          <div className="info-card">
+            <div className="info-icon" aria-hidden="true">🌐</div>
+            <div>
+              <strong>Website</strong>
+              <p>
+                {company.website ? (
+                  <a href={company.website} target="_blank" rel="noreferrer">
+                    {company.website}
+                  </a>
+                ) : (
+                  "Chưa có"
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="info-card">
+            <div className="info-icon" aria-hidden="true">👥</div>
+            <div>
+              <strong>Quy mô</strong>
+              <p>{company.size || "Không xác định"}</p>
+            </div>
+          </div>
+
+          <div className="info-card">
+            <div className="info-icon" aria-hidden="true">📅</div>
+            <div>
+              <strong>Năm thành lập</strong>
+              <p>{company.foundedYear || "Chưa cập nhật"}</p>
+            </div>
+          </div>
+
+          {/* ✅ MÃ SỐ THUẾ - trường mới */}
+          <div className="info-card">
+            <div className="info-icon" aria-hidden="true">🧾</div>
+            <div>
+              <strong>Mã số thuế</strong>
+              <p>{company.taxCode || "Chưa cập nhật"}</p>
+            </div>
+          </div>
+
+          {/* Mô tả công ty */}
+          <div className="info-card description-card">
+            <div className="info-icon" aria-hidden="true">ℹ️</div>
+            <div>
+              <strong>Giới thiệu công ty</strong>
+              <p className="company-desc">{company.description || "Chưa có mô tả."}</p>
             </div>
           </div>
         </div>
 
-        {/* Nút hành động */}
+        {/* ==================== ACTIONS ==================== */}
         <div className="detail-actions">
-          <Link
-            to={`/company/${company.companyId}/jobs`}
-            className="btn-primary"
-          >
-            Xem việc làm tại {company.name}
+          <Link className="btn-primary" to={`/company/${company.companyId}/jobs`}>
+            <span aria-hidden="true">💼</span>&nbsp;Xem việc làm tại {company.name}
           </Link>
+
           <button className="btn-secondary" onClick={() => navigate(-1)}>
-            Quay lại
+            <span aria-hidden="true"></span>Quay lại
           </button>
         </div>
       </section>
@@ -149,3 +155,4 @@ const CompanyDetail = () => {
 };
 
 export default CompanyDetail;
+``
