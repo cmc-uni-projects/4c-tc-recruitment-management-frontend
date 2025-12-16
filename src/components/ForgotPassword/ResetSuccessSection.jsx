@@ -10,6 +10,10 @@ export default function ResetSuccessSection() {
         <h1>SmartHire</h1>
       </div>
 
+
+
+      
+
       <div className="login-box">
         <h2>Đặt lại mật khẩu thành công!</h2>
         <p>Bạn có thể đăng nhập với mật khẩu mới.</p>
