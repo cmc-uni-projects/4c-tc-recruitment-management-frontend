@@ -641,19 +641,19 @@ function ManageJobSection() {
                     <td>{job.experienceRequired || 0} năm</td>
                     <td className="actions">
                       <button
-                        className="job-view-btn"
+                        className="view-btn1"
                         onClick={() => openViewModal(job)}
                       >
                         Xem
                       </button>
                       <button
-                        className="job-edit-btn"
+                        className="edit-btn"
                         onClick={() => openModal(job)}
                       >
                         Sửa
                       </button>
                       <button
-                        className="job-delete-btn"
+                        className="delete-btn"
                         onClick={() => handleDelete(job.jobId)}
                       >
                         Xóa
@@ -789,7 +789,6 @@ function ManageJobSection() {
                 disabled={!selectedCV?.cvUrl && !cvPdfBlobUrl}
                 title="Xem file PDF đã upload"
               >
-                PDF upload
               </button>
 
               <button
@@ -800,7 +799,6 @@ function ManageJobSection() {
                 disabled={!selectedCV?.cvHtml}
                 title="Xem CV render (HTML)"
               >
-                CV render (HTML)
               </button>
             </div>
 
